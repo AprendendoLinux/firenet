@@ -487,6 +487,19 @@ footer p {
     color: #ffcc00; /* Cor amarela */
 }
 
+.plan-card, .advantage-card {
+    position: relative;
+}
+
+.plan-card::before, .advantage-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 /* Media Queries para Responsividade */
 
 /* Telas até 650px (tablets e celulares maiores) */

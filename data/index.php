@@ -48,7 +48,7 @@ $DEBUG_LOGS = false;
         <a href="/">Início</a>
         <a href="#planos">Planos</a>
         <a href="#vantagens">Vantagens</a>
-        <a href="#cobertura">Cobertura</a>
+        <a href="#cobertura" onclick="focusSearch()">Cobertura</a>
         <a href="#central-cliente">Central do Cliente</a>
         <a href="#cadastro">Cadastro</a>
         <a href="#contato">Contato</a>

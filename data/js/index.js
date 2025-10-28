@@ -96,6 +96,14 @@ window.searchStreet = function() {
     showLocation(address);
 };
 
+function focusSearch() {
+    const searchInput = document.getElementById('searchStreet');
+    if (searchInput) {
+        searchInput.focus();
+        debugLog('Focando na caixa de busca da seção de cobertura');
+    }
+}
+
 // Função para filtrar a lista de ruas com base na busca
 function filterStreets() {
     const searchInput = document.getElementById('searchStreet').value.trim().toLowerCase();
