@@ -312,5 +312,35 @@ $DEBUG_LOGS = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
+
+    <!-- Script para a janela flutuante "Assine já" com controle por sessão -->
+    <script>
+        function handleScroll() {
+            const signupPopup = document.getElementById('signupPopup');
+            const hasSeenPopup = localStorage.getItem('firenet_popup_seen');
+
+            if (signupPopup && window.scrollY > 100 && !hasSeenPopup) {
+                signupPopup.classList.add('visible');
+                debugLog('11. Janela flutuante "Assine já" exibida');
+                localStorage.setItem('firenet_popup_seen', 'true'); // Marca como visto
+                window.removeEventListener('scroll', handleScroll);
+            }
+        }
+
+        window.closeSignupPopup = function() {
+            const signupPopup = document.getElementById('signupPopup');
+            if (signupPopup) {
+                signupPopup.style.display = 'none';
+                debugLog('12. Janela flutuante "Assine já" fechada');
+                localStorage.setItem('firenet_popup_seen', 'true'); // Marca como visto ao fechar
+            }
+        };
+
+        // Adiciona o listener de rolagem quando o DOM carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('13. Adicionando listener de rolagem para a janela flutuante');
+            window.addEventListener('scroll', handleScroll);
+        });
+    </script>
 </body>
 </html>
