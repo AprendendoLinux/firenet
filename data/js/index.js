@@ -164,4 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', handleScroll);
 });
 
+// Foco automático ao clicar em "Cobertura" no menu
+document.querySelector('nav a[href="#cobertura"]')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelector('#cobertura')?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+        const input = document.getElementById('searchStreet');
+        if (input) input.focus();
+    }, 500);
+});
+
 debugLog('10. Script index.js carregado com sucesso');

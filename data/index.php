@@ -71,30 +71,31 @@ $DEBUG_LOGS = false;
                 Escolha o plano que melhor se adapta às suas necessidades. Todos os valores incluem descontos para pagamento até o vencimento!
             </p>
             <div class="plans">
-                <a href="#cadastro" class="plan-card">
+                <div class="plan-card" onclick="window.location.href='#cadastro'">
                     <h3>800 MEGA</h3>
                     <p>R$ 164,90*</p>
                     <p class="full-price">Valor Integral: R$ 184,90</p>
                     <p class="discount-note">*Com desconto até o vencimento</p>
-                </a>
-                <a href="#cadastro" class="plan-card">
+                </div>
+
+                <div class="plan-card" onclick="window.location.href='#cadastro'">
                     <h3>700 MEGA</h3>
                     <p>R$ 144,90*</p>
                     <p class="full-price">Valor Integral: R$ 164,90</p>
                     <p class="discount-note">*Com desconto até o vencimento</p>
-                </a>
-                <a href="#cadastro" class="plan-card">
+               </div>
+                <div class="plan-card" onclick="window.location.href='#cadastro'">
                     <h3>600 MEGA</h3>
                     <p>R$ 104,90*</p>
                     <p class="full-price">Valor Integral: R$ 124,90</p>
                     <p class="discount-note">*Com desconto até o vencimento</p>
-                </a>
-                <a href="#cadastro" class="plan-card">
+                </div>
+                <div class="plan-card" onclick="window.location.href='#cadastro'">
                     <h3>500 MEGA</h3>
                     <p>R$ 84,90*</p>
                     <p class="full-price">Valor Integral: R$ 104,90</p>
                     <p class="discount-note">*Com desconto até o vencimento</p>
-                </a>
+                </div>
             </div>
             <p class="installation-info">
                 <strong>Taxa de Instalação:</strong> A instalação tem uma taxa única de <strong>R$ 120,00</strong> para os bairros Pilares, Inhaúma, Engenho da Rainha e Tomás Coelho. Esse custo cobre os materiais necessários para a ativação do serviço, incluindo o equipamento ONT (que fica na casa do cliente), a fibra óptica e os conectores. O pagamento deve ser feito diretamente ao técnico no momento da finalização, aceitando <strong>dinheiro, Pix, cartão de débito ou crédito</strong>.
@@ -110,30 +111,30 @@ $DEBUG_LOGS = false;
                 Escolher a FireNet Telecom significa optar por qualidade, velocidade e confiabilidade. Confira os benefícios que oferecemos:
             </p>
             <div class="advantages">
-                <a href="#cadastro" class="advantage-card">
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Suporte a IPv6 e IPv4 fixo fora do CGNAT (por uma pequena taxa de aluguel).</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Baixa latência e ping baixo para destinos nacionais, ideal para gamers e profissionais de TI.</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>DNS próprio na própria rede, agilizando a resolução de nomes e melhorando a abertura de sites.</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Taxa de Upload proporcional a taxa de Download.</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Conexão estável, perfeita para streaming e downloads.</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Planos com descontos exclusivos até o vencimento, economizando no seu bolso.</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Atendimento personalizado via WhatsApp, com suporte rápido e eficiente.</p>
-                </a>
-                <a href="#cadastro" class="advantage-card">
+                </div>
+                <div class="advantage-card" onclick="window.location.href='#cadastro'">
                     <p>Infraestrutura de ponta para garantir a melhor performance em qualquer situação.</p>
-                </a>
+                </div>
             </div>
         </div>
 

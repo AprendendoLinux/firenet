@@ -500,6 +500,25 @@ footer p {
     height: 100%;
 }
 
+/* CORREÇÃO: Cards clicáveis em toda a área */
+.plan-card,
+.advantage-card {
+    cursor: pointer !important;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.plan-card:hover,
+.advantage-card:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.7) !important;
+}
+
+/* Garante que o clique funcione em qualquer lugar do card */
+.plan-card *,
+.advantage-card * {
+    pointer-events: none;
+}
 /* Media Queries para Responsividade */
 
 /* Telas até 650px (tablets e celulares maiores) */
