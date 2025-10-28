@@ -45,7 +45,7 @@ $DEBUG_LOGS = false;
     </header>
 
     <nav>
-        <a href="#inicio">Início</a>
+        <a href="/">Início</a>
         <a href="#planos">Planos</a>
         <a href="#vantagens">Vantagens</a>
         <a href="#cobertura">Cobertura</a>
