@@ -198,6 +198,10 @@ body {
     color: #000;
 }
 
+html {
+    overflow-y: scroll;
+}
+
 @keyframes slideIn {
     from {
         transform: translateY(-50px);

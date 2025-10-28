@@ -13,6 +13,11 @@ body {
     /* Removido min-height: 100vh para evitar espaço extra */
 }
 
+html {
+    overflow-y: scroll;
+}
+
+
 .container {
     flex: 0; /* Alterado de flex: 1 para não crescer além do conteúdo */
     display: flex;

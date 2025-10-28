@@ -489,6 +489,10 @@ tr:hover {
     }
 }
 
+html {
+    overflow-y: scroll;
+}
+
 /* Media Queries para telas muito pequenas (até 480px) */
 @media (max-width: 480px) {
     /* Ajusta o tamanho dos títulos */

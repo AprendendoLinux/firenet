@@ -13,6 +13,10 @@ body {
     min-height: 100vh;
 }
 
+html {
+    overflow-y: scroll;
+}
+
 .container {
     flex: 1;
     display: flex;
@@ -503,4 +507,5 @@ h2 {
         font-size: 0.9em;
         padding: 8px;
     }
+    
 }

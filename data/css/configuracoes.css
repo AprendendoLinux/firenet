@@ -7,6 +7,10 @@
     font-family: 'Arial', sans-serif;
 }
 
+html {
+    overflow-y: scroll;
+}
+
 /* Estiliza o corpo da página */
 body {
     background-color: #f5f5f5; /* Fundo cinza claro */
