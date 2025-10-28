@@ -1,0 +1,249 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+header {
+    background: linear-gradient(90deg, #ff0000, #000);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 5px solid #ffcc00;
+}
+
+header img {
+    width: 200px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.login-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 380px;
+    text-align: center;
+    border: 1px solid #ff0000;
+}
+
+h2 {
+    color: #ff0000;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.error {
+    color: #ff0000;
+    margin-bottom: 20px;
+    font-size: 1em;
+}
+
+.success {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 1em;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-size: 1.1em;
+    color: #333;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%;
+}
+
+.trust-device {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.trust-device input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.trust-device label {
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+}
+
+.g-recaptcha {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+}
+
+button:hover:not(.validating):not(:disabled) {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+button:disabled:not(.validating) {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button.validating {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button.validating::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+    margin-left: 5px;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
+}
+
+.resend-button {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.resend-button:hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.cancel-button {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.cancel-button:hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.home-button {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.home-button:hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.forgot-password {
+    text-align: left;
+    margin-top: 10px;
+}
+
+.forgot-password a {
+    color: #ff0000;
+    text-decoration: none;
+    font-size: 1em;
+}
+
+.forgot-password a:hover {
+    color: #ffcc00;
+    text-decoration: underline;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    input, button, .resend-button, .cancel-button, .home-button {
+        font-size: 0.9em;
+    }
+
+    .trust-device label {
+        font-size: 0.9em;
+    }
+
+    
+}

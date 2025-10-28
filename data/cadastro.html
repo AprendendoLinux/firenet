@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireNet Telecom - Cadastro</title>
+    <link rel="stylesheet" href="css/cadastro.css">
+</head>
+<body>
+    <header>
+        <a href='/'><img src="imagens/firenet.png" alt="Logotipo FireNet Telecom"></a>
+    </header>
+
+    <nav>
+        <a href="index.php#inicio">Início</a>
+        <a href="index.php#planos">Planos</a>
+        <a href="index.php#vantagens">Vantagens</a>
+        <a href="index.php#cobertura">Cobertura</a>
+        <a href="index.php#central-cliente">Central do Cliente</a>
+        <a href="cadastro.html">Cadastro</a>
+        <a href="index.php#contato">Contato</a>
+        <a href="login.php">Área do Consultor</a>
+    </nav>
+
+    <div class="container">
+        <div class="section form-section" id="cadastro">
+            <h2>Faça Seu Cadastro</h2>
+            <p>
+                Preencha o formulário abaixo para se tornar um cliente FireNet Telecom e aproveitar a melhor internet da região!
+            </p>
+            <form action="cadastro.php" method="POST" id="cadastro-form">
+                <div id="form-error" class="error"></div>
+                <div>
+                    <label for="nome">Qual é o seu nome completo? *</label><br>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+
+                <div>
+                    <label for="cpf">Qual é seu CPF? *</label><br>
+                    <input type="text" id="cpf" name="cpf" required maxlength="14">
+                    <span id="cpf_error" class="error-message"></span>
+                </div>
+
+                <div>
+                    <label for="rg">Qual seu RG (carteira de identidade)? *</label><br>
+                    <input type="text" id="rg" name="rg" required maxlength="12">
+                </div>
+
+                <div>
+                    <label for="data_nascimento">Qual é a sua data de nascimento? *</label><br>
+                    <input type="date" id="data_nascimento" name="data_nascimento" required>
+                </div>
+
+                <div>
+                    <label for="telefone">Qual é o seu telefone de contato (com DDD)? *</label><br>
+                    <input type="tel" id="telefone" name="telefone" required maxlength="15">
+                </div>
+
+                <div>
+                    <label for="whatsapp">O número informado é WhatsApp? *</label><br>
+                    <select id="whatsapp" name="whatsapp" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="email">Qual é o seu e-mail? *</label><br>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div>
+                    <label for="cep">Qual o seu CEP? *</label><br>
+                    <input type="text" id="cep" name="cep" required maxlength="9">
+                    <span id="cep_error" class="error-message"></span>
+                </div>
+
+                <div>
+                    <label for="rua">Qual o seu endereço? *</label><br>
+                    <input type="text" id="rua" name="rua" required readonly>
+                </div>
+
+                <div>
+                    <label for="numero">Número da sua residência? *</label><br>
+                    <input type="text" id="numero" name="numero" required>
+                </div>
+
+                <div>
+                    <label for="complemento">Qual o complemento?</label><br>
+                    <input type="text" id="complemento" name="complemento">
+                </div>
+
+                <div>
+                    <label for="ponto_referencia">Qual é o ponto de Referência? *</label><br>
+                    <input type="text" id="ponto_referencia" name="ponto_referencia" required>
+                </div>
+
+                <div>
+                    <label for="bairro">Qual é o seu bairro? *</label><br>
+                    <input type="text" id="bairro" name="bairro" required readonly>
+                </div>
+
+                <div>
+                    <label for="plano">Qual é o plano Desejado? *</label><br>
+                    <select id="plano" name="plano" required>
+                        <option value="">Selecione um plano</option>
+                        <option value="800 MEGA">800 MEGA - R$ 164,00</option>
+                        <option value="700 MEGA">700 MEGA - R$ 144,90</option>
+                        <option value="600 MEGA">600 MEGA - R$ 104,90</option>
+                        <option value="500 MEGA">500 MEGA - R$ 84,90</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="vencimento">Qual é o dia de vencimento desejado? *</label><br>
+                    <select id="vencimento" name="vencimento" required>
+                        <option value="">Selecione o dia de vencimento</option>
+                        <option value="Dia 5">Dia 5</option>
+                        <option value="Dia 10">Dia 10</option>
+                        <option value="Dia 15">Dia 15</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="nome_rede">Qual o nome da REDE WIFI que deseja? *</label><br>
+                    <input type="text" id="nome_rede" name="nome_rede" required>
+                </div>
+
+                <div>
+                    <label for="senha_rede">E qual é a senha que deseja usar (mínimo 8 e máximo 10 caracteres)? *</label><br>
+                    <input type="text" id="senha_rede" name="senha_rede" required minlength="8" maxlength="10">
+                    <span id="senha_rede_error" class="error-message"></span>
+                </div>
+
+                <div class="lgpd-container">
+                    <label for="lgpd">Declaro que estou fornecendo estas informações exclusivamente para fins de cadastro e formalização da assinatura do serviço de internet oferecido pela empresa FireNet. Estou ciente de que os dados enviados serão tratados de acordo com a Lei Geral de Proteção de Dados Pessoais (LGPD – Lei nº 13.709/2018), garantindo sua segurança, confidencialidade e utilização apenas para os propósitos especificados, conforme a política de privacidade da empresa.</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="lgpd" name="lgpd" value="Sim" required>
+                        <span>Eu concordo</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn" disabled>Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 FireNet Telecom - Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="js/cadastro.js"></script>
+</body>
+</html>

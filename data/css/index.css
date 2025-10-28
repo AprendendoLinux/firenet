@@ -1,0 +1,719 @@
+/* Reset e Estilos Gerais */
+/* Remove margens e paddings padrão, define box-sizing e fonte padrão */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Estiliza o corpo da página */
+body {
+    background-color: #fff; /* Fundo branco */
+    color: #000; /* Texto preto */
+    line-height: 1.6; /* Espaçamento entre linhas */
+}
+
+/* Estiliza o cabeçalho */
+header {
+    background: linear-gradient(90deg, #ff0000, #000); /* Gradiente vermelho para preto */
+    padding: 20px;
+    text-align: center;
+    border-bottom: 5px solid #ffcc00; /* Borda inferior amarela */
+}
+
+/* Estiliza a imagem do logotipo no cabeçalho */
+header img {
+    width: 200px; /* Largura fixa para o logotipo */
+}
+
+/* Estiliza a barra de navegação */
+nav {
+    background-color: #000; /* Fundo preto */
+    padding: 10px;
+    text-align: center;
+}
+
+/* Estiliza os links da navegação */
+nav a {
+    color: #ff0000; /* Cor vermelha */
+    text-decoration: none; /* Remove sublinhado */
+    margin: 0 15px; /* Margem horizontal */
+    font-size: 1.1em; /* Tamanho da fonte */
+    font-weight: bold; /* Negrito */
+    transition: color 0.3s, transform 0.3s; /* Transições suaves para cor e escala */
+}
+
+/* Efeito hover nos links da navegação */
+nav a:hover {
+    color: #ffcc00; /* Cor amarela ao passar o mouse */
+    transform: scale(1.1); /* Aumenta levemente o tamanho */
+}
+
+/* Estiliza o contêiner principal */
+.container {
+    max-width: 1200px; /* Largura máxima */
+    margin: 0 auto; /* Centraliza horizontalmente */
+    padding: 40px 20px; /* Padding vertical e horizontal */
+}
+
+/* Estiliza as seções da página */
+.section {
+    background-color: #f5f5f5; /* Fundo cinza claro */
+    padding: 40px;
+    margin-bottom: 30px; /* Espaço inferior */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    opacity: 0; /* Inicia invisível para animação */
+    animation: fadeInSection 1s forwards; /* Animação de entrada */
+}
+
+/* Define a animação de entrada para as seções */
+@keyframes fadeInSection {
+    0% { opacity: 0; transform: translateY(20px); } /* Início: invisível e deslocado para baixo */
+    100% { opacity: 1; transform: translateY(0); } /* Fim: visível e na posição correta */
+}
+
+/* Aplica atrasos diferentes para cada seção */
+.section:nth-child(1) { animation-delay: 0.2s; }
+.section:nth-child(2) { animation-delay: 0.4s; }
+.section:nth-child(3) { animation-delay: 0.6s; }
+.section:nth-child(4) { animation-delay: 0.8s; }
+.section:nth-child(5) { animation-delay: 1.0s; }
+.section:nth-child(6) { animation-delay: 1.2s; }
+
+/* Estiliza os títulos das seções */
+.section h2 {
+    color: #ff0000; /* Cor vermelha */
+    font-size: 2.5em; /* Tamanho grande */
+    margin-bottom: 20px; /* Espaço inferior */
+    border-bottom: 3px solid #ffcc00; /* Borda inferior amarela */
+    padding-bottom: 10px; /* Espaço abaixo do texto */
+}
+
+/* Estiliza os parágrafos das seções */
+.section p {
+    font-size: 1.2em; /* Tamanho da fonte */
+    margin-bottom: 15px; /* Espaço inferior */
+    color: #333; /* Cor cinza escura */
+}
+
+/* Estiliza o cartão de introdução */
+.intro-card {
+    background-color: #ff0000; /* Fundo vermelho */
+    padding: 20px;
+    border-radius: 10px; /* Bordas arredondadas */
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s; /* Transições suaves */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Altura mínima para centralização vertical */
+}
+
+/* Efeito hover no cartão de introdução */
+.intro-card:hover {
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.7); /* Sombra amarela */
+}
+
+/* Estiliza os parágrafos do cartão de introdução */
+.intro-card p {
+    font-size: 1.5em; /* Tamanho da fonte */
+    color: #fff; /* Cor branca */
+    margin: 0; /* Remove margem para centralização */
+}
+
+/* Estiliza o contêiner das vantagens */
+.advantages {
+    display: grid; /* Layout de grade */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Colunas responsivas */
+    gap: 20px; /* Espaço entre os cartões */
+    margin-top: 20px; /* Espaço superior */
+}
+
+/* Estiliza os cartões de vantagens */
+.advantage-card {
+    background-color: #ff0000; /* Fundo vermelho */
+    padding: 20px;
+    border-radius: 10px; /* Bordas arredondadas */
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s; /* Transições suaves */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px; /* Altura mínima para centralização vertical */
+    cursor: pointer; /* Cursor de mãozinha */
+    text-decoration: none; /* Remove sublinhado */
+}
+
+/* Efeito hover nos cartões de vantagens */
+.advantage-card:hover {
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.7); /* Sombra amarela */
+}
+
+/* Estiliza os parágrafos dos cartões de vantagens */
+.advantage-card p {
+    font-size: 1.5em; /* Tamanho da fonte */
+    color: #fff; /* Cor branca */
+    margin: 0; /* Remove margem para centralização */
+}
+
+/* Estiliza o contêiner dos planos */
+.plans {
+    display: grid; /* Layout de grade */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Colunas responsivas */
+    gap: 20px; /* Espaço entre os cartões */
+    margin-top: 20px; /* Espaço superior */
+}
+
+/* Estiliza os cartões de planos */
+.plan-card {
+    background-color: #ff0000; /* Fundo vermelho */
+    padding: 20px;
+    border-radius: 10px; /* Bordas arredondadas */
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s; /* Transições suaves */
+    animation: bounce 1s infinite; /* Animação de salto contínua */
+    cursor: pointer; /* Cursor de mãozinha */
+    text-decoration: none; /* Remove sublinhado */
+}
+
+/* Define a animação de salto para os cartões */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); } /* Posição inicial e final */
+    50% { transform: translateY(-10px); } /* Posição intermediária (salto) */
+}
+
+/* Efeito hover nos cartões de planos */
+.plan-card:hover {
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.7); /* Sombra amarela */
+}
+
+/* Estiliza os títulos dos cartões de planos */
+.plan-card h3 {
+    font-size: 2em; /* Tamanho grande */
+    color: #fff; /* Cor branca */
+    margin-bottom: 10px; /* Espaço inferior */
+}
+
+/* Estiliza os parágrafos dos cartões de planos */
+.plan-card p {
+    font-size: 1.5em; /* Tamanho da fonte */
+    color: #ffcc00; /* Cor amarela */
+    margin-bottom: 5px; /* Espaço inferior */
+}
+
+/* Estiliza o preço integral nos cartões */
+.plan-card .full-price {
+    font-size: 0.9em; /* Tamanho menor */
+    color: #ccc; /* Cor cinza clara */
+}
+
+/* Estiliza a nota de desconto nos cartões */
+.plan-card .discount-note {
+    font-size: 0.8em; /* Tamanho pequeno */
+    color: #fff; /* Cor branca */
+    margin-top: 5px; /* Espaço superior */
+}
+
+/* Estiliza as informações de instalação */
+.installation-info {
+    font-size: 1.1em; /* Tamanho da fonte */
+    margin-top: 20px; /* Espaço superior */
+    color: #333; /* Cor cinza escura */
+    background-color: #fff; /* Fundo branco */
+    padding: 15px;
+    border-radius: 5px; /* Bordas arredondadas */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
+}
+
+/* Estiliza o texto em negrito nas informações de instalação */
+.installation-info strong {
+    color: #ff0000; /* Cor vermelha */
+}
+
+/* Estiliza a mensagem de ausência de fidelidade */
+.no-fidelity-message {
+    font-size: 1.2em; /* Tamanho da fonte */
+    margin-top: 20px; /* Espaço superior */
+    color: #fff !important; /* Cor branca (forçada) */
+    background-color: #ff0000; /* Fundo vermelho */
+    padding: 15px;
+    border-radius: 5px; /* Bordas arredondadas */
+    text-align: center;
+    font-weight: bold; /* Negrito */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+/* Estiliza o mapa de cobertura */
+.coverage-map {
+    height: 400px; /* Altura fixa */
+    width: 100%; /* Largura total */
+    border-radius: 10px; /* Bordas arredondadas */
+    margin-bottom: 20px; /* Espaço inferior */
+}
+
+/* Estiliza a caixa de busca */
+.search-box {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    padding: 10px;
+    font-size: 1em;
+    width: 300px;
+    border: 2px solid #ff0000;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+.search-box button {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #ff0000;
+    color: #fff;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-box button:hover {
+    background-color: #ffcc00;
+    color: #000;
+}
+
+/* Estiliza a lista de ruas com cobertura */
+.coverage-list {
+    column-count: 3; /* Divide em 3 colunas */
+    column-gap: 20px; /* Espaço entre colunas */
+    list-style: none; /* Remove marcadores padrão */
+    margin-top: 20px; /* Espaço superior */
+}
+
+/* Estiliza os itens da lista de cobertura */
+.coverage-list li {
+    font-size: 1em; /* Tamanho da fonte */
+    margin-bottom: 10px; /* Espaço inferior */
+    color: #333; /* Cor cinza escura */
+    padding-left: 20px; /* Espaço à esquerda para o ícone */
+    position: relative; /* Para posicionar o ícone */
+}
+
+/* Estiliza os links na lista de cobertura */
+.coverage-list li a {
+    color: #ff0000; /* Cor vermelha */
+    text-decoration: none; /* Remove sublinhado */
+    cursor: pointer;
+    transition: color 0.3s; /* Transição suave para a cor */
+}
+
+/* Efeito hover nos links da lista de cobertura */
+.coverage-list li a:hover {
+    color: #ffcc00; /* Cor amarela */
+}
+
+/* Adiciona ícone de localização antes dos itens da lista */
+.coverage-list li::before {
+    content: "📍"; /* Emoji de localização */
+    position: absolute;
+    left: 0;
+    color: #ff0000; /* Cor vermelha */
+}
+
+/* Estiliza as seções de portal do cliente e cadastro */
+.client-portal, .cadastro-portal {
+    text-align: center; /* Centraliza o conteúdo */
+}
+
+/* Estiliza os links dos portais */
+.client-portal a, .cadastro-portal a {
+    display: inline-block; /* Permite padding e margem */
+    background-color: #ff0000; /* Fundo vermelho */
+    color: #fff; /* Cor branca */
+    padding: 15px 30px; /* Padding interno */
+    border-radius: 5px; /* Bordas arredondadas */
+    text-decoration: none; /* Remove sublinhado */
+    font-size: 1.2em; /* Tamanho da fonte */
+    font-weight: bold; /* Negrito */
+    transition: background-color 0.3s, transform 0.3s; /* Transições suaves */
+}
+
+/* Efeito hover nos links dos portais */
+.client-portal a:hover, .cadastro-portal a:hover {
+    background-color: #ffcc00; /* Fundo amarelo */
+    color: #000; /* Texto preto */
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+}
+
+/* Estiliza a seção de contato */
+.contact-section {
+    text-align: center; /* Centraliza o conteúdo */
+}
+
+/* Estiliza o link de contato */
+.contact-section a {
+    color: #ff0000; /* Cor vermelha */
+    font-size: 1.5em; /* Tamanho grande */
+    text-decoration: none; /* Remove sublinhado */
+    transition: color 0.3s; /* Transição suave para a cor */
+}
+
+/* Efeito hover no link de contato */
+.contact-section a:hover {
+    color: #ffcc00; /* Cor amarela */
+}
+
+/* Estiliza o rodapé */
+footer {
+    background-color: #000; /* Fundo preto */
+    padding: 20px;
+    text-align: center;
+    border-top: 3px solid #ff0000; /* Borda superior vermelha */
+}
+
+/* Estiliza o texto do rodapé */
+footer p {
+    font-size: 1em; /* Tamanho da fonte */
+    color: #fff; /* Cor branca */
+}
+
+/* Estiliza o botão flutuante de voltar ao topo */
+.scroll-top-btn {
+    position: fixed;
+    right: 30px; /* Espaço à direita */
+    bottom: 120px; /* Posicionado mais acima para evitar sobreposição com o rodapé */
+    background-color: #ffcc00; /* Fundo amarelo */
+    color: #000; /* Texto preto */
+    padding: 12px; /* Padding para botão redondo */
+    border: 3px solid #000; /* Borda preta */
+    border-radius: 50%; /* Bordas completamente arredondadas para formato circular */
+    font-size: 1.2em; /* Tamanho da fonte */
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000; /* Garante que fique acima de outros elementos */
+    transition: opacity 0.3s; /* Transição suave apenas para opacity */
+    opacity: 0.8; /* Levemente transparente */
+    width: 60px; /* Largura para botão maior */
+    height: 60px; /* Altura para botão maior */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Efeito hover no botão flutuante */
+.scroll-top-btn:hover {
+    background-color: #ffcc00; /* Mantém fundo amarelo */
+    color: #000; /* Mantém texto preto */
+    border: 3px solid #000; /* Mantém borda preta */
+    opacity: 1; /* Totalmente visível */
+}
+
+/* Estiliza a janela flutuante de "Assine já" */
+.signup-popup {
+    position: fixed;
+    top: 50%; /* Centraliza verticalmente */
+    left: 50%; /* Centraliza horizontalmente */
+    transform: translate(-50%, -50%) scale(0.8); /* Inicia com leve redução */
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo preto com 85% de opacidade */
+    color: #fff; /* Texto branco */
+    padding: 30px; /* Padding uniforme */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    z-index: 1000; /* Acima de outros elementos */
+    width: 650px; /* Largura fixa para desktops */
+    height: auto; /* Altura ajustada ao conteúdo */
+    min-height: 400px; /* Altura mínima para manter proporção inicial */
+    opacity: 0; /* Inicia invisível */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Animação suave */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centraliza verticalmente o conteúdo */
+}
+
+/* Estado visível da janela */
+.signup-popup.visible {
+    opacity: 1; /* Totalmente visível */
+    transform: translate(-50%, -50%) scale(1); /* Tamanho normal, centralizado */
+}
+
+/* Estiliza o título da janela */
+.signup-popup h3 {
+    font-size: 1.8em; /* Tamanho reduzido proporcionalmente */
+    margin-bottom: 20px; /* Espaço inferior ajustado */
+    text-align: center;
+    line-height: 1.4; /* Melhor espaçamento para texto longo */
+    max-width: 80%; /* Limita a largura para evitar overflow */
+}
+
+/* Estiliza o link da janela */
+.signup-popup a {
+    display: inline-block;
+    background-color: #e6b800; /* Fundo amarelo escuro para combinar com o preto */
+    color: #000; /* Texto preto */
+    padding: 12px 24px; /* Padding reduzido proporcionalmente */
+    border-radius: 8px; /* Bordas mais arredondadas */
+    text-decoration: none; /* Remove sublinhado */
+    font-size: 1.2em; /* Tamanho reduzido proporcionalmente */
+    font-weight: bold; /* Negrito */
+    transition: background-color 0.3s, color 0.3s; /* Transição suave */
+}
+
+/* Efeito hover no link da janela */
+.signup-popup a:hover {
+    background-color: #000; /* Fundo preto */
+    color: #ffcc00; /* Texto amarelo claro */
+}
+
+/* Estiliza o botão de fechar */
+.signup-popup .close-btn {
+    position: absolute;
+    top: 10px; /* Ajustado para o novo tamanho */
+    right: 10px; /* Ajustado para o novo tamanho */
+    background: none;
+    border: none;
+    color: #fff; /* Cor branca */
+    font-size: 1.5em; /* Tamanho reduzido proporcionalmente */
+    cursor: pointer;
+    transition: color 0.3s; /* Transição suave */
+}
+
+/* Efeito hover no botão de fechar */
+.signup-popup .close-btn:hover {
+    color: #ffcc00; /* Cor amarela */
+}
+
+/* Media Queries para Responsividade */
+
+/* Telas até 650px (tablets e celulares maiores) */
+@media (max-width: 650px) {
+    /* Reduz o tamanho do logotipo no cabeçalho */
+    header img {
+        width: 150px;
+    }
+
+    /* Ajusta a margem e tamanho da fonte dos links de navegação */
+    nav a {
+        margin: 0 10px;
+        font-size: 1em;
+    }
+
+    /* Reduz o padding das seções */
+    .section {
+        padding: 20px;
+    }
+
+    /* Reduz o tamanho dos títulos das seções */
+    .section h2 {
+        font-size: 2em;
+    }
+
+    /* Reduz o tamanho dos parágrafos das seções */
+    .section p {
+        font-size: 1em;
+    }
+
+    /* Exibe os planos e vantagens em uma única coluna */
+    .plans, .advantages {
+        grid-template-columns: 1fr;
+    }
+
+    /* Reduz o tamanho dos parágrafos dos cartões de introdução e vantagens */
+    .intro-card p, .advantage-card p {
+        font-size: 1.2em;
+    }
+
+    /* Reduz a lista de cobertura para 2 colunas */
+    .coverage-list {
+        column-count: 2;
+    }
+
+    /* Reduz a altura do mapa de cobertura */
+    .coverage-map {
+        height: 300px;
+    }
+
+    /* Ajusta a caixa de busca */
+    .search-box input {
+        width: 200px;
+    }
+
+    .search-box button {
+        padding: 10px 15px;
+    }
+
+    /* Ajusta o padding e tamanho da fonte dos links dos portais */
+    .client-portal a, .cadastro-portal a {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    /* Ajusta o tamanho e padding da mensagem de fidelidade */
+    .no-fidelity-message {
+        font-size: 1em;
+        padding: 10px;
+    }
+
+    /* Ajusta o botão flutuante para telas menores */
+    .scroll-top-btn {
+        right: 20px;
+        bottom: 100px; /* Ajustado para ficar mais acima */
+        padding: 10px;
+        font-size: 1.1em;
+        width: 50px; /* Tamanho ajustado */
+        height: 50px; /* Tamanho ajustado */
+        background-color: #ffcc00; /* Fundo amarelo */
+        color: #000; /* Texto preto */
+        border: 2px solid #000; /* Borda preta */
+    }
+
+    /* Efeito hover no botão flutuante */
+    .scroll-top-btn:hover {
+        background-color: #ffcc00; /* Mantém fundo amarelo */
+        color: #000; /* Mantém texto preto */
+        border: 2px solid #000; /* Mantém borda preta */
+    }
+
+    /* Ajusta a janela flutuante para telas menores */
+    .signup-popup {
+        width: 90vw; /* Usa 90% da largura da viewport */
+        height: auto; /* Altura ajustada ao conteúdo */
+        min-height: unset; /* Remove a altura mínima para ser proporcional ao texto */
+        max-width: 90vw; /* Garante que não ultrapasse a viewport */
+        max-height: 80vh; /* Limita a altura máxima */
+        padding: 40px 15px 25px 15px; /* Aumenta o padding-top para 40px, mantém padding-bottom em 25px e laterais em 15px */
+        overflow-y: auto; /* Adiciona rolagem vertical se necessário */
+    }
+
+    /* Ajusta o título da janela */
+    .signup-popup h3 {
+        font-size: 1.5em; /* Reduzido proporcionalmente */
+        margin-bottom: 10px; /* Reduzido para menos espaço */
+        max-width: 90%;
+    }
+
+    /* Ajusta o link da janela */
+    .signup-popup a {
+        padding: 10px 20px; /* Reduzido proporcionalmente */
+        font-size: 1em; /* Reduzido proporcionalmente */
+    }
+
+    /* Ajusta o botão de fechar */
+    .signup-popup .close-btn {
+        font-size: 1.3em; /* Reduzido proporcionalmente */
+        top: 15px; /* Ajustado para acompanhar o novo padding-top */
+        right: 8px;
+    }
+}
+
+/* Telas até 480px (celulares menores) */
+@media (max-width: 480px) {
+    /* Mantém o tamanho do logotipo */
+    header img {
+        width: 150px;
+    }
+
+    /* Reduz ainda mais a margem e tamanho da fonte dos links de navegação */
+    nav a {
+        margin: 0 5px;
+        font-size: 0.9em;
+    }
+
+    /* Reduz o tamanho dos títulos das seções */
+    .section h2 {
+        font-size: 1.5em;
+    }
+
+    /* Reduz o tamanho dos parágrafos dos cartões de introdução e vantagens */
+    .intro-card p, .advantage-card p {
+        font-size: 1em;
+    }
+
+    /* Exibe a lista de cobertura em uma única coluna */
+    .coverage-list {
+        column-count: 1;
+    }
+
+    /* Reduz a altura do mapa de cobertura */
+    .coverage-map {
+        height: 250px;
+    }
+
+    /* Ajusta a caixa de busca */
+    .search-box input {
+        width: 150px;
+    }
+
+    .search-box button {
+        padding: 10px 10px;
+    }
+
+    /* Ajusta o padding e tamanho da fonte dos links dos portais */
+    .client-portal a, .cadastro-portal a {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    /* Ajusta o tamanho e padding da mensagem de fidelidade */
+    .no-fidelity-message {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    /* Ajusta o botão flutuante para telas muito pequenas */
+    .scroll-top-btn {
+        right: 15px;
+        bottom: 110px; /* Ajustado para ficar mais acima */
+        padding: 8px;
+        font-size: 1em;
+        width: 45px; /* Tamanho ajustado */
+        height: 45px; /* Tamanho ajustado */
+        background-color: #ffcc00; /* Fundo amarelo */
+        color: #000; /* Texto preto */
+        border: 2px solid #000; /* Borda preta */
+    }
+
+    /* Efeito hover no botão flutuante */
+    .scroll-top-btn:hover {
+        background-color: #ffcc00; /* Mantém fundo amarelo */
+        color: #000; /* Mantém texto preto */
+        border: 2px solid #000; /* Mantém borda preta */
+    }
+
+    /* Ajusta a janela flutuante para telas muito pequenas */
+    .signup-popup {
+        width: 90vw; /* Usa 90% da largura da viewport */
+        height: auto; /* Altura ajustada ao conteúdo */
+        min-height: unset; /* Remove a altura mínima para ser proporcional ao texto */
+        max-width: 90vw; /* Garante que não ultrapasse a viewport */
+        max-height: 75vh; /* Limita a altura máxima */
+        padding: 35px 10px 20px 10px; /* Aumenta o padding-top para 35px, mantém padding-bottom em 20px e laterais em 10px */
+        overflow-y: auto; /* Adiciona rolagem vertical se necessário */
+    }
+
+    /* Ajusta o título da janela */
+    .signup-popup h3 {
+        font-size: 1.2em; /* Reduzido proporcionalmente */
+        margin-bottom: 8px; /* Reduzido para menos espaço */
+        max-width: 95%;
+    }
+
+    /* Ajusta o link da janela */
+    .signup-popup a {
+        padding: 8px 16px; /* Reduzido proporcionalmente */
+        font-size: 0.9em; /* Reduzido proporcionalmente */
+    }
+
+    /* Ajusta o botão de fechar */
+    .signup-popup .close-btn {
+        font-size: 1.1em; /* Reduzido proporcionalmente */
+        top: 12px; /* Ajustado para acompanhar o novo padding-top */
+        right: 6px;
+    }
+}

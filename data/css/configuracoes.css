@@ -1,0 +1,425 @@
+/* Reset e Estilos Gerais */
+/* Remove margens e paddings padrão, define box-sizing e fonte padrão */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Estiliza o corpo da página */
+body {
+    background-color: #f5f5f5; /* Fundo cinza claro */
+    color: #333; /* Texto cinza escuro */
+    display: flex; /* Layout flexível */
+    flex-direction: column; /* Alinha itens em coluna */
+    min-height: 599px; /* Altura mínima para evitar layout quebrado */
+}
+
+/* Estiliza o cabeçalho */
+header {
+    background: linear-gradient(90deg, #ff0000, #000); /* Gradiente vermelho para preto */
+    padding: 20px;
+    text-align: center;
+    border-bottom: 5px solid #ffcc00; /* Borda inferior amarela */
+}
+
+/* Estiliza a imagem do logotipo no cabeçalho */
+header img {
+    width: 200px; /* Largura fixa para o logotipo */
+}
+
+/* Estiliza o contêiner principal */
+.container {
+    flex: 1; /* Ocupa o espaço disponível */
+    display: flex; /* Layout flexível */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: flex-start; /* Alinha ao topo */
+    padding: 20px; /* Padding interno */
+}
+
+/* Estiliza o contêiner das configurações */
+.settings-container {
+    background-color: #fff; /* Fundo branco */
+    padding: 30px;
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    border: 1px solid #ff0000; /* Borda vermelha */
+    max-width: 600px; /* Largura máxima */
+    width: 100%; /* Ocupa a largura disponível */
+}
+
+/* Estiliza os títulos principais */
+h2 {
+    color: #ff0000; /* Cor vermelha */
+    font-size: 2em; /* Tamanho grande */
+    margin-bottom: 20px; /* Espaço inferior */
+    text-align: center;
+    font-weight: bold; /* Negrito */
+}
+
+/* Estiliza mensagens de erro */
+.error, .test-error {
+    color: #ff0000; /* Cor vermelha */
+    margin-bottom: 15px; /* Espaço inferior */
+    font-size: 0.9em; /* Tamanho pequeno */
+    text-align: center;
+}
+
+/* Estiliza mensagens de sucesso */
+.success, .test-success {
+    color: #155724; /* Verde escuro */
+    background-color: #d4edda; /* Fundo verde claro */
+    padding: 8px;
+    border-radius: 4px; /* Bordas arredondadas */
+    margin-bottom: 15px; /* Espaço inferior */
+    font-size: 0.9em; /* Tamanho pequeno */
+    text-align: center;
+}
+
+/* Estiliza mensagens de aviso */
+.warning {
+    color: #856404; /* Amarelo escuro */
+    background-color: #fff3cd; /* Fundo amarelo claro */
+    padding: 8px;
+    border-radius: 4px; /* Bordas arredondadas */
+    margin-bottom: 15px; /* Espaço inferior */
+    font-size: 0.9em; /* Tamanho pequeno */
+    text-align: center;
+}
+
+/* Estiliza mensagens de erro nos modais */
+.modal-error {
+    color: #721c24; /* Vermelho escuro */
+    background-color: #f8d7da; /* Fundo vermelho claro */
+    padding: 8px;
+    border-radius: 4px; /* Bordas arredondadas */
+    margin-bottom: 10px; /* Espaço inferior */
+    font-size: 0.9em; /* Tamanho pequeno */
+    text-align: center;
+}
+
+/* Estiliza botões de ação */
+.action-button {
+    background-color: #000; /* Fundo preto */
+    color: #fff; /* Texto branco */
+    padding: 10px 20px; /* Padding interno */
+    border: none;
+    border-radius: 4px; /* Bordas arredondadas */
+    font-size: 1em; /* Tamanho da fonte */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Transições suaves */
+    display: block;
+    text-align: center;
+    margin-bottom: 10px; /* Espaço inferior */
+    width: 100%; /* Ocupa a largura total */
+}
+
+/* Efeito hover nos botões de ação */
+.action-button:hover {
+    background-color: #ffcc00; /* Fundo amarelo */
+    color: #000; /* Texto preto */
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+}
+
+/* Estiliza os modais */
+.modal {
+    display: none; /* Inicia oculto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Ocupa toda a largura */
+    height: 100%; /* Ocupa toda a altura */
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    z-index: 1000; /* Camada superior */
+}
+
+/* Estiliza o conteúdo dos modais */
+.modal-content {
+    background-color: #fff; /* Fundo branco */
+    padding: 20px;
+    border-radius: 8px; /* Bordas arredondadas */
+    width: 500px; /* Largura fixa */
+    max-width: 90%; /* Máximo 90% da tela */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Sombra mais forte */
+    border-left: 4px solid #ff0000; /* Borda esquerda vermelha */
+}
+
+/* Estiliza os títulos dos modais */
+.modal-content h3 {
+    color: #ff0000; /* Cor vermelha */
+    margin-bottom: 15px; /* Espaço inferior */
+    font-size: 1.2em; /* Tamanho médio */
+}
+
+/* Estiliza os formulários nos modais */
+.modal-content form {
+    display: flex; /* Layout flexível */
+    flex-direction: column; /* Alinha itens em coluna */
+    gap: 10px; /* Espaço entre elementos */
+}
+
+/* Estiliza os campos de entrada nos modais */
+.modal-content input[type="text"],
+.modal-content input[type="password"],
+.modal-content input[type="email"],
+.modal-content input[type="number"],
+.modal-content select {
+    padding: 8px;
+    border-radius: 4px; /* Bordas arredondadas */
+    border: 1px solid #ccc; /* Borda cinza */
+    font-size: 0.9em; /* Tamanho pequeno */
+    width: 100%; /* Ocupa a largura total */
+}
+
+/* Estiliza os rótulos nos modais */
+.modal-content label {
+    display: flex; /* Layout flexível */
+    align-items: center; /* Alinha verticalmente */
+    font-size: 0.9em; /* Tamanho pequeno */
+}
+
+/* Estiliza os checkboxes nos modais */
+.modal-content input[type="checkbox"] {
+    margin-left: 8px; /* Espaço à esquerda */
+}
+
+/* Estiliza os botões de envio nos modais */
+.modal-content button[type="submit"] {
+    background-color: #ff0000; /* Fundo vermelho */
+    color: #fff; /* Texto branco */
+    padding: 8px;
+    border: none;
+    border-radius: 4px; /* Bordas arredondadas */
+    font-size: 0.9em; /* Tamanho pequeno */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Transições suaves */
+}
+
+/* Efeito hover nos botões de envio */
+.modal-content button[type="submit"]:hover:not(:disabled) {
+    background-color: #ffcc00; /* Fundo amarelo */
+    color: #000; /* Texto preto */
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+}
+
+/* Estiliza botões de envio desabilitados */
+.modal-content button[type="submit"]:disabled {
+    opacity: 0.5; /* Semitransparente */
+    cursor: not-allowed; /* Cursor de proibição */
+}
+
+/* Efeito de validação nos botões de envio */
+.modal-content button[type="submit"].validating::after {
+    content: '...'; /* Indicador de carregamento */
+    animation: dots 1.5s infinite; /* Animação de pontos */
+    margin-left: 5px; /* Espaço à esquerda */
+}
+
+/* Define a animação de pontos para botões em validação */
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
+}
+
+/* Estiliza o botão de fechar nos modais */
+.modal-content .close-button {
+    background-color: #000; /* Fundo preto */
+    color: #fff; /* Texto branco */
+    padding: 8px;
+    border: none;
+    border-radius: 4px; /* Bordas arredondadas */
+    font-size: 0.9em; /* Tamanho pequeno */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Transições suaves */
+    margin-top: 10px; /* Espaço superior */
+}
+
+/* Efeito hover no botão de fechar */
+.modal-content .close-button:hover {
+    background-color: #ffcc00; /* Fundo amarelo */
+    color: #000; /* Texto preto */
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+}
+
+/* Estiliza o formulário de teste de e-mail */
+.test-form {
+    display: flex; /* Layout flexível */
+    gap: 10px; /* Espaço entre elementos */
+    margin-top: 15px; /* Espaço superior */
+}
+
+/* Estiliza o campo de entrada no formulário de teste */
+.test-form input {
+    flex: 1; /* Ocupa o espaço disponível */
+}
+
+/* Estiliza o botão no formulário de teste */
+.test-form button {
+    padding: 8px 16px; /* Padding interno */
+    width: auto; /* Largura automática */
+}
+
+/* Estiliza o contêiner de checkboxes */
+.checkbox-container {
+    display: flex; /* Layout flexível */
+    align-items: center; /* Alinha verticalmente */
+    gap: 10px; /* Espaço entre elementos */
+    font-size: 0.9em; /* Tamanho pequeno */
+}
+
+/* Estiliza o rótulo do checkbox */
+.checkbox-label {
+    flex: 1; /* Ocupa o espaço disponível */
+    text-align: center; /* Centraliza o texto */
+}
+
+/* Estiliza o botão de voltar */
+.back-button {
+    background-color: #000; /* Fundo preto */
+    color: #fff; /* Texto branco */
+    padding: 10px;
+    border: none;
+    border-radius: 4px; /* Bordas arredondadas */
+    font-size: 1em; /* Tamanho da fonte */
+    text-decoration: none; /* Remove sublinhado */
+    display: block;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s; /* Transições suaves */
+    margin-top: 20px; /* Espaço superior */
+}
+
+/* Efeito hover no botão de voltar */
+.back-button:hover {
+    background-color: #ffcc00; /* Fundo amarelo */
+    color: #000; /* Texto preto */
+    transform: scale(1.05); /* Aumenta levemente o tamanho */
+}
+
+/* Estiliza o contêiner do reCAPTCHA */
+.recaptcha-container {
+    margin: 10px 0; /* Margem vertical */
+    text-align: center; /* Centraliza o conteúdo */
+}
+
+/* Media Queries para Responsividade */
+
+/* Telas até 768px (tablets e celulares maiores) */
+@media (max-width: 768px) {
+    /* Reduz o padding do contêiner de configurações */
+    .settings-container {
+        padding: 15px;
+    }
+
+    /* Reduz o tamanho dos títulos principais */
+    h2 {
+        font-size: 1.5em;
+    }
+
+    /* Reduz o padding e tamanho da fonte dos botões de ação */
+    .action-button {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    /* Ajusta o conteúdo dos modais */
+    .modal-content {
+        width: 90%; /* Ocupa 90% da tela */
+        padding: 15px;
+    }
+
+    /* Reduz o tamanho dos títulos nos modais */
+    .modal-content h3 {
+        font-size: 1.1em;
+    }
+
+    /* Ajusta os campos e botões nos modais */
+    .modal-content input[type="text"],
+    .modal-content input[type="password"],
+    .modal-content input[type="email"],
+    .modal-content input[type="number"],
+    .modal-content select,
+    .modal-content button[type="submit"],
+    .modal-content .close-button {
+        font-size: 0.85em;
+        padding: 8px;
+    }
+
+    /* Ajusta o formulário de teste para coluna */
+    .test-form {
+        flex-direction: column;
+    }
+
+    /* Ajusta o botão do formulário de teste */
+    .test-form button {
+        width: 100%; /* Ocupa a largura total */
+    }
+
+    /* Reduz o tamanho do reCAPTCHA */
+    .recaptcha-container {
+        transform: scale(0.9); /* Reduz em 10% */
+        transform-origin: center;
+    }
+}
+
+/* Telas até 480px (celulares menores) */
+@media (max-width: 480px) {
+    /* Reduz ainda mais o padding do contêiner de configurações */
+    .settings-container {
+        padding: 10px;
+    }
+
+    /* Reduz o tamanho dos títulos principais */
+    h2 {
+        font-size: 1.3em;
+    }
+
+    /* Reduz o tamanho das mensagens */
+    .error, .success, .test-error, .test-success, .modal-error, .warning {
+        font-size: 0.8em;
+    }
+
+    /* Reduz o padding e tamanho da fonte dos botões de ação */
+    .action-button {
+        padding: 8px 10px;
+        font-size: 0.8em;
+    }
+
+    /* Ajusta o conteúdo dos modais */
+    .modal-content {
+        width: 95%; /* Ocupa 95% da tela */
+        padding: 10px;
+    }
+
+    /* Reduz o tamanho dos títulos nos modais */
+    .modal-content h3 {
+        font-size: 1em;
+    }
+
+    /* Ajusta os campos e botões nos modais */
+    .modal-content input[type="text"],
+    .modal-content input[type="password"],
+    .modal-content input[type="email"],
+    .modal-content input[type="number"],
+    .modal-content select,
+    .modal-content button[type="submit"],
+    .modal-content .close-button {
+        font-size: 0.8em;
+        padding: 6px;
+    }
+
+    /* Reduz o tamanho do contêiner de checkboxes */
+    .checkbox-container {
+        font-size: 0.8em;
+    }
+
+    /* Reduz ainda mais o tamanho do reCAPTCHA */
+    .recaptcha-container {
+        transform: scale(0.77); /* Reduz em 23% */
+        transform-origin: center;
+    }
+}

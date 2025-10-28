@@ -1,0 +1,554 @@
+/* Reset e Estilos Gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Define o fundo e a cor do texto do corpo da página */
+body {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* Estiliza o container principal da página */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Estiliza as seções de resumo e lista de clientes */
+.summary,
+.client-list {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border: 1px solid #ff0000;
+}
+
+/* Estiliza os títulos das seções de resumo e lista de clientes */
+.summary h2,
+.client-list h2 {
+    color: #ff0000;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+/* Estiliza o texto dentro da seção de resumo */
+.summary p {
+    font-size: 1.2em;
+}
+
+/* Estiliza a mensagem de boas-vindas */
+.welcome-message {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Estiliza mensagens genéricas de sucesso e erro */
+.message {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estiliza mensagens de sucesso */
+.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Estiliza mensagens de erro */
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Estiliza mensagens de erro e sucesso dentro de modais */
+.modal-error,
+.modal-success {
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* Estiliza mensagens de erro em modais */
+.modal-error {
+    color: #721c24;
+    background-color: #f8d7da;
+}
+
+/* Estiliza mensagens de sucesso em modais */
+.modal-success {
+    color: #155724;
+    background-color: #d4edda;
+}
+
+/* Estiliza o formulário de busca */
+.search-form {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Estiliza os rótulos do formulário de busca */
+.search-form label {
+    font-size: 1.1em;
+    color: #333;
+    margin-right: 10px;
+}
+
+/* Ajusta o espaçamento do terceiro rótulo no formulário de busca */
+.search-form label:nth-child(3) {
+    margin-left: 20px; /* Afastando o label "Buscar por Nome:" */
+}
+
+/* Estiliza os campos de entrada do formulário de busca */
+.search-form input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 200px;
+}
+
+/* Estiliza o botão do formulário de busca */
+.search-form button {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Efeito hover no botão do formulário de busca */
+.search-form button:hover {
+    background-color: #cc0000;
+}
+
+/* Estiliza o contêiner da tabela para permitir rolagem horizontal */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estiliza a tabela de clientes */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    min-width: 1000px;
+}
+
+/* Estiliza as células de cabeçalho e conteúdo da tabela */
+th,
+td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9em;
+}
+
+/* Estiliza os cabeçalhos da tabela */
+th {
+    background-color: #ff0000;
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Estiliza as células de conteúdo da tabela */
+td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Efeito hover nas linhas da tabela */
+tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Estiliza os ícones de ações */
+.action-icons a,
+.action-iconsAPH button {
+    color: #ff0000;
+    text-decoration: none;
+    font-size: 1em;
+    margin: 0 5px;
+    transition: color 0.3s;
+}
+
+/* Efeito hover nos ícones de ações */
+.action-icons a:hover,
+.action-icons button:hover {
+    color: #ffcc00;
+}
+
+/* Estiliza o status "Instalação Programada" */
+.status-programada {
+    color: #fff;
+    background-color: #ffcc00;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Estiliza o status "Instalação Concluída" */
+.status-concluida {
+    color: #fff;
+    background-color: #28a745;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Estiliza o status "Instalação Não Realizada" */
+.status-nao-realizada {
+    color: #fff;
+    background-color: #dc3545;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Estiliza o status "Não Definido" */
+.status-nao-definido {
+    color: #fff;
+    background-color: #6c757d;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Estiliza o contêiner das ações */
+.actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+/* Estiliza os links de ordenação */
+.sort-link {
+    color: #fff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Efeito hover nos links de ordenação */
+.sort-link:hover {
+    color: #ffcc00;
+}
+
+/* Estiliza os ícones de ordenação */
+.sort-icon {
+    width: 10px;
+    height: 10px;
+    fill: #fff;
+    transition: fill 0.3s;
+}
+
+/* Efeito hover e estado ativo nos ícones de ordenação */
+.sort-link:hover .sort-icon,
+.sort-active .sort-icon {
+    fill: #ffcc00;
+}
+
+/* Estiliza links de ordenação ativos */
+.sort-active {
+    color: #ffcc00;
+}
+
+/* Estiliza o botão de edição */
+.edit-btn {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 4px 8px;
+    border: none;
+    font-size: 0.7em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: inline-block;
+}
+
+/* Efeito hover no botão de edição */
+.edit-btn:hover {
+    background-color: #cc0000;
+}
+
+/* Estiliza a coluna de edição */
+.edit-column {
+    text-align: center;
+    width: 80px;
+}
+
+/* Estiliza o modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Estiliza o conteúdo do modal */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1001;
+}
+
+/* Estiliza o título do modal */
+.modal-content h3 {
+    color: #ff0000;
+    margin-bottom: 15px;
+}
+
+/* Estiliza o formulário dentro do modal */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estiliza os campos de entrada do modal */
+.modal-content input[type="date"],
+.modal-content select,
+.modal-content textarea {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%;
+}
+
+/* Estiliza a área de texto do modal */
+.modal-content textarea {
+    resize: vertical;
+    height: 80px;
+}
+
+/* Estiliza o botão de submissão do modal */
+.modal-content button[type="submit"] {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    z-index: 1002;
+    pointer-events: auto;
+    position: relative;
+}
+
+/* Efeito hover no botão de submissão do modal */
+.modal-content button[type="submit"]:hover:not(:disabled) {
+    background-color: #cc0000;
+}
+
+/* Estiliza o botão de submissão desabilitado */
+.modal-content button[type="submit"]:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Efeito de animação de salvamento no botão de submissão */
+.modal-content button[type="submit"].saving::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+    margin-left: 5px;
+}
+
+/* Define a animação de salvamento */
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
+}
+
+/* Estiliza o botão de fechar o modal */
+.modal-content .close-btn {
+    background: none;
+    color: #ff0000;
+    font-size: 1.2em;
+    padding: 5px;
+    text-align: right;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Media Queries para telas menores (até 768px) */
+@media (max-width: 768px) {
+    /* Ajusta o padding do container */
+    .container {
+        padding: 10px;
+    }
+
+    /* Ajusta o layout do formulário de busca */
+    .search-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Remove o margin-left do terceiro rótulo */
+    .search-form label:nth-child(3) {
+        margin-left: 0; /* Remove o margin-left em telas menores */
+    }
+
+    /* Ajusta a largura dos campos de entrada */
+    .search-form input {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    /* Ajusta a largura do botão de busca */
+    .search-form button {
+        width: 100%;
+    }
+
+    /* Ajusta o tamanho dos títulos */
+    .summary h2,
+    .client-list h2 {
+        font-size: 1.5em;
+    }
+
+    /* Ajusta o tamanho do texto */
+    .summary p,
+    .welcome-message {
+        font-size: 1em;
+    }
+
+    /* Ajusta o padding das células da tabela */
+    th,
+    td {
+        padding: 6px;
+        font-size: 0.8em;
+    }
+
+    /* Ajusta o tamanho do botão de edição */
+    .edit-btn {
+        font-size: 0.6em;
+        padding: 3px 6px;
+    }
+
+    /* Ajusta o tamanho dos ícones de ações */
+    .action-icons a,
+    .action-icons button {
+        font-size: 0.9em;
+        margin: 0 4px;
+    }
+
+    /* Ajusta o tamanho dos ícones de ordenação */
+    .sort-icon {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Ajusta a largura do conteúdo do modal */
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    /* Ajusta a largura da coluna de edição */
+    .edit-column {
+        width: 60px;
+    }
+}
+
+/* Media Queries para telas muito pequenas (até 480px) */
+@media (max-width: 480px) {
+    /* Ajusta o tamanho dos títulos */
+    .summary h2,
+    .client-list h2 {
+        font-size: 1.3em;
+    }
+
+    /* Ajusta o padding e tamanho da fonte das células da tabela */
+    th,
+    td {
+        padding: 5px;
+        font-size: 0.7em;
+    }
+
+    /* Ajusta o tamanho do botão de edição */
+    .edit-btn {
+        font-size: 0.5em;
+        padding: 2px 5px;
+    }
+
+    /* Ajusta o tamanho dos ícones de ações */
+    .action-icons a,
+    .action-icons button {
+        font-size: 0.8em;
+        margin: 0 3px;
+    }
+
+    /* Ajusta o espaçamento das ações */
+    .actions {
+        gap: 3px;
+    }
+
+    /* Ajusta o tamanho dos ícones de ordenação */
+    .sort-icon {
+        width: 7px;
+        height: 7px;
+    }
+
+    /* Ajusta a largura e padding do conteúdo do modal */
+    .modal-content {
+        width: 98%;
+        padding: 10px;
+    }
+
+    /* Ajusta o tamanho da fonte dos campos do modal */
+    .modal-content input[type="date"],
+    .modal-content select,
+    .modal-content textarea {
+        font-size: 0.9em;
+    }
+
+    /* Ajusta o tamanho e padding dos botões do modal */
+    .modal-content button {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    /* Ajusta a largura da coluna de edição */
+    .edit-column {
+        width: 50px;
+    }
+}

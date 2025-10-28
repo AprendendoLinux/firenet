@@ -1,0 +1,491 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    /* Removido min-height: 100vh para evitar espaço extra */
+}
+
+.container {
+    flex: 0; /* Alterado de flex: 1 para não crescer além do conteúdo */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Mantido para posicionar a caixa próxima ao topo */
+    padding: 20px;
+}
+
+.security-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+    border: 1px solid #ff0000;
+}
+
+h2 {
+    color: #ff0000;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h3 {
+    color: #000;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    display: block !important; /* Garantir que o título não seja ocultado */
+}
+
+.qr-section-title {
+    color: #ff0000 !important; /* Garantir visibilidade */
+    display: block !important;
+    visibility: visible !important;
+    font-size: 1.2em !important;
+    margin-bottom: 15px !important;
+}
+
+.error {
+    color: #ff0000;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.success {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.modal-error, .modal-success {
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.modal-success {
+    color: #155724;
+    background-color: #d4edda;
+}
+
+.security-section {
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.security-section p {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.action-button {
+    background-color: #000;
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    display: inline-block;
+}
+
+.action-button:hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal[style*="display: block"] {
+    display: flex !important;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border-left: 4px solid #ff0000;
+}
+
+.modal-content h3 {
+    color: #ff0000;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="password"],
+.modal-content input[type="email"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.9em;
+}
+
+.modal-content label {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.modal-content input[type="checkbox"],
+.modal-content input[type="radio"] {
+    margin-right: 8px;
+}
+
+.modal-content button[type="submit"] {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.modal-content button[type="submit"]:hover:not(.validating):not(.disabled) {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Estilo para botões desabilitados (usando a classe .disabled) */
+button.disabled,
+.modal-content button.disabled,
+.modal-content .close-button.disabled,
+.modal-content .resend-button.disabled,
+#proceed-totp-button.disabled,
+#cancel-totp-button.disabled,
+#confirm-2fa-submit.disabled,
+#resend-2fa-button.disabled,
+#cancel-2fa-button.disabled,
+#copy-secret-button.disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.modal-content button[type="submit"].validating {
+    background-color: #cccccc;
+    color: #fff;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.modal-content button[type="submit"].validating::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+    margin-left: 5px;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
+}
+
+.modal-content .close-button,
+.modal-content .resend-button {
+    background-color: #000 !important;
+    color: #fff !important;
+    padding: 8px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 0.9em !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s, transform 0.2s !important;
+    margin-top: 10px !important;
+}
+
+.modal-content .close-button:hover:not(.disabled),
+.modal-content .resend-button:hover:not(.disabled) {
+    background-color: #ffcc00 !important;
+    color: #000 !important;
+    transform: scale(1.05) !important;
+}
+
+.modal-content img.qr-code {
+    display: block;
+    margin: 10px auto;
+    max-width: 200px;
+}
+
+.logs-table-container {
+    max-height: 260px;
+    overflow-y: auto;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+th, td {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+th {
+    background-color: #ff0000;
+    color: #fff;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+tr:hover {
+    background-color: #f0f0f0;
+}
+
+.back-button {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 20px;
+}
+
+.back-button:hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Estilizar botões específicos */
+#proceed-totp-button {
+    background-color: #ff0000 !important;
+    color: white !important;
+    font-weight: bold !important;
+    padding: 8px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 0.9em !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s, transform 0.2s !important;
+}
+
+#proceed-totp-button:hover:not(.disabled) {
+    background-color: #e60000 !important;
+    transform: scale(1.05) !important;
+}
+
+#cancel-totp-button {
+    background-color: #000000 !important;
+    color: white !important;
+    padding: 8px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 0.9em !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s, transform 0.2s !important;
+}
+
+#cancel-totp-button:hover:not(.disabled) {
+    background-color: #333333 !important;
+    transform: scale(1.05) !important;
+}
+
+/* Estilizar a seção do QR code */
+#2fa-qr-section {
+    text-align: center;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    margin-top: 10px;
+}
+
+#2fa-qr-section p {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+/* Estilizar o contêiner da chave de configuração */
+.secret-key-container {
+    margin: 15px 0;
+    text-align: left;
+}
+
+.secret-key-container label {
+    font-size: 0.9em;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.secret-key-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.secret-key-wrapper button {
+    background-color: #ff0000;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+.secret-key-wrapper button:hover:not(.disabled) {
+    background-color: #e60000;
+    transform: scale(1.05);
+}
+
+#secret-key {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+    background-color: #f0f0f0;
+    color: #333;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 2px;
+}
+
+#2fa-qr-section .secret-key-wrapper #copy-secret-button {
+    background-color: #ff0000;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+#2fa-qr-section .secret-key-wrapper #copy-secret-button:hover:not(.disabled) {
+    background-color: #e60000;
+    transform: scale(1.05);
+}
+
+#2fa-qr-section .secret-key-wrapper #copy-secret-button.copied {
+    background-color: #28a745;
+}
+
+#2fa-qr-section .secret-key-wrapper #copy-secret-button.copied:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+/* Estilizar o contêiner dos botões */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Estilos para o contêiner de senha e o ícone de alternar visibilidade */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    width: 100%;
+    padding-right: 30px; /* Espaço para o ícone */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1em;
+    color: #333;
+    user-select: none;
+}
+
+.toggle-password:hover {
+    color: #ff0000;
+}
+
+.form-error {
+    color: #ff0000;
+    font-size: 0.8em;
+    margin-top: 5px;
+    display: none;
+}

@@ -1,0 +1,31 @@
+services:
+  firenet:
+    container_name: firenet
+    hostname: firenet
+    image: aprendendolinux/firenet:latest
+    restart: always
+    environment:
+      DB_HOST: db-server
+      DB_NAME: firenet
+      DB_USER: firenet
+      DB_PASS: firenet_password
+    ports:
+      - 8080:80
+    depends_on:
+      - db-server
+      
+  db-server:
+    container_name: db-server
+    hostname:  db-server
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: firenet
+      MYSQL_USER: firenet
+      MYSQL_PASSWORD: firenet_password
+    volumes:
+      - /srv/db-server:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:3306:3306"

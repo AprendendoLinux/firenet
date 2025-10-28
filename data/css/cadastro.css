@@ -1,0 +1,240 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #fff;
+    color: #000;
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(90deg, #ff0000, #000);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 5px solid #ffcc00;
+}
+
+header img {
+    width: 200px;
+}
+
+nav {
+    background-color: #000;
+    padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    color: #ff0000;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: color 0.3s, transform 0.3s;
+}
+
+nav a:hover {
+    color: #ffcc00;
+    transform: scale(1.1);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.section {
+    background-color: #f5f5f5;
+    padding: 40px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeInSection 1s forwards;
+}
+
+@keyframes fadeInSection {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.section h2 {
+    color: #ff0000;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #ffcc00;
+    padding-bottom: 10px;
+}
+
+.section p {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.form-section form {
+    display: grid;
+    gap: 20px;
+}
+
+.form-section label {
+    font-size: 1.2em;
+    color: #333;
+}
+
+.form-section input,
+.form-section select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+.form-section input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.form-section button {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.form-section button:disabled:not(.submitting) {
+    background-color: #cccccc !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.form-section button:not(:disabled):not(.submitting):hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.form-section button.submitting {
+    background-color: #cccccc !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.form-section button.submitting::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+    margin-left: 5px;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60% { content: '...'; }
+    80%, 100% { content: ''; }
+}
+
+.error {
+    color: #ff0000;
+    font-size: 0.9em;
+    margin-top: 10px;
+    display: none;
+}
+
+.lgpd-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkbox-wrapper span {
+    font-size: 1em;
+    color: #333;
+}
+
+.error-message {
+    color: #ff0000;
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: none;
+}
+
+footer {
+    background-color: #000;
+    padding: 20px;
+    text-align: center;
+    border-top: 3px solid #ff0000;
+}
+
+footer p {
+    font-size: 1em;
+    color: #fff;
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 768px) {
+    header img {
+        width: 150px;
+    }
+
+    nav {
+        padding: 15px;
+    }
+
+    nav a {
+        margin: 0 10px;
+        font-size: 1em;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .section h2 {
+        font-size: 2em;
+    }
+
+    .section p {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    header img {
+        width: 150px;
+    }
+
+    nav {
+        padding: 15px;
+    }
+
+    nav a {
+        margin: 0 5px;
+        font-size: 0.9em;
+    }
+
+    .section h2 {
+        font-size: 1.5em;
+    }
+}
