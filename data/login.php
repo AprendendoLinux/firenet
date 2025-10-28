@@ -377,7 +377,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_2fa']) && isse
     </header>
 
     <nav>
-        <a href="index.php#inicio">Início</a>
+        <a href="/">Início</a>
         <a href="index.php#planos">Planos</a>
         <a href="index.php#vantagens">Vantagens</a>
         <a href="index.php#cobertura">Cobertura</a>
