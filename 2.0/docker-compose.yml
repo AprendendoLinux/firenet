@@ -1,0 +1,18 @@
+# docker-compose.yml
+services:
+  web:
+    build: .
+    container_name: firenet-web
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+    networks:
+      - firenet-network
+
+networks:
+  firenet-network:
+    driver: bridge
