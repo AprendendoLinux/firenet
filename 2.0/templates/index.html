@@ -8,6 +8,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  /* Altura aproximada do header (ajuste fino se quiser) */
+  :root { --header-h: 80px; }
+
+  /* Garante que qualquer âncora (#id) pare um pouco abaixo do topo */
+  section[id], header[id], div[id] {
+    scroll-margin-top: var(--header-h);
+  }
+</style>
+
+
 </head>
 <body>
 
@@ -319,5 +331,59 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  (function () {
+    const header = document.querySelector('header');
+    const navMobile = document.getElementById('navMobile');
+    const headerH = header ? header.offsetHeight : 80;
+
+    function smoothScrollTo(hash) {
+      if (!hash || hash === '#') return;
+      const el = document.querySelector(hash);
+      if (!el) return;
+      // Calcula a posição alvo compensando o header fixo
+      const y = el.getBoundingClientRect().top + window.pageYOffset - headerH;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+
+    // Fechar o menu mobile e só depois rolar
+    function handleAnchorClick(e) {
+      const href = this.getAttribute('href') || '';
+      if (!href.startsWith('#')) return;
+
+      e.preventDefault();
+
+      // Se o menu mobile está aberto, esconde e rola após o colapso
+      const isMobileOpen = navMobile && navMobile.classList.contains('show');
+      if (isMobileOpen) {
+        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(navMobile, { toggle: false });
+        const once = () => {
+          navMobile.removeEventListener('hidden.bs.collapse', once);
+          // Pequeno timeout para garantir layout estabilizado
+          setTimeout(() => smoothScrollTo(href), 0);
+        };
+        navMobile.addEventListener('hidden.bs.collapse', once);
+        bsCollapse.hide();
+      } else {
+        smoothScrollTo(href);
+      }
+    }
+
+    // Links do menu desktop e do menu mobile
+    document.querySelectorAll('nav a[href^="#"]').forEach(a => {
+      a.addEventListener('click', handleAnchorClick);
+    });
+
+    // (Opcional) Botões/links dentro da página que levam a #âncoras (ex.: “Assinar”)
+    document.querySelectorAll('a.btn[href^="#"]').forEach(a => {
+      a.addEventListener('click', handleAnchorClick);
+    });
+  })();
+</script>
+
+
 </body>
 </html>
