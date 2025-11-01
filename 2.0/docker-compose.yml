@@ -16,8 +16,7 @@ services:
       DB_USER: root
       DB_PASSWORD: '123@Mudar'
     depends_on:
-      firenet-dev-db:
-        condition: service_healthy
+      - firenet-dev-db
 
   firenet-dev-db:
     image: mysql:latest
@@ -29,12 +28,6 @@ services:
       MYSQL_DATABASE: firenet
     volumes:
       - /srv/firenet-dev-db:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
-      timeout: 20s
-      retries: 10
-      start_period: 30s
 
   firenet-phpmyadmin:
     image: phpmyadmin:latest

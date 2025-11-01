@@ -3,6 +3,7 @@ import os
 import pymysql
 from datetime import datetime
 import re  # Para validações regex
+import time  # Para delays nos retries
 
 app = Flask(__name__)
 
@@ -36,6 +37,31 @@ def validar_cpf(cpf):
         if int(cpf[t]) != d:
             return False
     return True
+
+# Função para aguardar o banco de dados estar disponível
+def wait_for_db(max_retries=30, retry_interval=5):
+    retries = 0
+    while retries < max_retries:
+        try:
+            conn = pymysql.connect(
+                host=DB_HOST,
+                user=DB_USER,
+                password=DB_PASSWORD,
+                charset='utf8mb4'
+            )
+            cursor = conn.cursor()
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("Conexão com o banco de dados estabelecida com sucesso.")
+            return True
+        except pymysql.err.OperationalError as e:
+            retries += 1
+            print(f"Erro ao conectar ao banco de dados: {e}. Tentativa {retries}/{max_retries}. Aguardando {retry_interval} segundos...")
+            time.sleep(retry_interval)
+    print("Falha ao conectar ao banco de dados após o máximo de tentativas.")
+    return False
 
 # Check e create tabelas ao iniciar
 def init_db():
@@ -134,9 +160,7 @@ def init_db():
     conn.commit()
     cursor.close()
     conn.close()
-
-# Inicia DB check
-init_db()
+    print("Tabelas verificadas e inicializadas com sucesso.")
 
 @app.route('/')
 def index():
@@ -340,4 +364,8 @@ def validar_cobertura():
         return jsonify({'error': 'Erro interno ao validar cobertura.'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    if wait_for_db():
+        init_db()
+        app.run(host='0.0.0.0', port=5000, debug=False)
+    else:
+        raise RuntimeError("Não foi possível iniciar o aplicativo: falha na conexão com o banco de dados.")
