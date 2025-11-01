@@ -388,6 +388,7 @@
     let selectedPlace = null;
     let map;
     let geocoder;
+    let marker = null; // Para gerenciar o marcador no mapa
 
     function initMap() {
         geocoder = new google.maps.Geocoder();
@@ -432,6 +433,59 @@
                     selectedBairro = comp.long_name;
                 }
             });
+
+            // Adicionar marcador e centralizar no local selecionado via autocomplete
+            if (marker) marker.setMap(null);
+            marker = new google.maps.Marker({
+                position: place.geometry.location,
+                map: map
+            });
+            map.setCenter(place.geometry.location);
+            map.setZoom(18);
+        });
+
+        // Adicionar listener de clique no mapa para selecionar localização e verificar viabilidade automaticamente
+        map.addListener('click', function(event) {
+            geocoder.geocode({ location: event.latLng }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    selectedPlace = results[0];
+                    selectedRua = '';
+                    selectedBairro = '';
+                    results[0].address_components.forEach(comp => {
+                        if (comp.types.includes('route')) {
+                            selectedRua = comp.long_name;
+                        }
+                        if (comp.types.includes('sublocality_level_1') || comp.types.includes('neighborhood') || comp.types.includes('sublocality')) {
+                            selectedBairro = comp.long_name;
+                        }
+                    });
+
+                    // Atualizar o input de busca com a rua e bairro encontrados
+                    document.getElementById('ruaSearch').value = selectedRua + (selectedBairro ? ', ' + selectedBairro : '');
+
+                    // Adicionar ou atualizar marcador no ponto clicado
+                    if (marker) marker.setMap(null);
+                    marker = new google.maps.Marker({
+                        position: event.latLng,
+                        map: map
+                    });
+
+                    // Centralizar e zoom no ponto clicado
+                    map.setCenter(event.latLng);
+                    map.setZoom(18);
+
+                    // Verificar viabilidade automaticamente após clique
+                    checkCoverage();
+                } else {
+                    console.log('Geocode failed: ' + status);
+                    Swal.fire({
+                        title: 'Erro',
+                        text: 'Não foi possível obter o endereço para este local. Tente novamente.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
         });
     }
 
@@ -443,7 +497,7 @@
         if (!rua) {
             Swal.fire({
                 title: 'Erro',
-                text: 'Por favor, digite ou selecione a rua.',
+                text: 'Por favor, digite, selecione ou clique em uma rua no mapa.',
                 icon: 'error',
                 confirmButtonColor: '#dc3545'
             });
@@ -486,7 +540,7 @@
                     }
                 });
 
-                // Centralizar o mapa na rua
+                // Centralizar o mapa na rua (se não já centralizado pelo clique ou autocomplete)
                 if (selectedPlace && selectedPlace.geometry) {
                     map.setCenter(selectedPlace.geometry.location);
                     map.setZoom(18);
