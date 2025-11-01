@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import pymysql
 from datetime import datetime
@@ -109,6 +109,28 @@ def init_db():
             )
         """)
 
+    if 'cobertura' not in existing_tables:
+        cursor.execute("""
+            CREATE TABLE cobertura (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                tipo_logradouro VARCHAR(255) NOT NULL,
+                nome_logradouro VARCHAR(255) NOT NULL,
+                bairro VARCHAR(255) NOT NULL,
+                cidade VARCHAR(255) NOT NULL,
+                estado VARCHAR(255) NOT NULL,
+                pais VARCHAR(255) NOT NULL
+            )
+        """)
+        # Inserir endereços padrão
+        cursor.execute("""
+            INSERT INTO cobertura (tipo_logradouro, nome_logradouro, bairro, cidade, estado, pais)
+            VALUES ('Rua', 'Mateus Silva', 'Inhaúma', 'Rio de Janeiro', 'RJ', 'Brasil')
+        """)
+        cursor.execute("""
+            INSERT INTO cobertura (tipo_logradouro, nome_logradouro, bairro, cidade, estado, pais)
+            VALUES ('Rua', 'Soares Meireles', 'Pilares', 'Rio de Janeiro', 'RJ', 'Brasil')
+        """)
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -126,7 +148,6 @@ def check_cpf():
     Endpoint chamado pelo JavaScript do cadastro.html para
     verificar se o CPF já existe (validação em tempo real).
     """
-    from flask import jsonify
     data = request.get_json(silent=True) or {}
     cpf_raw = data.get('cpf', '') or ''
     cpf_num = re.sub(r'\D', '', cpf_raw)
@@ -274,6 +295,49 @@ def cadastro():
 @app.route('/sucesso')
 def sucesso():
     return render_template('sucesso.html')  # Crie sucesso.html similar ao PHP
+
+# Nova API para validar cobertura de endereço (baseado em rua existente em cobertura)
+@app.route('/validar_cobertura', methods=['POST'])
+def validar_cobertura():
+    """
+    Endpoint para validar se o endereço (rua e opcionalmente bairro) informado consta no banco de dados.
+    Assume que se há entradas na tabela cobertura matching, há cobertura.
+    Recebe JSON com 'rua' (obrigatório) e 'bairro' (opcional).
+    Retorna JSON com 'mensagem' e opcionalmente 'link' se houver cobertura.
+    """
+    data = request.get_json(silent=True) or {}
+    rua_raw = data.get('rua', '') or ''
+    bairro_raw = data.get('bairro', '') or ''
+    rua = sanitize(rua_raw)
+    bairro = sanitize(bairro_raw)
+
+    if not rua:
+        return jsonify({'error': 'Rua não informada.'}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Verifica se existe pelo menos uma entrada com esse logradouro (case-insensitive)
+        sql = "SELECT COUNT(*) FROM cobertura WHERE LOWER(CONCAT(tipo_logradouro, ' ', nome_logradouro)) = LOWER(%s)"
+        params = (rua,)
+        if bairro:
+            sql += " AND LOWER(bairro) = LOWER(%s)"
+            params += (bairro,)
+        cursor.execute(sql, params)
+        count = cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+
+        if count > 0:
+            mensagem = "Parabéns, essa rua possui cobertura da FireNet Telecom. Clique aqui para se cadastrar."
+            return jsonify({'mensagem': mensagem, 'link': url_for('cadastro')})
+        else:
+            mensagem = "Infelizmente essa rua ainda não possui viabilidade técnica para a instalação da FireNet Telecom."
+            return jsonify({'mensagem': mensagem})
+
+    except Exception as e:
+        print("Erro ao validar cobertura:", e)
+        return jsonify({'error': 'Erro interno ao validar cobertura.'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
