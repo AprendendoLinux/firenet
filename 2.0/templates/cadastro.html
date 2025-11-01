@@ -235,23 +235,36 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  // ===== util: debounce para "validar assim que termina de digitar" =====
+  function debounce(fn, wait = 350) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(null, args), wait);
+    };
+  }
+
   // ===== Helpers (máscaras apenas em input) =====
   // Nome: capitalização
-  document.getElementById('nome').addEventListener('input', function (e) {
+  const nomeInput = document.getElementById('nome');
+  nomeInput.addEventListener('input', function (e) {
     let v = e.target.value.toLowerCase();
     e.target.value = v.replace(/\b\w/g, ch => ch.toUpperCase());
+    updateNavButtons();
   });
 
   // RG mask
-  document.getElementById('rg').addEventListener('input', function (e) {
+  const rgInput = document.getElementById('rg');
+  rgInput.addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
     v = v.replace(/^(\d{2})(\d)/, '$1.$2');
     v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
     v = v.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
     e.target.value = v.substring(0, 12);
+    updateNavButtons();
   });
 
-  // CPF mask
+  // CPF mask + validação imediata
   const cpfInput = document.getElementById('cpf');
   const cpfError = document.getElementById('cpf-error');
   const cpfExistsError = document.getElementById('cpf-exists-error');
@@ -263,25 +276,72 @@
     v = v.replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
     v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
     e.target.value = v;
+
+    // validação instantânea quando completar 14 chars
+    cpfError.style.display = 'none';
+    cpfExistsError.style.display = 'none';
+    cpfExists = false;
+    if (e.target.value.length === 14) {
+      if (!validarCPF(e.target.value)) {
+        cpfError.style.display = 'block';
+      } else {
+        debouncedCheckCpfExists(e.target.value);
+      }
+    }
+    updateNavButtons();
   });
 
   // Telefone mask
-  document.getElementById('telefone').addEventListener('input', function (e) {
+  const telefoneInput = document.getElementById('telefone');
+  telefoneInput.addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
     v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
     v = v.replace(/(\d)(\d{4})$/, '$1-$2');
     e.target.value = v;
+    updateNavButtons();
   });
 
-  // CEP mask
+  // CEP mask + busca imediata
   const cepInput = document.getElementById('cep');
   const cepError = document.getElementById('cep-error');
   cepInput.addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
     e.target.value = v.replace(/(\d{5})(\d)/, '$1-$2');
+    debouncedViaCep();
   });
 
-  // ===== Validadores e checagens (somente ao sair do campo) =====
+  // E-mail validação instantânea
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('email-error');
+  emailInput.addEventListener('input', debounce(function (e) {
+    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+    emailError.style.display = e.target.value && !emailRegex.test(e.target.value) ? 'block' : 'none';
+    updateNavButtons();
+  }, 300));
+
+  // Inputs simples que devem atualizar o estado imediatamente
+  ['data_nascimento','whatsapp','numero','complemento','ponto_referencia','plano','vencimento','nome_rede','lgpd']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const evt = (el.tagName === 'SELECT') || id === 'lgpd' ? 'change' : 'input';
+      el.addEventListener(evt, () => {
+        updateNavButtons();
+        updateSubmitState();
+      });
+    });
+
+  // Senha com validação instantânea e habilitação do "Enviar"
+  const senhaInput = document.getElementById('senha_rede');
+  const senhaError = document.getElementById('senha-error');
+  senhaInput.addEventListener('input', function () {
+    const senha = senhaInput.value || '';
+    const ok = senha.length >= 8 && senha.length <= 10;
+    senhaError.style.display = senha && !ok ? 'block' : 'none';
+    updateSubmitState();
+  });
+
+  // ===== Validadores e checagens =====
   function validarCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -308,7 +368,14 @@
     } catch { return false; }
   }
 
-  // CEP -> ViaCEP (no blur)
+  const debouncedCheckCpfExists = debounce(async (v) => {
+    const exists = await checkCpfExists(v);
+    cpfExists = !!exists;
+    cpfExistsError.style.display = cpfExists ? 'block' : 'none';
+    updateNavButtons();
+  }, 400);
+
+  // CEP -> ViaCEP (instantâneo ao completar 8 dígitos)
   function clearAddressFields() {
     document.getElementById('rua').value = '';
     document.getElementById('rua_hidden').value = '';
@@ -317,8 +384,8 @@
     document.getElementById('estado').value = '';
   }
 
-  cepInput.addEventListener('blur', function () {
-    const v = this.value.replace(/\D/g, '');
+  function fetchViaCepNow() {
+    const v = cepInput.value.replace(/\D/g, '');
     cepError.style.display = 'none';
     if (v.length !== 8) { clearAddressFields(); updateNavButtons(); return; }
 
@@ -343,49 +410,9 @@
         updateNavButtons();
       })
       .catch(() => { cepError.style.display = 'block'; clearAddressFields(); updateNavButtons(); });
-  });
+  }
 
-  // CPF: valida + checa no banco (no blur)
-  cpfInput.addEventListener('blur', async function () {
-    cpfError.style.display = 'none';
-    cpfExistsError.style.display = 'none';
-    cpfExists = false;
-    const v = cpfInput.value;
-    if (v.length === 14) {
-      if (!validarCPF(v)) {
-        cpfError.style.display = 'block';
-      } else {
-        const exists = await checkCpfExists(v);
-        cpfExists = !!exists;
-        if (cpfExists) cpfExistsError.style.display = 'block';
-      }
-    }
-    updateNavButtons();
-  });
-
-  // E-mail (no blur)
-  const emailInput = document.getElementById('email');
-  const emailError = document.getElementById('email-error');
-  emailInput.addEventListener('blur', function (e) {
-    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
-    emailError.style.display = e.target.value && !emailRegex.test(e.target.value) ? 'block' : 'none';
-    updateNavButtons();
-  });
-
-  // Campos com validação simples ao sair
-  ['nome','rg','data_nascimento','telefone','whatsapp','numero','complemento','ponto_referencia','plano','vencimento','nome_rede','senha_rede','lgpd']
-    .forEach(id => {
-      const el = document.getElementById(id);
-      const evt = (el && el.tagName === 'SELECT') || id === 'lgpd' ? 'change' : 'blur';
-      if (el) el.addEventListener(evt, () => {
-        if (id === 'senha_rede') {
-          const senha = el.value || '';
-          const ok = senha.length >= 8 && senha.length <= 10;
-          document.getElementById('senha-error').style.display = senha && !ok ? 'block' : 'none';
-        }
-        updateNavButtons();
-      });
-    });
+  const debouncedViaCep = debounce(fetchViaCepNow, 400);
 
   // ===== Navegação entre etapas =====
   const steps = Array.from(document.querySelectorAll('.step'));
@@ -406,9 +433,9 @@
 
   function validateStep(idx) {
     if (idx === 0) {
-      const nome = document.getElementById('nome').value.trim();
+      const nome = nomeInput.value.trim();
       const cpfV = cpfInput.value;
-      const rg = document.getElementById('rg').value.trim();
+      const rg = rgInput.value.trim();
       const dn = document.getElementById('data_nascimento').value;
       if (!nome || !rg || !dn) return false;
       if (cpfV.length !== 14 || !validarCPF(cpfV)) return false;
@@ -416,9 +443,9 @@
       return true;
     }
     if (idx === 1) {
-      const tel = document.getElementById('telefone').value.trim();
+      const tel = telefoneInput.value.trim();
       const wa = document.getElementById('whatsapp').value;
-      const email = document.getElementById('email').value;
+      const email = emailInput.value;
       const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
       return !!tel && !!wa && !!email && emailRegex.test(email);
     }
@@ -436,7 +463,7 @@
       const plano = document.getElementById('plano').value;
       const venc = document.getElementById('vencimento').value;
       const nomeRede = document.getElementById('nome_rede').value.trim();
-      const senha = document.getElementById('senha_rede').value;
+      const senha = senhaInput.value;
       const lgpd = document.getElementById('lgpd').checked;
       const senhaOk = senha.length >= 8 && senha.length <= 10;
       return !!plano && !!venc && !!nomeRede && senhaOk && lgpd;
@@ -478,7 +505,7 @@
     submitBtn.disabled = !validateStep(3);
   }
 
-  // Validação final no submit (respeitando regra de blur prévio)
+  // Validação final no submit
   const form = document.getElementById('cadastro-form');
   form.addEventListener('submit', async function (e) {
     // última verificação CPF
