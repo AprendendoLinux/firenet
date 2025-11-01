@@ -168,11 +168,14 @@ def cadastro():
             whatsapp = request.form.get('whatsapp')
             email = request.form.get('email')
             cep = sanitize(request.form.get('cep'))
-            rua = sanitize(request.form.get('rua'))
+
+            # Nota: agora o campo visual de endereço é apenas display,
+            # e enviamos rua (logradouro) e bairro via inputs ocultos.
+            rua = sanitize(request.form.get('rua') or request.form.get('rua_hidden'))
             numero = sanitize(request.form.get('numero'))
             complemento = sanitize(request.form.get('complemento'))
             ponto_referencia = sanitize(request.form.get('ponto_referencia'))
-            bairro = sanitize(request.form.get('bairro'))
+            bairro = sanitize(request.form.get('bairro'))  # vem oculto via JS
             plano = request.form.get('plano')
             vencimento = request.form.get('vencimento')
             nome_rede = sanitize(request.form.get('nome_rede'))
@@ -213,7 +216,7 @@ def cadastro():
             date_obj = datetime.strptime(data_nascimento, '%Y-%m-%d')
             data_nascimento = date_obj.strftime('%d/%m/%Y')
 
-            # ===== NOVO: Verifica se CPF já existe antes de inserir =====
+            # ===== Verifica se CPF já existe antes de inserir =====
             cpf_num = re.sub(r'\D', '', cpf or '')
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -244,8 +247,6 @@ def cadastro():
             cursor.close()
             conn.close()
 
-            # Placeholder para email/Telegram (expanda se necessário)
-
             return redirect(url_for('sucesso'))
 
         except ValueError as e:
@@ -258,7 +259,6 @@ def cadastro():
             if 'cpf' in msg.lower():
                 friendly = 'CPF já cadastrado, favor entrar em contato via WhatsApp.'
             elif 'email' in msg.lower():
-                # Mantém foco no CPF; mas deixa amigável se acontecer com email
                 friendly = 'E-mail já cadastrado. Use outro e-mail ou recupere o acesso.'
             else:
                 friendly = 'Não foi possível concluir o cadastro. Tente novamente.'

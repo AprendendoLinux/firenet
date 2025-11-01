@@ -11,7 +11,6 @@
 </head>
 <body>
 
-<!-- Header idêntico ao index.html -->
 <header class="bg-white shadow-sm py-3 sticky-top">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
@@ -45,7 +44,6 @@
     </div>
 </header>
 
-<!-- Formulário -->
 <section class="py-5 bg-light">
     <div class="container">
         <h2 class="text-center text-danger mb-4">Faça Seu Cadastro</h2>
@@ -57,24 +55,29 @@
                 <label for="nome" class="form-label">Qual é o seu nome completo? *</label>
                 <input type="text" class="form-control" id="nome" name="nome" required>
             </div>
+
             <div class="mb-3">
                 <label for="cpf" class="form-label">Qual é seu CPF? *</label>
                 <input type="text" class="form-control" id="cpf" name="cpf" required maxlength="14">
                 <div id="cpf-error" class="text-danger" style="display: none;">CPF inválido. Por favor, insira um CPF válido.</div>
                 <div id="cpf-exists-error" class="text-danger" style="display: none;">CPF já cadastrado, favor entrar em contato via WhatsApp.</div>
             </div>
+
             <div class="mb-3">
                 <label for="rg" class="form-label">Qual seu RG (carteira de identidade)? *</label>
                 <input type="text" class="form-control" id="rg" name="rg" required maxlength="12">
             </div>
+
             <div class="mb-3">
                 <label for="data_nascimento" class="form-label">Qual é a sua data de nascimento? *</label>
                 <input type="date" max="9999-12-31" class="form-control" id="data_nascimento" name="data_nascimento" required>
             </div>
+
             <div class="mb-3">
                 <label for="telefone" class="form-label">Qual é o seu telefone de contato (com DDD)? *</label>
                 <input type="tel" class="form-control" id="telefone" name="telefone" required maxlength="15">
             </div>
+
             <div class="mb-3">
                 <label for="whatsapp" class="form-label">O número informado é WhatsApp? *</label>
                 <select class="form-select" id="whatsapp" name="whatsapp" required>
@@ -83,36 +86,48 @@
                     <option value="Não">Não</option>
                 </select>
             </div>
+
             <div class="mb-3">
                 <label for="email" class="form-label">Qual é o seu e-mail? *</label>
                 <input type="email" class="form-control" id="email" name="email" required>
                 <div id="email-error" class="text-danger" style="display: none;">E-mail inválido. Por favor, insira um e-mail válido.</div>
             </div>
+
             <div class="mb-3">
                 <label for="cep" class="form-label">Qual o seu CEP? *</label>
                 <input type="text" class="form-control" id="cep" name="cep" required maxlength="9">
                 <div id="cep-error" class="text-danger" style="display: none;">Endereço inexistente. Por favor, insira um CEP válido.</div>
             </div>
+
+            <!-- Endereço (display) -->
             <div class="mb-3">
                 <label for="rua" class="form-label">Qual o seu endereço? *</label>
-                <input type="text" class="form-control" id="rua" name="rua" required readonly>
+                <!-- Campo visível somente para exibir "Rua, Bairro, Cidade, UF" -->
+                <input type="text" class="form-control" id="rua" required readonly>
+                <!-- Campos ocultos que serão enviados ao backend -->
+                <input type="hidden" id="rua_hidden" name="rua">
+                <input type="hidden" id="bairro" name="bairro">
+                <input type="hidden" id="cidade" name="cidade">
+                <input type="hidden" id="estado" name="estado">
             </div>
+
             <div class="mb-3">
                 <label for="numero" class="form-label">Número da sua residência? *</label>
                 <input type="text" class="form-control" id="numero" name="numero" required>
             </div>
+
             <div class="mb-3">
                 <label for="complemento" class="form-label">Qual o complemento?</label>
                 <input type="text" class="form-control" id="complemento" name="complemento">
             </div>
+
             <div class="mb-3">
                 <label for="ponto_referencia" class="form-label">Qual é o ponto de Referência? *</label>
                 <input type="text" class="form-control" id="ponto_referencia" name="ponto_referencia" required>
             </div>
-            <div class="mb-3">
-                <label for="bairro" class="form-label">Qual é o seu bairro? *</label>
-                <input type="text" class="form-control" id="bairro" name="bairro" required readonly>
-            </div>
+
+            <!-- Campo "bairro" removido visualmente -->
+
             <div class="mb-3">
                 <label for="plano" class="form-label">Qual é o plano Desejado? *</label>
                 <select class="form-select" id="plano" name="plano" required>
@@ -123,6 +138,7 @@
                     <option value="500 MEGA">500 MEGA - R$ 84,90</option>
                 </select>
             </div>
+
             <div class="mb-3">
                 <label for="vencimento" class="form-label">Qual é o dia de vencimento desejado? *</label>
                 <select class="form-select" id="vencimento" name="vencimento" required>
@@ -132,19 +148,23 @@
                     <option value="Dia 15">Dia 15</option>
                 </select>
             </div>
+
             <div class="mb-3">
                 <label for="nome_rede" class="form-label">Qual o nome da REDE WIFI que deseja? *</label>
                 <input type="text" class="form-control" id="nome_rede" name="nome_rede" required>
             </div>
+
             <div class="mb-3">
                 <label for="senha_rede" class="form-label">E qual é a senha que deseja usar (mínimo 8 e máximo 10 caracteres)? *</label>
                 <input type="text" class="form-control" id="senha_rede" name="senha_rede" required minlength="8" maxlength="10">
                 <div id="senha-error" class="text-danger" style="display: none;">A senha deve ter entre 8 e 10 caracteres.</div>
             </div>
+
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="lgpd" name="lgpd" value="Sim" required>
                 <label class="form-check-label" for="lgpd">Declaro que estou fornecendo estas informações exclusivamente para fins de cadastro e formalização da assinatura do serviço de internet oferecido pela empresa FireNet. Estou ciente de que os dados enviados serão tratados de acordo com a Lei Geral de Proteção de Dados Pessoais (LGPD – Lei nº 13.709/2018), garantindo sua segurança, confidencialidade e utilização apenas para os propósitos especificados, conforme a política de privacidade da empresa.</label>
             </div>
+
             <button type="submit" class="btn btn-danger" id="submit-btn" disabled>Enviar</button>
         </form>
     </div>
@@ -160,11 +180,11 @@
 
     // Máscara RG: XX.XXX.XXX-X (somente números)
     document.getElementById('rg').addEventListener('input', function (e) {
-        let v = e.target.value.replace(/\D/g, '');  // Remove não-dígitos
+        let v = e.target.value.replace(/\D/g, '');
         v = v.replace(/^(\d{2})(\d)/, '$1.$2');
         v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
         v = v.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-        e.target.value = v.substring(0, 12);  // Limita a 12 chars
+        e.target.value = v.substring(0, 12);
     });
 
     // Função para validar CPF
@@ -190,25 +210,23 @@
     const cpfExistsError = document.getElementById('cpf-exists-error');
     let cpfExists = false;
 
-    // Função para checar se CPF existe no banco
+    // Checar se CPF existe no banco
     async function checkCpfExists(cpfValue) {
         try {
             const response = await fetch('/check_cpf', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cpf: cpfValue.replace(/\D/g, '') })
             });
             const data = await response.json();
             return data.exists;
         } catch (error) {
             console.error('Erro ao checar CPF:', error);
-            return false; // Assumir não existe em caso de erro para não bloquear
+            return false;
         }
     }
 
-    // Validação on blur para CPF (validação local e checagem de existência)
+    // Validação on blur para CPF
     cpfInput.addEventListener('blur', async function () {
         const cpfValue = cpfInput.value;
         cpfError.style.display = 'none';
@@ -219,10 +237,10 @@
             if (!validarCPF(cpfValue)) {
                 cpfError.style.display = 'block';
             } else {
-                // Checar se CPF já existe
-                cpfExists = await checkCpfExists(cpfValue);
-                if (cpfExists) {
+                const exists = await checkCpfExists(cpfValue);
+                if (exists) {
                     cpfExistsError.style.display = 'block';
+                    cpfExists = true;
                 }
             }
         }
@@ -234,11 +252,7 @@
     const emailError = document.getElementById('email-error');
     emailInput.addEventListener('blur', function () {
         const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
-        if (emailInput.value && !emailRegex.test(emailInput.value)) {
-            emailError.style.display = 'block';
-        } else {
-            emailError.style.display = 'none';
-        }
+        emailError.style.display = (emailInput.value && !emailRegex.test(emailInput.value)) ? 'block' : 'none';
         checkAllValid();
     });
 
@@ -255,7 +269,7 @@
         checkAllValid();
     });
 
-    // Máscaras existentes (CPF, Telefone, CEP)
+    // Máscaras (CPF, Telefone, CEP)
     document.getElementById('cpf').addEventListener('input', function (e) {
         let v = e.target.value.replace(/\D/g, '');
         v = v.replace(/(\d{3})(\d)/, '$1.$2');
@@ -280,7 +294,7 @@
         checkAllValid();
     });
 
-    // Validação on blur para CEP (com fetch na API)
+    // CEP -> ViaCEP -> preencher Rua, Bairro, Cidade, UF e o display completo
     const cepInput = document.getElementById('cep');
     const cepError = document.getElementById('cep-error');
     cepInput.addEventListener('blur', function () {
@@ -292,12 +306,28 @@
                 .then(data => {
                     if (data.erro) {
                         cepError.style.display = 'block';
+                        // Limpa tudo se der erro
                         document.getElementById('rua').value = '';
+                        document.getElementById('rua_hidden').value = '';
                         document.getElementById('bairro').value = '';
+                        document.getElementById('cidade').value = '';
+                        document.getElementById('estado').value = '';
                     } else {
                         cepError.style.display = 'none';
-                        document.getElementById('rua').value = data.logradouro;
-                        document.getElementById('bairro').value = data.bairro;
+                        const logradouro = data.logradouro || '';
+                        const bairro = data.bairro || '';
+                        const cidade = data.localidade || '';
+                        const uf = data.uf || '';
+
+                        // Preenche o display com "Rua, Bairro, Cidade, UF"
+                        const display = [logradouro, bairro, cidade, uf].filter(Boolean).join(', ');
+                        document.getElementById('rua').value = display;
+
+                        // Preenche os hidden para enviar ao backend
+                        document.getElementById('rua_hidden').value = logradouro;
+                        document.getElementById('bairro').value = bairro;
+                        document.getElementById('cidade').value = cidade;
+                        document.getElementById('estado').value = uf;
                     }
                     checkAllValid();
                 })
@@ -310,20 +340,22 @@
         }
     });
 
-    // Função para checar se todos os campos estão válidos
+    // Checar todos os campos
     function checkAllValid() {
         const form = document.getElementById('cadastro-form');
         const submitBtn = document.getElementById('submit-btn');
-        let allValid = form.checkValidity(); // Verifica campos required nativos
+        let allValid = form.checkValidity();
 
-        // Verificar erros personalizados
+        // Verificar erros customizados
         if (cpfError.style.display !== 'none' || cpfExistsError.style.display !== 'none' || cpfExists) allValid = false;
         if (emailError.style.display !== 'none') allValid = false;
         if (senhaError.style.display !== 'none') allValid = false;
         if (cepError.style.display !== 'none') allValid = false;
 
-        // Campos readonly como rua e bairro devem ter valor (preenchidos pelo CEP)
-        if (document.getElementById('rua').value === '' || document.getElementById('bairro').value === '') allValid = false;
+        // Campos de endereço agora: exigir que o display esteja preenchido
+        if (document.getElementById('rua').value === '') allValid = false;
+        // E garantir que os hidden tenham sido populados
+        if (document.getElementById('rua_hidden').value === '' || document.getElementById('bairro').value === '') allValid = false;
 
         submitBtn.disabled = !allValid;
     }
@@ -342,9 +374,7 @@
         e.preventDefault(); // Impede o submit padrão até a checagem
 
         checkAllValid();
-        if (document.getElementById('submit-btn').disabled) {
-            return;
-        }
+        if (document.getElementById('submit-btn').disabled) return;
 
         const cpfValue = cpfInput.value;
         if (cpfValue.length === 14 && validarCPF(cpfValue)) {
