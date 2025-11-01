@@ -133,7 +133,7 @@
           <div id="email-error" class="text-danger" style="display:none">E-mail inválido. Por favor, insira um e-mail válido.</div>
         </div>
         <div class="d-flex justify-content-between">
-          <button type="button" class="btn btn-danger rounded-pill" id="back-2">Voltar</button>
+          <button type="button" class="btn btn-outline-danger rounded-pill" id="back-2">Voltar</button>
           <button type="button" class="btn btn-danger rounded-pill" id="next-2" disabled>Prosseguir</button>
         </div>
       </div>
@@ -174,7 +174,7 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <button type="button" class="btn btn-danger rounded-pill" id="back-3">Voltar</button>
+          <button type="button" class="btn btn-outline-danger rounded-pill" id="back-3">Voltar</button>
           <button type="button" class="btn btn-danger rounded-pill" id="next-3" disabled>Prosseguir</button>
         </div>
       </div>
@@ -217,7 +217,7 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <button type="button" class="btn btn-danger rounded-pill" id="back-4">Voltar</button>
+          <button type="button" class="btn btn-outline-danger rounded-pill" id="back-4">Voltar</button>
           <button type="submit" class="btn btn-danger rounded-pill" id="submit-btn" disabled>Enviar</button>
         </div>
       </div>
@@ -235,19 +235,14 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // ===== Utils =====
-  const debounce = (fn, delay = 300) => {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
-  };
-
-  // ===== Helpers e máscaras (instantâneo) =====
-  // Capitalizar nome
+  // ===== Helpers (máscaras apenas em input) =====
+  // Nome: capitalização
   document.getElementById('nome').addEventListener('input', function (e) {
     let v = e.target.value.toLowerCase();
     e.target.value = v.replace(/\b\w/g, ch => ch.toUpperCase());
   });
 
-  // RG mask: XX.XXX.XXX-X
+  // RG mask
   document.getElementById('rg').addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
     v = v.replace(/^(\d{2})(\d)/, '$1.$2');
@@ -256,7 +251,7 @@
     e.target.value = v.substring(0, 12);
   });
 
-  // CPF mask + validação on input
+  // CPF mask
   const cpfInput = document.getElementById('cpf');
   const cpfError = document.getElementById('cpf-error');
   const cpfExistsError = document.getElementById('cpf-exists-error');
@@ -268,76 +263,72 @@
     v = v.replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
     v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
     e.target.value = v;
-
-    // esconde erros enquanto digita
-    cpfError.style.display = 'none';
-    cpfExistsError.style.display = 'none';
-    cpfExists = false;
-
-    // valida local quando atingir 14 chars (formato)
-    if (e.target.value.length === 14) {
-      if (!validarCPF(e.target.value)) {
-        cpfError.style.display = 'block';
-      } else {
-        debouncedCpfCheck(e.target.value); // checa no banco
-      }
-    }
-    updateNavButtons();
   });
 
-  const debouncedCpfCheck = debounce(async (cpfValue) => {
-    const exists = await checkCpfExists(cpfValue);
-    cpfExists = !!exists;
-    cpfExistsError.style.display = cpfExists ? 'block' : 'none';
-    updateNavButtons();
-  }, 400);
-
-  // Telefone mask + validação on input
+  // Telefone mask
   document.getElementById('telefone').addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
     v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
     v = v.replace(/(\d)(\d{4})$/, '$1-$2');
     e.target.value = v;
-    updateNavButtons();
   });
 
-  // Email validação on input
-  const emailInput = document.getElementById('email');
-  const emailError = document.getElementById('email-error');
-  emailInput.addEventListener('input', function (e) {
-    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
-    emailError.style.display = e.target.value && !emailRegex.test(e.target.value) ? 'block' : 'none';
-    updateNavButtons();
-  });
-
-  // CEP mask + ViaCEP on input (ao atingir 8 dígitos)
+  // CEP mask
   const cepInput = document.getElementById('cep');
   const cepError = document.getElementById('cep-error');
   cepInput.addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
-    // aplica máscara
     e.target.value = v.replace(/(\d{5})(\d)/, '$1-$2');
-
-    if (v.length < 8) {
-      cepError.style.display = 'none';
-      clearAddressFields();
-      updateNavButtons();
-      return;
-    }
-    if (v.length === 8) {
-      debouncedViaCep(v);
-    }
   });
 
-  const debouncedViaCep = debounce((cep) => {
-    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+  // ===== Validadores e checagens (somente ao sair do campo) =====
+  function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+    resto = (soma * 10) % 11; if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+    resto = (soma * 10) % 11; if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+    return true;
+  }
+
+  async function checkCpfExists(cpfValue) {
+    try {
+      const response = await fetch('/check_cpf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf: cpfValue.replace(/\D/g, '') })
+      });
+      const data = await response.json();
+      return data.exists;
+    } catch { return false; }
+  }
+
+  // CEP -> ViaCEP (no blur)
+  function clearAddressFields() {
+    document.getElementById('rua').value = '';
+    document.getElementById('rua_hidden').value = '';
+    document.getElementById('bairro').value = '';
+    document.getElementById('cidade').value = '';
+    document.getElementById('estado').value = '';
+  }
+
+  cepInput.addEventListener('blur', function () {
+    const v = this.value.replace(/\D/g, '');
+    cepError.style.display = 'none';
+    if (v.length !== 8) { clearAddressFields(); updateNavButtons(); return; }
+
+    fetch(`https://viacep.com.br/ws/${v}/json/`)
       .then(r => r.json())
       .then(data => {
         if (data.erro) {
           cepError.style.display = 'block';
           clearAddressFields();
         } else {
-          cepError.style.display = 'none';
           const logradouro = data.logradouro || '';
           const bairro = data.bairro || '';
           const cidade = data.localidade || '';
@@ -352,47 +343,49 @@
         updateNavButtons();
       })
       .catch(() => { cepError.style.display = 'block'; clearAddressFields(); updateNavButtons(); });
-  }, 400);
+  });
 
-  function clearAddressFields() {
-    document.getElementById('rua').value = '';
-    document.getElementById('rua_hidden').value = '';
-    document.getElementById('bairro').value = '';
-    document.getElementById('cidade').value = '';
-    document.getElementById('estado').value = '';
-  }
-
-  // ===== Validadores básicos =====
-  function validarCPF(cpf) {
-    cpf = cpf.replace(/\D/g, '');
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-    let soma = 0, resto;
-    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(9, 10))) return false;
-    soma = 0;
-    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(10, 11))) return false;
-    return true;
-  }
-
-  async function checkCpfExists(cpfValue) {
-    try {
-      const response = await fetch('/check_cpf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cpf: cpfValue.replace(/\D/g, '') })
-      });
-      const data = await response.json();
-      return data.exists;
-    } catch (err) {
-      console.error('Erro ao checar CPF', err);
-      return false;
+  // CPF: valida + checa no banco (no blur)
+  cpfInput.addEventListener('blur', async function () {
+    cpfError.style.display = 'none';
+    cpfExistsError.style.display = 'none';
+    cpfExists = false;
+    const v = cpfInput.value;
+    if (v.length === 14) {
+      if (!validarCPF(v)) {
+        cpfError.style.display = 'block';
+      } else {
+        const exists = await checkCpfExists(v);
+        cpfExists = !!exists;
+        if (cpfExists) cpfExistsError.style.display = 'block';
+      }
     }
-  }
+    updateNavButtons();
+  });
+
+  // E-mail (no blur)
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('email-error');
+  emailInput.addEventListener('blur', function (e) {
+    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+    emailError.style.display = e.target.value && !emailRegex.test(e.target.value) ? 'block' : 'none';
+    updateNavButtons();
+  });
+
+  // Campos com validação simples ao sair
+  ['nome','rg','data_nascimento','telefone','whatsapp','numero','complemento','ponto_referencia','plano','vencimento','nome_rede','senha_rede','lgpd']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      const evt = (el && el.tagName === 'SELECT') || id === 'lgpd' ? 'change' : 'blur';
+      if (el) el.addEventListener(evt, () => {
+        if (id === 'senha_rede') {
+          const senha = el.value || '';
+          const ok = senha.length >= 8 && senha.length <= 10;
+          document.getElementById('senha-error').style.display = senha && !ok ? 'block' : 'none';
+        }
+        updateNavButtons();
+      });
+    });
 
   // ===== Navegação entre etapas =====
   const steps = Array.from(document.querySelectorAll('.step'));
@@ -407,33 +400,27 @@
       if (i === idx) dot.parentElement.classList.add('active');
     });
     current = idx;
-    updateNavButtons();      // controla "Prosseguir" da etapa
-    updateSubmitState();     // controla "Enviar" na etapa 4
+    updateNavButtons();
+    updateSubmitState();
   }
 
-  // Validações por etapa (instantâneas)
   function validateStep(idx) {
     if (idx === 0) {
-      const nome = document.getElementById('nome');
+      const nome = document.getElementById('nome').value.trim();
       const cpfV = cpfInput.value;
-      const rg = document.getElementById('rg');
-      const dn = document.getElementById('data_nascimento');
-
-      // reset visuais se ainda digitando
-      if (cpfV.length < 14) { cpfError.style.display = 'none'; cpfExistsError.style.display = 'none'; }
-
-      if (!nome.value.trim() || !rg.value.trim() || !dn.value) return false;
-      if (cpfV.length !== 14 || !validarCPF(cpfV)) { return false; }
-      if (cpfExists) { return false; }
+      const rg = document.getElementById('rg').value.trim();
+      const dn = document.getElementById('data_nascimento').value;
+      if (!nome || !rg || !dn) return false;
+      if (cpfV.length !== 14 || !validarCPF(cpfV)) return false;
+      if (cpfExists) return false;
       return true;
     }
     if (idx === 1) {
-      const tel = document.getElementById('telefone');
-      const wa = document.getElementById('whatsapp');
-      const email = document.getElementById('email');
+      const tel = document.getElementById('telefone').value.trim();
+      const wa = document.getElementById('whatsapp').value;
+      const email = document.getElementById('email').value;
       const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
-      const ok = !!tel.value.trim() && !!wa.value && !!email.value.trim() && emailRegex.test(email.value);
-      return ok;
+      return !!tel && !!wa && !!email && emailRegex.test(email);
     }
     if (idx === 2) {
       const ruaVis = document.getElementById('rua').value.trim();
@@ -452,7 +439,6 @@
       const senha = document.getElementById('senha_rede').value;
       const lgpd = document.getElementById('lgpd').checked;
       const senhaOk = senha.length >= 8 && senha.length <= 10;
-      document.getElementById('senha-error').style.display = senha && !senhaOk ? 'block' : 'none';
       return !!plano && !!venc && !!nomeRede && senhaOk && lgpd;
     }
     return true;
@@ -468,18 +454,10 @@
     if (current === 2 && next3) next3.disabled = !validateStep(2);
   }
 
-  // Revalida instantaneamente ao digitar/mudar/blur
-  document.querySelectorAll('input, select').forEach(el => {
-    el.addEventListener('input', () => { updateNavButtons(); if (current === 3) updateSubmitState(); });
-    el.addEventListener('change', () => { updateNavButtons(); if (current === 3) updateSubmitState(); });
-    el.addEventListener('blur',   () => { updateNavButtons(); if (current === 3) updateSubmitState(); });
-  });
-
   // Botões de navegação
   document.getElementById('next-1').addEventListener('click', async () => {
     // segurança extra: rechecagem de CPF duplicado
     if (cpfInput.value.length === 14 && validarCPF(cpfInput.value)) {
-      await debouncedCpfCheck.flush?.(); // se existir flush, útil; se não, segue
       const exists = await checkCpfExists(cpfInput.value);
       cpfExists = !!exists;
       if (cpfExists) cpfExistsError.style.display = 'block';
@@ -500,10 +478,10 @@
     submitBtn.disabled = !validateStep(3);
   }
 
-  // Validação final no submit
+  // Validação final no submit (respeitando regra de blur prévio)
   const form = document.getElementById('cadastro-form');
   form.addEventListener('submit', async function (e) {
-    // última verificação de CPF duplicado
+    // última verificação CPF
     if (cpfInput.value.length === 14 && validarCPF(cpfInput.value)) {
       const exists = await checkCpfExists(cpfInput.value);
       cpfExists = !!exists;
@@ -516,7 +494,7 @@
     }
   });
 
-  // Inicializa estado correto
+  // Inicializa estado
   setStep(0);
 </script>
 </body>
