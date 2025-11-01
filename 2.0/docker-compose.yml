@@ -1,56 +1,47 @@
-# docker-compose.yml
+name: dev-firenet
 services:
-  web:
+  firenet-dev-app:
     build: .
-    container_name: firenet-web
+    container_name: firenet-dev-app
+    hostname: firenet-dev-app
     ports:
-      - "5000:5000"
+      - "8080:5000"
     volumes:
       - .:/app
-    restart: unless-stopped
+    restart: always
     environment:
-      - FLASK_ENV=production
-      - DB_HOST=db
-      - DB_NAME=firenet
-      - DB_USER=root
-      - DB_PASSWORD=example
+      FLASK_ENV: production
+      DB_HOST: firenet-dev-db
+      DB_NAME: firenet
+      DB_USER: root
+      DB_PASSWORD: '123@Mudar'
     depends_on:
-      db:
+      firenet-dev-db:
         condition: service_healthy
-    networks:
-      - firenet-network
 
-  db:
+  firenet-dev-db:
     image: mysql:latest
-    container_name: firenet-db
-    restart: unless-stopped
+    container_name: firenet-dev-db
+    hostname: firenet-dev-db
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: '123@Mudar'
       MYSQL_DATABASE: firenet
     volumes:
-      - /srv/db:/var/lib/mysql
-    healthcheck:  # Adicionado: Verifica se o MySQL está pronto
+      - /srv/firenet-dev-db:/var/lib/mysql
+    healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 20s
       retries: 10
-      start_period: 30s  # Tempo inicial para o container "aquecer"
-    networks:
-      - firenet-network
+      start_period: 30s
 
-  phpmyadmin:
-    container_name: phpmyadmin
-    hostname: phpmyadmin
-    networks:
-      - firenet-network
+  firenet-phpmyadmin:
     image: phpmyadmin:latest
+    container_name: firenet-phpmyadmin
+    hostname: firenet-phpmyadmin
     restart: always
     environment:
-      PMA_HOSTS: 'db'
+      PMA_HOSTS: 'firenet-dev-db'
     ports:
-      - 8080:80
-
-networks:
-  firenet-network:
-    driver: bridge
-    name: firenet-network
+      - "8081:80"

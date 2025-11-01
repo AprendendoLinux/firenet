@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, request, redirect, url_for
 import os
 import pymysql
@@ -14,7 +13,13 @@ DB_USER = os.environ.get('DB_USER', 'root')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', 'example')
 
 def get_db_connection():
-    return pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_NAME, charset='utf8mb4')
+    return pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        charset='utf8mb4'
+    )
 
 # Função para sanitizar inputs (similar a PHP)
 def sanitize(data):
@@ -36,11 +41,11 @@ def validar_cpf(cpf):
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
+
     # Verifica se tabelas existem
     cursor.execute("SHOW TABLES")
     existing_tables = [table[0] for table in cursor.fetchall()]
-    
+
     if 'cadastros' not in existing_tables:
         cursor.execute("""
             CREATE TABLE cadastros (
@@ -66,7 +71,7 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-    
+
     if 'password_resets' not in existing_tables:
         cursor.execute("""
             CREATE TABLE password_resets (
@@ -77,7 +82,7 @@ def init_db():
                 INDEX(email)
             )
         """)
-    
+
     if 'usuarios' not in existing_tables:
         cursor.execute("""
             CREATE TABLE usuarios (
@@ -92,7 +97,7 @@ def init_db():
                 2fa_secret VARCHAR(255)
             )
         """)
-    
+
     if 'relatorios' not in existing_tables:
         cursor.execute("""
             CREATE TABLE relatorios (
@@ -103,7 +108,7 @@ def init_db():
                 FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         """)
-    
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -115,6 +120,38 @@ init_db()
 def index():
     return render_template('index.html')
 
+@app.route('/check_cpf', methods=['POST'])
+def check_cpf():
+    """
+    Endpoint chamado pelo JavaScript do cadastro.html para
+    verificar se o CPF já existe (validação em tempo real).
+    """
+    from flask import jsonify
+    data = request.get_json(silent=True) or {}
+    cpf_raw = data.get('cpf', '') or ''
+    cpf_num = re.sub(r'\D', '', cpf_raw)
+
+    exists = False
+    if cpf_num:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            # Compara removendo pontuação do que está salvo
+            cursor.execute(
+                "SELECT COUNT(*) FROM cadastros "
+                "WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = %s",
+                (cpf_num,)
+            )
+            exists = cursor.fetchone()[0] > 0
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            # Em caso de falha, não travar o front; responder exists=False
+            print("Erro ao verificar CPF:", e)
+            exists = False
+
+    return jsonify({'exists': exists})
+
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     current_year = datetime.now().year
@@ -123,7 +160,7 @@ def cadastro():
             # Captura e sanitiza
             nome = request.form.get('nome')
             if nome:
-                nome = ' '.join(word.capitalize() for word in nome.lower().split())  # Capitaliza no backend também
+                nome = ' '.join(word.capitalize() for word in nome.lower().split())
             cpf = sanitize(request.form.get('cpf'))
             rg = sanitize(request.form.get('rg'))
             data_nascimento = request.form.get('data_nascimento')
@@ -143,7 +180,11 @@ def cadastro():
             lgpd = request.form.get('lgpd')
 
             # Validações (replicadas do PHP)
-            required_fields = [nome, cpf, rg, data_nascimento, telefone, whatsapp, email, cep, rua, numero, ponto_referencia, bairro, plano, vencimento, nome_rede, senha_rede, lgpd]
+            required_fields = [
+                nome, cpf, rg, data_nascimento, telefone, whatsapp, email, cep,
+                rua, numero, ponto_referencia, bairro, plano, vencimento,
+                nome_rede, senha_rede, lgpd
+            ]
             if None in required_fields or '' in required_fields:
                 raise ValueError('Todos os campos obrigatórios devem ser preenchidos.')
 
@@ -172,25 +213,60 @@ def cadastro():
             date_obj = datetime.strptime(data_nascimento, '%Y-%m-%d')
             data_nascimento = date_obj.strftime('%d/%m/%Y')
 
-            # Insere no DB
+            # ===== NOVO: Verifica se CPF já existe antes de inserir =====
+            cpf_num = re.sub(r'\D', '', cpf or '')
             conn = get_db_connection()
             cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) FROM cadastros "
+                "WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = %s",
+                (cpf_num,)
+            )
+            if cursor.fetchone()[0] > 0:
+                cursor.close()
+                conn.close()
+                raise ValueError('CPF já cadastrado, favor entrar em contato via WhatsApp.')
+
+            # Se não existe, faz o insert
             cursor.execute("""
-                INSERT INTO cadastros (nome, cpf, rg, data_nascimento, telefone, whatsapp, email, cep, rua, numero, complemento, ponto_referencia, bairro, plano, vencimento, nome_rede, senha_rede, lgpd)
+                INSERT INTO cadastros (
+                    nome, cpf, rg, data_nascimento, telefone, whatsapp,
+                    email, cep, rua, numero, complemento, ponto_referencia,
+                    bairro, plano, vencimento, nome_rede, senha_rede, lgpd
+                )
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (nome, cpf, rg, data_nascimento, telefone, whatsapp, email, cep, rua, numero, complemento, ponto_referencia, bairro, plano, vencimento, nome_rede, senha_rede, lgpd))
+            """, (
+                nome, cpf, rg, data_nascimento, telefone, whatsapp, email, cep,
+                rua, numero, complemento, ponto_referencia, bairro, plano,
+                vencimento, nome_rede, senha_rede, lgpd
+            ))
             conn.commit()
             cursor.close()
             conn.close()
 
             # Placeholder para email/Telegram (expanda se necessário)
-            # Ex.: Use smtplib para email, requests para Telegram API
 
-            return redirect(url_for('sucesso'))  # Crie uma rota /sucesso se necessário
+            return redirect(url_for('sucesso'))
 
         except ValueError as e:
+            # Mensagens de validação amigáveis
             return render_template('cadastro.html', error=str(e), form_data=request.form, current_year=current_year)
+
+        except pymysql.err.IntegrityError as e:
+            # Caso extremo: se UNIQUE estourar (condição de corrida), tratar amigável
+            msg = str(e.args[1] if len(e.args) > 1 else e)
+            if 'cpf' in msg.lower():
+                friendly = 'CPF já cadastrado, favor entrar em contato via WhatsApp.'
+            elif 'email' in msg.lower():
+                # Mantém foco no CPF; mas deixa amigável se acontecer com email
+                friendly = 'E-mail já cadastrado. Use outro e-mail ou recupere o acesso.'
+            else:
+                friendly = 'Não foi possível concluir o cadastro. Tente novamente.'
+            return render_template('cadastro.html', error=friendly, form_data=request.form, current_year=current_year)
+
         except Exception as e:
+            # Loga e retorna mensagem genérica
+            print("Erro interno no /cadastro:", e)
             return render_template('cadastro.html', error='Erro interno. Tente novamente.', form_data=request.form, current_year=current_year)
 
     return render_template('cadastro.html', current_year=current_year)
