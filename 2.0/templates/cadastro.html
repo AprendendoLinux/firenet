@@ -60,6 +60,8 @@
             <div class="mb-3">
                 <label for="cpf" class="form-label">Qual é seu CPF? *</label>
                 <input type="text" class="form-control" id="cpf" name="cpf" required maxlength="14">
+                <div id="cpf-error" class="text-danger" style="display: none;">CPF inválido. Por favor, insira um CPF válido.</div>
+                <div id="cpf-exists-error" class="text-danger" style="display: none;">CPF já cadastrado, favor entrar em contato via WhatsApp.</div>
             </div>
             <div class="mb-3">
                 <label for="rg" class="form-label">Qual seu RG (carteira de identidade)? *</label>
@@ -89,6 +91,7 @@
             <div class="mb-3">
                 <label for="cep" class="form-label">Qual o seu CEP? *</label>
                 <input type="text" class="form-control" id="cep" name="cep" required maxlength="9">
+                <div id="cep-error" class="text-danger" style="display: none;">Endereço inexistente. Por favor, insira um CEP válido.</div>
             </div>
             <div class="mb-3">
                 <label for="rua" class="form-label">Qual o seu endereço? *</label>
@@ -136,12 +139,13 @@
             <div class="mb-3">
                 <label for="senha_rede" class="form-label">E qual é a senha que deseja usar (mínimo 8 e máximo 10 caracteres)? *</label>
                 <input type="text" class="form-control" id="senha_rede" name="senha_rede" required minlength="8" maxlength="10">
+                <div id="senha-error" class="text-danger" style="display: none;">A senha deve ter entre 8 e 10 caracteres.</div>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="lgpd" name="lgpd" value="Sim" required>
                 <label class="form-check-label" for="lgpd">Declaro que estou fornecendo estas informações exclusivamente para fins de cadastro e formalização da assinatura do serviço de internet oferecido pela empresa FireNet. Estou ciente de que os dados enviados serão tratados de acordo com a Lei Geral de Proteção de Dados Pessoais (LGPD – Lei nº 13.709/2018), garantindo sua segurança, confidencialidade e utilização apenas para os propósitos especificados, conforme a política de privacidade da empresa.</label>
             </div>
-            <button type="submit" class="btn btn-danger">Enviar</button>
+            <button type="submit" class="btn btn-danger" id="submit-btn" disabled>Enviar</button>
         </form>
     </div>
 </section>
@@ -163,27 +167,98 @@
         e.target.value = v.substring(0, 12);  // Limita a 12 chars
     });
 
-    // Validação email frontend
+    // Função para validar CPF
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
+        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+        let soma = 0, resto;
+        for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if ((resto === 10) || (resto === 11)) resto = 0;
+        if (resto !== parseInt(cpf.substring(9, 10))) return false;
+        soma = 0;
+        for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+        resto = (soma * 10) % 11;
+        if ((resto === 10) || (resto === 11)) resto = 0;
+        if (resto !== parseInt(cpf.substring(10, 11))) return false;
+        return true;
+    }
+
+    // Variáveis para validações
+    const cpfInput = document.getElementById('cpf');
+    const cpfError = document.getElementById('cpf-error');
+    const cpfExistsError = document.getElementById('cpf-exists-error');
+    let cpfExists = false;
+
+    // Validação on blur para CPF (validação local e checagem de existência)
+    cpfInput.addEventListener('blur', function () {
+        const cpfValue = cpfInput.value;
+        cpfError.style.display = 'none';
+        cpfExistsError.style.display = 'none';
+        cpfExists = false;
+
+        if (cpfValue.length === 14) {
+            if (!validarCPF(cpfValue)) {
+                cpfError.style.display = 'block';
+            } else {
+                // Checar se CPF já existe via AJAX
+                fetch('/check_cpf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ cpf: cpfValue.replace(/\D/g, '') })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        cpfExistsError.style.display = 'block';
+                        cpfExists = true;
+                    }
+                    checkAllValid();
+                })
+                .catch(error => {
+                    console.error('Erro ao checar CPF:', error);
+                });
+            }
+        }
+        checkAllValid();
+    });
+
+    // Validação on blur para e-mail
     const emailInput = document.getElementById('email');
     const emailError = document.getElementById('email-error');
-    const form = document.getElementById('cadastro-form');
-    form.addEventListener('submit', function (e) {
+    emailInput.addEventListener('blur', function () {
         const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
-        if (!emailRegex.test(emailInput.value)) {
+        if (emailInput.value && !emailRegex.test(emailInput.value)) {
             emailError.style.display = 'block';
-            e.preventDefault();  // Impede submit se inválido
         } else {
             emailError.style.display = 'none';
         }
+        checkAllValid();
     });
 
-    // Outras máscaras existentes (CPF, Telefone, CEP, auto-CEP)
+    // Validação on blur para senha
+    const senhaInput = document.getElementById('senha_rede');
+    const senhaError = document.getElementById('senha-error');
+    senhaInput.addEventListener('blur', function () {
+        const senhaValue = senhaInput.value;
+        if (senhaValue.length > 0 && (senhaValue.length < 8 || senhaValue.length > 10)) {
+            senhaError.style.display = 'block';
+        } else {
+            senhaError.style.display = 'none';
+        }
+        checkAllValid();
+    });
+
+    // Máscaras existentes (CPF, Telefone, CEP)
     document.getElementById('cpf').addEventListener('input', function (e) {
         let v = e.target.value.replace(/\D/g, '');
         v = v.replace(/(\d{3})(\d)/, '$1.$2');
         v = v.replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
         v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
         e.target.value = v;
+        checkAllValid();
     });
 
     document.getElementById('telefone').addEventListener('input', function (e) {
@@ -191,25 +266,80 @@
         v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
         v = v.replace(/(\d)(\d{4})$/, '$1-$2');
         e.target.value = v;
+        checkAllValid();
     });
 
     document.getElementById('cep').addEventListener('input', function (e) {
         let v = e.target.value.replace(/\D/g, '');
         v = v.replace(/(\d{5})(\d)/, '$1-$2');
         e.target.value = v;
+        checkAllValid();
     });
 
-    document.getElementById('cep').addEventListener('blur', function () {
+    // Validação on blur para CEP (com fetch na API)
+    const cepInput = document.getElementById('cep');
+    const cepError = document.getElementById('cep-error');
+    cepInput.addEventListener('blur', function () {
         const cep = this.value.replace(/\D/g, '');
+        cepError.style.display = 'none';
         if (cep.length === 8) {
             fetch(`https://viacep.com.br/ws/${cep}/json/`)
                 .then(response => response.json())
                 .then(data => {
-                    if (!data.erro) {
+                    if (data.erro) {
+                        cepError.style.display = 'block';
+                        document.getElementById('rua').value = '';
+                        document.getElementById('bairro').value = '';
+                    } else {
+                        cepError.style.display = 'none';
                         document.getElementById('rua').value = data.logradouro;
                         document.getElementById('bairro').value = data.bairro;
                     }
+                    checkAllValid();
+                })
+                .catch(() => {
+                    cepError.style.display = 'block';
+                    checkAllValid();
                 });
+        } else {
+            checkAllValid();
+        }
+    });
+
+    // Função para checar se todos os campos estão válidos
+    function checkAllValid() {
+        const form = document.getElementById('cadastro-form');
+        const submitBtn = document.getElementById('submit-btn');
+        let allValid = form.checkValidity(); // Verifica campos required nativos
+
+        // Verificar erros personalizados
+        if (cpfError.style.display !== 'none' || cpfExistsError.style.display !== 'none' || cpfExists) allValid = false;
+        if (emailError.style.display !== 'none') allValid = false;
+        if (senhaError.style.display !== 'none') allValid = false;
+        if (cepError.style.display !== 'none') allValid = false;
+
+        // Campos readonly como rua e bairro devem ter valor (preenchidos pelo CEP)
+        if (document.getElementById('rua').value === '' || document.getElementById('bairro').value === '') allValid = false;
+
+        submitBtn.disabled = !allValid;
+    }
+
+    // Adicionar listeners para todos os campos para checar em tempo real
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('input', checkAllValid);
+        input.addEventListener('change', checkAllValid);
+        input.addEventListener('blur', checkAllValid);
+    });
+
+    // Validação no submit para impedir envio com erros (redundância)
+    const form = document.getElementById('cadastro-form');
+    form.addEventListener('submit', function (e) {
+        checkAllValid();
+        if (form.submitBtn.disabled) {
+            e.preventDefault();
+        } else {
+            // Aqui o backend deve checar novamente o CPF antes de inserir, mas como é frontend, assumimos que o check foi feito
         }
     });
 </script>
