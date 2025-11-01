@@ -282,14 +282,7 @@
             </button>
         </div>
 
-        <div class="ratio ratio-16x9 rounded shadow-lg overflow-hidden">
-            <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.123456789!2d-43.289!3d-22.889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDUzJzIwLjQiUyA0M8KwMTcnMTkuOCJX!5e0!3m2!1spt-BR!2sbr!4v1234567890" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy">
-            </iframe>
-        </div>
+        <div id="map" class="ratio ratio-16x9 rounded shadow-lg overflow-hidden"></div>
     </div>
 </section>
 
@@ -392,10 +385,26 @@
 <script>
     let selectedRua = '';
     let selectedBairro = '';
+    let selectedPlace = null;
+    let map;
+    let geocoder;
 
     function initMap() {
+        geocoder = new google.maps.Geocoder();
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -22.889, lng: -43.289},
+            zoom: 12
+        });
+
+        const bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(-23.08, -43.83), // southwest (min lat, min lng)
+            new google.maps.LatLng(-22.75, -43.12) // northeast (max lat, max lng)
+        );
+
         const input = document.getElementById('ruaSearch');
         const options = {
+            bounds: bounds,
+            strictBounds: true,
             types: ['address'],
             componentRestrictions: { country: 'br' }
         };
@@ -404,9 +413,15 @@
         autocomplete.addListener('place_changed', function () {
             const place = autocomplete.getPlace();
             if (!place.geometry) {
-                Swal.fire('Erro', "Nenhum detalhe disponível para a entrada: '" + place.name + "'", 'error');
+                Swal.fire({
+                    title: 'Erro',
+                    text: "Nenhum detalhe disponível para a entrada: '" + place.name + "'",
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
                 return;
             }
+            selectedPlace = place;
             selectedRua = '';
             selectedBairro = '';
             place.address_components.forEach(comp => {
@@ -417,8 +432,6 @@
                     selectedBairro = comp.long_name;
                 }
             });
-            // Opcionalmente, chame checkCoverage aqui se quiser verificação automática ao selecionar
-            // checkCoverage();
         });
     }
 
@@ -428,7 +441,12 @@
         let bairro = selectedBairro;
 
         if (!rua) {
-            Swal.fire('Erro', 'Por favor, digite ou selecione a rua.', 'error');
+            Swal.fire({
+                title: 'Erro',
+                text: 'Por favor, digite ou selecione a rua.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
             return;
         }
 
@@ -446,7 +464,12 @@
         })
         .then(data => {
             if (data.error) {
-                Swal.fire('Erro', data.error, 'error');
+                Swal.fire({
+                    title: 'Erro',
+                    text: data.error,
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
                 return;
             }
             if (data.link) {
@@ -454,6 +477,7 @@
                     title: 'Cobertura Disponível!',
                     text: 'Parabéns, essa rua possui cobertura da FireNet Telecom.',
                     icon: 'success',
+                    confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Cadastre-se agora',
                     showCloseButton: true
                 }).then(result => {
@@ -461,13 +485,40 @@
                         window.location.href = data.link;
                     }
                 });
+
+                // Centralizar o mapa na rua
+                if (selectedPlace && selectedPlace.geometry) {
+                    map.setCenter(selectedPlace.geometry.location);
+                    map.setZoom(18);
+                } else {
+                    geocoder.geocode({ 
+                        address: rua + (bairro ? ', ' + bairro : '') + ', Rio de Janeiro, RJ, Brasil' 
+                    }, function(results, status) {
+                        if (status === 'OK') {
+                            map.setCenter(results[0].geometry.location);
+                            map.setZoom(18);
+                        } else {
+                            console.log('Geocode failed: ' + status);
+                        }
+                    });
+                }
             } else {
-                Swal.fire('Sem Cobertura', data.mensagem, 'info');
+                Swal.fire({
+                    title: 'Sem Cobertura',
+                    text: data.mensagem,
+                    icon: 'info',
+                    confirmButtonColor: '#dc3545'
+                });
             }
         })
         .catch(error => {
             console.error('Erro:', error);
-            Swal.fire('Erro', 'Erro ao verificar cobertura. Tente novamente.', 'error');
+            Swal.fire({
+                title: 'Erro',
+                text: 'Erro ao verificar cobertura. Tente novamente.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
         });
     }
 
