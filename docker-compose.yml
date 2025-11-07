@@ -1,0 +1,76 @@
+services:
+  firenet:
+    container_name: firenet
+    hostname: firenet
+    image: aprendendolinux/firenet:latest
+    restart: always
+    ports:
+      - "8080:5000"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - dev-firenet
+    environment:
+      # Modo de ambiente do Flask (development/production)
+      FLASK_ENV: production
+      # Endereço do host do banco de dados
+      DB_HOST: database
+      # Nome do banco de dados
+      DB_NAME: firenet_db
+      # Usuário do banco de dados
+      DB_USER: root
+      # Senha do banco de dados (substitua por valor seguro)
+      DB_PASSWORD: 'fake_db_pass_123'
+      # Chave API do Google Maps para serviços de mapeamento
+      GOOGLE_MAPS_API_KEY: 'fake_google_maps_key_abc123'
+      # Chave secreta para gerenciamento de sessões e segurança
+      SECRET_KEY: 'fake_secret_key_xyz456'
+      # Token do bot do Telegram para integrações
+      TELEGRAM_BOT_TOKEN: 'fake_telegram_token_789def'
+      # Servidor de email para envio de mensagens
+      MAIL_SERVER: 'smtp.example.com'
+      # Porta do servidor de email
+      MAIL_PORT: '587'
+      # Usar TLS para email (True/False)
+      MAIL_USE_TLS: 'False'
+      # Usar SSL para email (True/False)
+      MAIL_USE_SSL: 'False'
+      # Nome de usuário do email
+      MAIL_USERNAME: 'user@example.com'
+      # Senha do email (substitua por valor seguro)
+      MAIL_PASSWORD: 'fake_mail_pass_ghi789'
+      # Remetente padrão para emails
+      MAIL_DEFAULT_SENDER: 'App <no-reply@example.com>'
+      # URL base da aplicação
+      APP_BASE_URL: 'https://example.com/'
+      # Email de resposta
+      REPLY_TO_EMAIL: 'reply@example.com'
+      # Chave do site reCAPTCHA para proteção contra spam
+      RECAPTCHA_SITE_KEY: 'fake_recaptcha_site_key_jkl012'
+      # Chave secreta reCAPTCHA (substitua por valor seguro)
+      RECAPTCHA_SECRET_KEY: 'fake_recaptcha_secret_mno345'
+    depends_on:
+      - database
+
+  database:
+    image: mysql:latest
+    container_name: database
+    hostname: database
+    restart: always
+    networks:
+      - dev-firenet
+    environment:
+      # Senha root do MySQL (substitua por valor seguro)
+      MYSQL_ROOT_PASSWORD: 'fake_mysql_root_pass_456'
+      # Nome do banco de dados MySQL
+      MYSQL_DATABASE: firenet_db
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /srv/database:/var/lib/mysql
+    ports:
+      - '3306:3306'
+
+networks:
+  dev-firenet:
+    driver: bridge
+    name: dev-firenet

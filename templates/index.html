@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireNet Telecom - Internet de Alta Velocidade</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Meta Tags Gerais -->
+    <meta name="description" content="A FireNet Telecom oferece internet de alta velocidade com planos de até 800 MEGA. Conexão estável e rápida para Pilares, Inhaúma, Engenho da Rainha e Tomás Coelho, RJ. Assine agora!">
+
+    <!-- Meta Tags Open Graph para Redes Sociais -->
+    <meta property="og:title" content="FireNet Telecom - Internet de Alta Velocidade">
+    <meta property="og:description" content="Conexão rápida e estável com planos de até 800 MEGA. Cobertura em Pilares, Inhaúma, Engenho da Rainha e Tomás Coelho, RJ. Confira nossos planos e assine já!">
+    <meta property="og:image" content="{{ url_for('static', filename='card_firenet.jpg', _external=True) }}">
+    <meta property="og:url" content="{{ url_for('index', _external=True) }}">
+    <meta property="og:type" content="website">
+
+    <!-- Meta Tags para Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FireNet Telecom - Internet de Alta Velocidade">
+    <meta name="twitter:description" content="Conexão rápida e estável com planos de até 800 MEGA. Cobertura em Pilares, Inhaúma, Engenho da Rainha e Tomás Coelho, RJ. Assine já!">
+    <meta name="twitter:image" content="{{ url_for('static', filename='card_firenet.jpg', _external=True) }}">
+
+<style>
+  /* Altura aproximada do header (ajuste fino se quiser) */
+  :root { --header-h: 80px; }
+
+  /* Garante que qualquer âncora (#id) pare um pouco abaixo do topo */
+  section[id], header[id], div[id] {
+    scroll-margin-top: var(--header-h);
+  }
+</style>
+</head>
+
+<body>
+<!-- Header (Branco, logo grande, menu limpo) -->
+<header class="bg-white shadow-sm py-3 sticky-top">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet">
+            </a>
+                <!-- MENU SUPERIOR ATUALIZADO -->
+                <nav class="d-none d-md-flex gap-4">
+                    <a href="#inicio" class="nav-link text-dark fw-medium">Início</a>
+                    <a href="#planos" class="nav-link text-dark fw-medium">Planos</a>
+                    <a href="#vantagens" class="nav-link text-dark fw-medium">Vantagens</a>
+                    <a href="#cobertura" class="nav-link text-dark fw-medium">Cobertura</a>
+                    <a href="#central" class="nav-link text-dark fw-medium">Central do Cliente</a>
+                    <a href="#cadastro" class="nav-link text-dark fw-medium">Cadastro</a>
+                    <a href="/contato" class="nav-link text-dark fw-medium">Contato</a>
+                </nav>
+            <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="collapse mt-3" id="navMobile">
+            <!-- MENU MOBILE ATUALIZADO -->
+            <nav class="d-flex flex-column text-center gap-2">
+                <a href="#inicio" class="py-2 text-dark">Início</a>
+                <a href="#planos" class="py-2 text-dark">Planos</a>
+                <a href="#vantagens" class="py-2 text-dark">Vantagens</a>
+                <a href="#cobertura" class="py-2 text-dark">Cobertura</a>
+                <a href="#central" class="py-2 text-dark">Central do Cliente</a>
+                <a href="#cadastro" class="py-2 text-dark">Cadastro</a>
+                <a href="/contato" class="py-2 text-dark">Contato</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+<!-- Hero (Imagem de fundo + texto branco) -->
+<section id="inicio" class="hero-section text-white text-center">
+    <div class="container position-relative">
+        <div class="hero-content">
+            <h1 class="display-4 fw-bold mb-3">Internet de Alta Velocidade com a FireNet Telecom</h1>
+            <p class="lead mb-4">
+                A FireNet Telecom oferece a melhor experiência de internet para você, seja para navegar, jogar ou trabalhar.
+                Com velocidades de até <strong>800 MEGAS</strong>, garantimos conexão estável e rápida.
+            </p>
+            <a href="#planos" class="btn btn-danger btn-lg px-5 rounded-pill shadow-lg">Conheça os Planos</a>
+        </div>
+    </div>
+</section>
+
+<!-- Planos (Cards brancos com ícone e botão vermelho) -->
+<section id="planos" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center text-danger mb-2">Nossos Planos</h2>
+        <p class="text-center text-muted mb-5 small">
+            Escolha o plano que melhor se adapta às suas necessidades. Todos os valores incluem descontos para pagamento até o vencimento!
+        </p>
+        <div class="row g-4 justify-content-center">
+
+            <!-- 800 MEGAS -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card plan-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon mb-3 text-danger">
+                            <i class="fas fa-bolt fa-3x"></i>
+                        </div>
+                        <h3 class="text-danger fw-bold">800 MEGAS</h3>
+                        <h4 class="price">R$ 164,90<sup class="text-danger">*</sup></h4>
+                        <p class="small text-muted">Valor Integral: R$ 184,90</p>
+                        <p class="text-danger small fw-semibold">*Com desconto até o vencimento</p>
+                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 700 MEGAS -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card plan-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon mb-3 text-danger">
+                            <i class="fas fa-rocket fa-3x"></i>
+                        </div>
+                        <h3 class="text-danger fw-bold">700 MEGAS</h3>
+                        <h4 class="price">R$ 144,90<sup class="text-danger">*</sup></h4>
+                        <p class="small text-muted">Valor Integral: R$ 164,90</p>
+                        <p class="text-danger small fw-semibold">*Com desconto até o vencimento</p>
+                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 600 MEGAS -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card plan-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon mb-3 text-danger">
+                            <i class="fas fa-wifi fa-3x"></i>
+                        </div>
+                        <h3 class="text-danger fw-bold">600 MEGAS</h3>
+                        <h4 class="price">R$ 104,90<sup class="text-danger">*</sup></h4>
+                        <p class="small text-muted">Valor Integral: R$ 124,90</p>
+                        <p class="text-danger small fw-semibold">*Com desconto até o vencimento</p>
+                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 500 MEGAS -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card plan-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon mb-3 text-danger">
+                            <i class="fas fa-tachometer-alt fa-3x"></i>
+                        </div>
+                        <h3 class="text-danger fw-bold">500 MEGAS</h3>
+                        <h4 class="price">R$ 84,90<sup class="text-danger">*</sup></h4>
+                        <p class="small text-muted">Valor Integral: R$ 104,90</p>
+                        <p class="text-danger small fw-semibold">*Com desconto até o vencimento</p>
+                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Taxa de Instalação -->
+        <div class="mt-5 p-4 bg-white rounded shadow-sm border-start border-danger border-5 text-center">
+            <p class="mb-2"><strong>Taxa de Instalação:</strong> R$ 120,00 (única) para Pilares, Inhaúma, Engenho da Rainha e Tomás Coelho.</p>
+            <p class="small text-muted">Valor pago diretamente ao técnico após a realização da instalação (dinheiro ou Pix).</p>
+        </div>
+        <div class="mt-3 p-4 bg-danger text-white rounded text-center shadow-lg">
+            <p class="mb-0 fw-bold">Todos os planos são LIVRES DE FIDELIDADE!</p>
+        </div>
+    </div>
+</section>
+
+<!-- Vantagens -->
+<section id="vantagens" class="py-5 bg-white">
+    {% include 'cards_vantagens.html' %}
+</section>
+
+<!-- Cobertura -->
+<section id="cobertura" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center text-danger mb-2">Área de Cobertura</h2>
+        <p class="text-center text-muted mb-4 small">
+            Digite o nome da rua para verificar se está na nossa rede em Pilares, Inhaúma, Engenho da Rainha e Tomás Coelho.
+        </p>
+        <div class="input-group mb-4 max-w-600 mx-auto">
+            <input type="text" class="form-control form-control-lg" placeholder="Digite o nome da rua" id="ruaSearch">
+            <button class="btn btn-danger btn-lg px-4" id="checkCoverageBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+        <div id="map" class="ratio ratio-16x9 rounded shadow-lg overflow-hidden"></div>
+    </div>
+</section>
+
+<!-- Cadastro -->
+<section id="cadastro" class="py-5 bg-white text-center">
+    <div class="container">
+        <h2 class="text-danger mb-3">Faça Seu Cadastro</h2>
+        <p class="text-muted mb-4">Clique abaixo e torne-se cliente FireNet!</p>
+        <a href="/cadastro" class="btn btn-danger btn-lg px-5 rounded-pill shadow-lg">Cadastre-se</a>
+    </div>
+</section>
+
+<!-- Central do Cliente -->
+<section id="central" class="py-5 bg-light text-center">
+<div class="container">
+        <h2 class="text-danger mb-3">Central do Cliente</h2>
+        <p class="text-muted mb-4">Emita boletos, consulte contratos, abra chamados e muito mais.</p>
+        <a href="https://sistema.alfaprovedor.com.br/central_assinante_web/login" target="_blank" class="btn btn-danger btn-lg px-5 rounded-pill shadow-lg">Central do Cliente</a>
+    </div>
+</section>
+</main>
+
+{% include 'footer.html' %}
+
+<div class="whats-button">
+  <a title="Clique aqui para entrar em contato via WhatsApp"
+    href="https://wa.me/5521997123987?text=Ol%C3%A1!%20Gostaria%20de%20assinar%20a%20FireNet%20Telecom.">
+    <img loading="lazy" src="{{ url_for('static', filename='whatsapp.webp') }}" alt="WhatsApp" title="Contato via WhatsApp">
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  (function () {
+    const header = document.querySelector('header');
+    const navMobile = document.getElementById('navMobile');
+    const headerH = header ? header.offsetHeight : 80;
+
+    function smoothScrollTo(hash) {
+      if (!hash || hash === '#') return;
+      const el = document.querySelector(hash);
+      if (!el) return;
+      // Calcula a posição alvo compensando o header fixo
+      const y = el.getBoundingClientRect().top + window.pageYOffset - headerH;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+
+    // Fechar o menu mobile e só depois rolar
+    function handleAnchorClick(e) {
+      const href = this.getAttribute('href') || '';
+      if (!href.startsWith('#')) return;
+
+      e.preventDefault();
+
+      // Se o menu mobile está aberto, esconde e rola após o colapso
+      const isMobileOpen = navMobile && navMobile.classList.contains('show');
+      if (isMobileOpen) {
+        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(navMobile, { toggle: false });
+        const once = () => {
+          navMobile.removeEventListener('hidden.bs.collapse', once);
+          // Pequeno timeout para garantir layout estabilizado
+          setTimeout(() => smoothScrollTo(href), 0);
+        };
+        navMobile.addEventListener('hidden.bs.collapse', once);
+        bsCollapse.hide();
+      } else {
+        smoothScrollTo(href);
+      }
+    }
+
+    // Links do menu desktop e do menu mobile
+    document.querySelectorAll('nav a[href^="#"]').forEach(a => {
+      a.addEventListener('click', handleAnchorClick);
+    });
+
+    // (Opcional) Botões/links dentro da página que levam a #âncoras (ex.: “Assinar”)
+    document.querySelectorAll('a.btn[href^="#"]').forEach(a => {
+      a.addEventListener('click', handleAnchorClick);
+    });
+  })();
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initMap" async defer></script>
+
+<script>
+    let selectedRua = '';
+    let selectedBairro = '';
+    let selectedPlace = null;
+    let map;
+    let geocoder;
+    let marker = null; // Para gerenciar o marcador no mapa
+
+    function initMap() {
+        geocoder = new google.maps.Geocoder();
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -22.889, lng: -43.289},
+            zoom: 12
+        });
+
+        const bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(-23.08, -43.83), // southwest (min lat, min lng)
+            new google.maps.LatLng(-22.75, -43.12) // northeast (max lat, max lng)
+        );
+
+        const input = document.getElementById('ruaSearch');
+        const options = {
+            bounds: bounds,
+            strictBounds: true,
+            types: ['address'],
+            componentRestrictions: { country: 'br' }
+        };
+        const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+        autocomplete.addListener('place_changed', function () {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                Swal.fire({
+                    title: 'Erro',
+                    text: "Nenhum detalhe disponível para a entrada: '" + place.name + "'",
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
+            selectedPlace = place;
+            selectedRua = '';
+            selectedBairro = '';
+            place.address_components.forEach(comp => {
+                if (comp.types.includes('route')) {
+                    selectedRua = comp.long_name;
+                }
+                if (comp.types.includes('sublocality_level_1') || comp.types.includes('neighborhood') || comp.types.includes('sublocality')) {
+                    selectedBairro = comp.long_name;
+                }
+            });
+
+            // Adicionar marcador e centralizar no local selecionado via autocomplete
+            if (marker) marker.setMap(null);
+            marker = new google.maps.Marker({
+                position: place.geometry.location,
+                map: map
+            });
+            map.setCenter(place.geometry.location);
+            map.setZoom(18);
+
+            // Verificar viabilidade automaticamente após seleção via autocomplete
+            checkCoverage();
+        });
+
+        // Adicionar listener de clique no mapa para selecionar localização e verificar viabilidade automaticamente
+        map.addListener('click', function(event) {
+            geocoder.geocode({ location: event.latLng }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    selectedPlace = results[0];
+                    selectedRua = '';
+                    selectedBairro = '';
+                    results[0].address_components.forEach(comp => {
+                        if (comp.types.includes('route')) {
+                            selectedRua = comp.long_name;
+                        }
+                        if (comp.types.includes('sublocality_level_1') || comp.types.includes('neighborhood') || comp.types.includes('sublocality')) {
+                            selectedBairro = comp.long_name;
+                        }
+                    });
+
+                    // Atualizar o input de busca com a rua e bairro encontrados
+                    document.getElementById('ruaSearch').value = selectedRua + (selectedBairro ? ', ' + selectedBairro : '');
+
+                    // Adicionar ou atualizar marcador no ponto clicado
+                    if (marker) marker.setMap(null);
+                    marker = new google.maps.Marker({
+                        position: event.latLng,
+                        map: map
+                    });
+
+                    // Centralizar e zoom no ponto clicado
+                    map.setCenter(event.latLng);
+                    map.setZoom(18);
+
+                    // Verificar viabilidade automaticamente após clique
+                    checkCoverage();
+                } else {
+                    console.log('Geocode failed: ' + status);
+                    Swal.fire({
+                        title: 'Erro',
+                        text: 'Não foi possível obter o endereço para este local. Tente novamente.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
+        });
+    }
+
+    // Função para verificar cobertura
+    function checkCoverage() {
+        let rua = selectedRua || document.getElementById('ruaSearch').value.trim();
+        let bairro = selectedBairro;
+
+        if (!rua) {
+            Swal.fire({
+                title: 'Erro',
+                text: 'Por favor, digite, selecione ou clique em uma rua no mapa.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
+            return;
+        }
+
+        const data = { rua };
+        if (bairro) data.bairro = bairro;
+
+        fetch('/validar_cobertura', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Resposta de rede não ok');
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                Swal.fire({
+                    title: 'Erro',
+                    text: data.error,
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
+            if (data.link) {
+                Swal.fire({
+                    title: 'Cobertura Disponível!',
+                    text: 'Parabéns, essa rua possui cobertura da FireNet Telecom.',
+                    icon: 'success',
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Cadastre-se agora',
+                    showCloseButton: true
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        window.location.href = data.link;
+                    }
+                });
+
+                // Centralizar o mapa na rua (se não já centralizado pelo clique ou autocomplete)
+                if (selectedPlace && selectedPlace.geometry) {
+                    map.setCenter(selectedPlace.geometry.location);
+                    map.setZoom(18);
+                } else {
+                    geocoder.geocode({ 
+                        address: rua + (bairro ? ', ' + bairro : '') + ', Rio de Janeiro, RJ, Brasil' 
+                    }, function(results, status) {
+                        if (status === 'OK') {
+                            map.setCenter(results[0].geometry.location);
+                            map.setZoom(18);
+                        } else {
+                            console.log('Geocode failed: ' + status);
+                        }
+                    });
+                }
+            } else {
+                Swal.fire({
+                    title: 'Sem Cobertura',
+                    text: data.mensagem,
+                    icon: 'info',
+                    confirmButtonColor: '#dc3545'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            Swal.fire({
+                title: 'Erro',
+                text: 'Erro ao verificar cobertura. Tente novamente.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+    }
+
+    document.getElementById('checkCoverageBtn').addEventListener('click', checkCoverage);
+    initMap();
+</script>
+
+</body>
+</html>

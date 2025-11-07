@@ -1,0 +1,141 @@
+/* static/css/imprimir-cliente.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+.a4-page {
+    width: 210mm;
+    height: 297mm;
+    padding: 15mm;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+@media screen {
+    body {
+        background-color: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .a4-page {
+        margin: 20px auto;
+    }
+}
+
+@media print {
+    body {
+        background-color: #fff;
+    }
+
+    .a4-page {
+        margin: 0;
+        box-shadow: none;
+        width: 210mm;
+        height: 297mm;
+    }
+
+    .no-print {
+        display: none;
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header img {
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    color: #ff0000;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section h2 {
+    color: #ff0000;
+    font-size: 18px;
+    border-bottom: 2px solid #ffcc00;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.section p {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.section p strong {
+    color: #000;
+}
+
+.status-programada {
+    color: #ffcc00;
+    font-weight: bold;
+}
+
+.status-concluida {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-nao-realizada {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.footer {
+    position: absolute;
+    bottom: 15mm;
+    width: calc(100% - 30mm);
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+.no-print {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-print button {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.no-print button:hover {
+    background-color: #ffcc00;
+    color: #000;
+}

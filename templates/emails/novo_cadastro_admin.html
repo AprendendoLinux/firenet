@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Cadastro na FireNet Telecom</title>
+    <style>
+        body { font-family: 'Montserrat', Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid #dc3545; }
+        .header { background-color: #ffffff; color: #333333; padding: 30px 20px; text-align: center; }
+        .header img { max-width: 200px; display: block; margin: 0 auto; }
+        .content { padding: 40px 30px; text-align: center; }
+        .content h1 { color: #dc3545; font-weight: 700; font-size: 28px; margin-bottom: 20px; }
+        .content p { color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px; text-align: left; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .data-table th, .data-table td { padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; }
+        .data-table th { background-color: #f8f9fa; font-weight: 600; color: #333333; }
+        .data-table td { color: #333333; }
+        .footer { background-color: #dc3545; color: #ffffff; padding: 20px; text-align: center; font-size: 12px; }
+        @media only screen and (max-width: 600px) {
+            .container { max-width: 100%; border-radius: 0; }
+            .content { padding: 30px 20px; }
+            .header { padding: 20px; }
+            .data-table th, .data-table td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <table class="container" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; border: 1px solid #dc3545;">
+        <tr>
+            <td class="header" style="background-color: #ffffff; color: #333333; padding: 30px 20px; text-align: center;">
+                <img src="{{ base_url }}static/logo.png" alt="FireNet Telecom" style="max-width: 200px; display: block; margin: 0 auto;">
+            </td>
+        </tr>
+        <tr>
+            <td class="content" style="padding: 40px 30px; text-align: center;">
+                <h1 style="color: #dc3545; font-weight: 700; font-size: 28px; margin-bottom: 20px;">Novo Cadastro Recebido</h1>
+                <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px; text-align: left;">Um novo cliente se cadastrou na FireNet Telecom. Aqui estão todos os detalhes:</p>
+                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Nome:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ nome }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">CPF:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ cpf }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">RG:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ rg }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Data de Nascimento:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ data_nascimento }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Telefone:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ telefone }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">WhatsApp:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ whatsapp }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Email:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ email }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">CEP:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ cep }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Rua:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ rua }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Número:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ numero }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Complemento:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ complemento or 'Nenhum' }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Ponto de Referência:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ ponto_referencia }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Bairro:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ bairro }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Plano:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ plano }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Vencimento:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ vencimento }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Nome da Rede:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ nome_rede }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Senha da Rede:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ senha_rede }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">LGPD:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ lgpd }}</td></tr>
+                    <tr><th style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; background-color: #f8f9fa; font-weight: 600; color: #333333;">Data de Cadastro:</th><td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-align: left; color: #333333;">{{ data_cadastro }}</td></tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="footer" style="background-color: #dc3545; color: #ffffff; padding: 20px; text-align: center; font-size: 12px;">
+                &copy; {{ current_year }} FireNet Telecom - Todos os direitos reservados.
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

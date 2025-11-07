@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexão Estável - FireNet Telecom</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<header class="bg-white shadow-sm py-3 sticky-top">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/"><img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet"></a>
+            <nav class="d-none d-md-flex gap-4">
+                <a href="/" class="nav-link text-dark fw-medium">Início</a>
+                <a href="/#planos" class="nav-link text-dark fw-medium">Planos</a>
+                <a href="/#vantagens" class="nav-link text-dark fw-medium">Vantagens</a>
+                <a href="/#cobertura" class="nav-link text-dark fw-medium">Cobertura</a>
+                <a href="/#central" class="nav-link text-dark fw-medium">Central do Cliente</a>
+                <a href="/#cadastro" class="nav-link text-dark fw-medium">Cadastro</a>
+                <a href="/contato" class="nav-link text-dark fw-medium">Contato</a>
+            </nav>
+            <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile"><i class="fas fa-bars"></i></button>
+        </div>
+        <div class="collapse mt-3" id="navMobile">
+            <nav class="d-flex flex-column text-center gap-2">
+                <a href="/" class="py-2 text-dark">Início</a>
+                <a href="/#planos" class="py-2 text-dark">Planos</a>
+                <a href="/#vantagens" class="py-2 text-dark">Vantagens</a>
+                <a href="/#cobertura" class="py-2 text-dark">Cobertura</a>
+                <a href="/#central" class="py-2 text-dark">Central do Cliente</a>
+                <a href="/#cadastro" class="py-2 text-dark">Cadastro</a>
+                <a href="/contato" class="py-2 text-dark">Contato</a>
+            </nav>
+        </div>
+    </div>
+</header>
+<section class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center text-danger mb-2">Conexão Estável</h2>
+        <p>Estabilidade na conexão é como uma ponte forte que não balança com o vento. Significa que sua internet não cai ou fica lenta de repente, mesmo com muitos dispositivos conectados ou durante picos de uso.</p>
+        <p>Na FireNet, usamos tecnologia de fibra óptica e roteadores avançados para manter tudo estável. Para streaming, você assiste filmes na Netflix ou séries no YouTube sem pausas ou buffering, como se estivesse vendo TV a cabo antiga, mas melhor. Para downloads, arquivos grandes como jogos ou atualizações vêm rápidos e sem interrupções, economizando tempo. Benefícios incluem menos estresse em casa (especialmente com crianças jogando ou família assistindo TV), trabalho sem paradas em videochamadas, e uso contínuo para smart homes. É ideal para famílias grandes ou quem depende da internet 24/7, garantindo que tudo funcione como um relógio, sem surpresas ruins.</p>
+    </div>
+</section>
+<!-- Vantagens -->
+<section id="vantagens" class="py-5 bg-light">
+    {% include 'cards_vantagens.html' %}
+</section>
+<footer class="bg-dark text-white py-4 text-center">
+    <div class="container"><p class="mb-0">&copy; 2025 FireNet Telecom - Todos os direitos reservados.</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

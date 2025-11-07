@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha do Cliente - FireNet Telecom</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/imprimir-cliente.css') }}">
+</head>
+<body>
+    <div class="a4-page">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logotipo FireNet Telecom">
+            <h1>Ficha do Cliente - FireNet Telecom</h1>
+        </div>
+
+        <div class="section">
+            <h2>Dados Pessoais</h2>
+            <p><strong>Nome:</strong> {{ cliente[1] }}</p>
+            <p><strong>CPF:</strong> {{ cliente[2] }}</p>
+            <p><strong>RG:</strong> {{ cliente[3] }}</p>
+            <p><strong>Data de Nascimento:</strong> {{ cliente[4] or 'Não definida' }}</p>
+            <p><strong>Telefone:</strong> {{ cliente[5] }}</p>
+            <p><strong>WhatsApp:</strong> {{ cliente[6] }}</p>
+            <p><strong>E-mail:</strong> {{ cliente[7] }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Endereço</h2>
+            <p><strong>CEP:</strong> {{ cliente[8] }}</p>
+            <p><strong>Rua:</strong> {{ cliente[9] }}</p>
+            <p><strong>Número:</strong> {{ cliente[10] }}</p>
+            <p><strong>Complemento:</strong> {{ cliente[11] or 'Não informado' }}</p>
+            <p><strong>Ponto de Referência:</strong> {{ cliente[12] }}</p>
+            <p><strong>Bairro:</strong> {{ cliente[13] }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Dados do Plano</h2>
+            <p><strong>Plano:</strong> {{ cliente[14] }}</p>
+            <p><strong>Data de Vencimento:</strong> {{ cliente[15] }}</p>
+            <p><strong>Nome da Rede:</strong> {{ cliente[16] }}</p>
+            <p><strong>Senha da Rede:</strong> {{ cliente[17] }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Instalação</h2>
+            <p><strong>Data Prevista para Instalação:</strong> {{ cliente[21] or 'Não definida' }}</p>
+            <p><strong>Turno:</strong> {{ cliente[22] or 'Não definido' }}</p>
+            <p><strong>Status:</strong> <span class="{% if cliente[23] == 'Instalação Programada' %}status-programada{% elif cliente[23] == 'Instalação Concluída' %}status-concluida{% elif cliente[23] == 'Instalação Não Realizada' %}status-nao-realizada{% endif %}">{{ cliente[23] or 'Não definido' }}</span></p>
+            <p><strong>Observações:</strong> {{ cliente[24] or 'Nenhuma' }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Outros</h2>
+            <p><strong>Aceite LGPD:</strong> {{ cliente[18] }}</p>
+            <p><strong>Data de Cadastro:</strong> {{ created_at }}</p>
+        </div>
+
+        <div class="footer">
+            <p>FireNet Telecom - © 2025 Todos os direitos reservados.</p>
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button onclick="window.print()">Imprimir Ficha</button>
+    </div>
+
+</body>
+</html>

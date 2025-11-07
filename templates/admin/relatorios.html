@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - FireNet Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        // Inicializa tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+</head>
+<body>
+    <!-- Navbar Admin -->
+    {% include 'admin/menu.html' %}
+
+    <main><section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center text-danger mb-4">Relatórios</h2>
+            {% set messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Form para Gerar Novo Relatório (acima da tabela, fixo em 3 últimas) -->
+            <div class="mb-5">
+                <form id="formGerarRelatorio" method="POST" action="{{ url_for('admin_gerar_relatorio') }}">
+                    <div class="row g-3 justify-content-center">
+                        <!-- Data de vencimento (centralizado) -->
+                        <div class="col-md-6">
+                            <label for="data_vencimento" class="form-label">Data de Vencimento (dd/mm/aaaa)</label>
+                            <input
+                                type="text"
+                                id="data_vencimento"
+                                name="data_vencimento"
+                                class="form-control"
+                                value="{{ suggested_vencimento or '' }}"
+                                required
+                                pattern="\d{2}/\d{2}/\d{4}"
+                                placeholder="dd/mm/aaaa"
+                                maxlength="10"
+                            />
+                            <div class="form-text">Ex.: 10/12/2025. Serão usadas as 3 últimas instalações concluídas disponíveis: <strong>{{ total_instalacoes or 0 }}</strong>.</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <button type="submit" class="btn btn-success">Gerar Relatório</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabela de Relatórios (diretamente na página, com paginação como em clientes.html) -->
+            <div class="table-responsive">
+                <table class="table table-striped" id="relatorios-table">
+                    <thead>
+                        <tr>
+                            <th>Identificador</th>
+                            <th>Data de Vencimento</th>
+                            <th>Clientes</th>
+                            <th>Data de Criação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for relatorio in relatorios_antigos %}
+                        <tr>
+                            <td>{{ relatorio.identificador }}</td>
+                            <td>{{ relatorio.data_vencimento }}</td>
+                            <td>{{ relatorio.clientes_nomes }}</td>
+                            <td>{{ relatorio.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('admin_imprimir_relatorio', identificador=relatorio.identificador) }}" class="btn btn-sm btn-info" target="_blank" title="Visualizar/Imprimir"><i class="fas fa-print"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação no rodapé (idêntica à de clientes.html) -->
+            <div class="d-flex justify-content-center mt-3">
+                <a href="{{ url_for('admin_relatorios', page=current_page - 1) }}" class="btn btn-outline-primary me-2 {% if current_page == 1 %}disabled{% endif %}"><i class="fas fa-chevron-left"></i></a>
+                <span class="align-self-center mx-3">Página {{ current_page }} de {{ total_pages }}</span>
+                <a href="{{ url_for('admin_relatorios', page=current_page + 1) }}" class="btn btn-outline-primary ms-2 {% if current_page >= total_pages %}disabled{% endif %}"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </section></main>
+
+    <!-- Modal para instalações insuficientes (adaptado para qtd=3 fixa) -->
+    <div class="modal fade" id="modalInsuficiente" tabindex="-1" aria-labelledby="modalInsuficienteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalInsuficienteLabel">Instalações insuficientes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    Ainda não há 3 instalações com status <strong>Concluída</strong>.
+                    <br />Atualmente existem <strong id="modalTotal">0</strong> disponíveis.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok, entendi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'footer.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Máscara para data_vencimento (dd/mm/yyyy)
+        const dataVencInput = document.getElementById('data_vencimento');
+        if (dataVencInput) {
+            dataVencInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');  // Remove não-dígitos
+                if (value.length > 8) value = value.slice(0, 8);
+                value = value.replace(/(\d{2})(\d)/, '$1/$2')
+                             .replace(/(\d{2})(\d)/, '$1/$2');
+                e.target.value = value;
+            });
+        }
+
+        // Validação antes de submit (instalações insuficientes, fixo em 3)
+        (function () {
+            const TOTAL_INST = {{ total_instalacoes or 0 }};
+            const form = document.getElementById('formGerarRelatorio');
+
+            form.addEventListener('submit', function (e) {
+                const qtd = 3;  // Fixo
+
+                if (TOTAL_INST < qtd) {
+                    e.preventDefault();
+                    document.getElementById('modalTotal').textContent = String(TOTAL_INST);
+
+                    if (window.bootstrap) {
+                        new bootstrap.Modal(document.getElementById('modalInsuficiente')).show();
+                    } else {
+                        alert(`Ainda não há ${qtd} instalações concluídas. Atualmente existem ${TOTAL_INST}.`);
+                    }
+                }
+            }, false);
+        })();
+
+        // Abrir nova aba após geração (se houver novo_relatorio na sessão)
+        {% if session.get('novo_relatorio') %}
+        window.open('{{ url_for("admin_imprimir_relatorio", identificador=session["novo_relatorio"]) }}', '_blank');
+        {% set _ = session.pop('novo_relatorio', None) %}
+        {% endif %}
+    </script>
+</body>
+</html>

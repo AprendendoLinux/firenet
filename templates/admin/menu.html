@@ -1,0 +1,26 @@
+    <header class="bg-white shadow-sm py-3 sticky-top">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="/admin/clientes"><img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet"></a>
+                <nav class="d-none d-md-flex gap-4">
+                    <a href="{{ url_for('clientes') }}" class="nav-link text-dark fw-medium">Clientes</a>
+                    <a href="{{ url_for('admin_usuarios') }}" class="nav-link text-dark fw-medium">Usuários</a>
+                    <a href="{{ url_for('admin_relatorios') }}" class="nav-link text-dark fw-medium">Relatórios</a>
+                    <a href="{{ url_for('admin_cobertura') }}" class="nav-link text-dark fw-medium">Área de Cobertura</a>
+                    <a href="{{ url_for('logout') }}" class="nav-link text-dark fw-medium">Logout</a>
+                </nav>
+                <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="collapse mt-3" id="navMobile">
+                <nav class="d-flex flex-column text-center gap-2">
+                    <a href="{{ url_for('clientes') }}" class="py-2 text-dark">Clientes</a>
+                    <a href="{{ url_for('admin_usuarios') }}" class="py-2 text-dark">Usuários</a>
+                    <a href="{{ url_for('admin_relatorios') }}" class="py-2 text-dark">Relatórios</a>
+                    <a href="{{ url_for('admin_cobertura') }}" class="py-2 text-dark">Área de Cobertura</a>
+                    <a href="{{ url_for('logout') }}" class="py-2 text-dark">Logout</a>
+                </nav>
+            </div>
+        </div>
+    </header>

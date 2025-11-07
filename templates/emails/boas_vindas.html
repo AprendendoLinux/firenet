@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boas-vindas à FireNet Telecom</title>
+    <style>
+        body { font-family: 'Montserrat', Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid #dc3545; }
+        .header { background-color: #ffffff; color: #333333; padding: 30px 20px; text-align: center; }
+        .header img { max-width: 200px; display: block; margin: 0 auto; }
+        .content { padding: 40px 30px; text-align: center; }
+        .content h1 { color: #dc3545; font-weight: 700; font-size: 28px; margin-bottom: 20px; }
+        .content p { color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+        .button { display: inline-block; background-color: #dc3545; color: #ffffff !important; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; margin: 25px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .button:hover { background-color: #c82333; }
+        .footer { background-color: #dc3545; color: #ffffff; padding: 20px; text-align: center; font-size: 12px; }
+        @media only screen and (max-width: 600px) {
+            .container { max-width: 100%; border-radius: 0; }
+            .content { padding: 30px 20px; }
+            .header { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <table class="container" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; border: 1px solid #dc3545;">
+        <tr>
+            <td class="header" style="background-color: #ffffff; color: #333333; padding: 30px 20px; text-align: center;">
+                <img src="{{ base_url }}static/logo.png" alt="FireNet Telecom" style="max-width: 200px; display: block; margin: 0 auto;">
+            </td>
+        </tr>
+        <tr>
+            <td class="content" style="padding: 40px 30px; text-align: center;">
+                <h1 style="color: #dc3545; font-weight: 700; font-size: 28px; margin-bottom: 20px;">Boas-vindas, {{ nome }}!</h1>
+                <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Obrigado por assinar a FireNet Telecom. Estamos animados em tê-lo como parte da nossa família!</p>
+                <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Seu cadastro foi recebido com sucesso. Em breve, entraremos em contato para agendar sua instalação.</p>
+                <a href="{{ base_url }}" class="button" style="display: inline-block; background-color: #dc3545; color: #ffffff !important; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; margin: 25px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Acessar Site</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="footer" style="background-color: #dc3545; color: #ffffff; padding: 20px; text-align: center; font-size: 12px;">
+                &copy; {{ current_year }} FireNet Telecom - Todos os direitos reservados.
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
