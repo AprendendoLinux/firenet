@@ -11,7 +11,7 @@
 
 ## Introdução
 
-Bem-vindo ao repositório **FireNet Telecom**! Este projeto é uma aplicação web completa desenvolvida em Python com o framework Flask, projetada para gerenciar cadastros de clientes de uma provedora de internet fictícia chamada FireNet Telecom. O sistema permite o registro de novos clientes, gerenciamento de instalações, envio de notificações por email e Telegram, reset de senhas, verificação de cobertura de endereços, geração de relatórios, páginas públicas de marketing com detalhes sobre vantagens e muito mais.
+Bem-vindo ao repositório **FireNet Telecom**! Este projeto é uma aplicação web completa desenvolvida em Python com o framework Flask, projetada para gerenciar cadastros de clientes de uma provedora de internet chamada FireNet Telecom. O sistema permite o registro de novos clientes, gerenciamento de instalações, envio de notificações por email e Telegram, reset de senhas, verificação de cobertura de endereços, geração de relatórios, páginas públicas de marketing com detalhes sobre vantagens e muito mais.
 
 O objetivo principal é fornecer uma solução robusta e escalável para automação de processos administrativos em provedores de telecomunicações, com foco em usabilidade, segurança e integração com serviços externos como Google Maps, reCAPTCHA e bots de Telegram. O frontend é construído com templates HTML renderizados via Jinja2, Bootstrap para responsividade e JavaScript para interações dinâmicas, como validações em tempo real, modais, buscas AJAX, wizards de cadastro e mapas interativos. Inclui templates profissionais para emails, garantindo comunicações consistentes e branded.
 
