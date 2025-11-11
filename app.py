@@ -394,38 +394,49 @@ def validar_cobertura():
         print("Erro ao validar cobertura:", e)
         return jsonify({'error': 'Erro interno ao validar cobertura.'}), 500
 
-# Nova rota: Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if 'user_id' in session:
         return redirect(url_for('clientes'))
     if request.method == 'POST':
-        login_input = request.form.get('username')
-        password = request.form.get('password')
-
-        if not login_input or not password:
-            flash('Preencha todos os campos.', 'danger')
-            return render_template('login.html')
-
+        recaptcha_response = request.form.get('g-recaptcha-response')
+        if not recaptcha_response:
+            flash('Por favor, complete o reCAPTCHA.', 'danger')
+            return redirect(url_for('login'))
+        secret_key = app.config['RECAPTCHA_SECRET_KEY']
+        payload = {
+            'secret': secret_key,
+            'response': recaptcha_response,
+            'remoteip': request.remote_addr
+        }
+        response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=payload)
+        result = response.json()
+        if not result['success']:
+            flash('Falha na verificação do reCAPTCHA. Tente novamente.', 'danger')
+            return redirect(url_for('login'))
+        username = request.form['username'].strip().lower()
+        password = request.form['password']
         try:
             conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("SELECT id, password FROM usuarios WHERE username = %s OR email = %s", (login_input, login_input))
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute("""
+                SELECT id, username, email, password
+                FROM usuarios
+                WHERE LOWER(username) = %s OR LOWER(email) = %s
+            """, (username, username))
             user = cursor.fetchone()
             cursor.close()
             conn.close()
-
-            if user and check_password_hash(user[1], password):
-                session['user_id'] = user[0]
-                session.permanent = True  # Marca a sessão como permanente
+            if user and check_password_hash(user['password'], password):
+                session['user_id'] = user['id']
+                session.permanent = True
                 return redirect(url_for('clientes'))
             else:
                 flash('Credenciais inválidas.', 'danger')
         except Exception as e:
             print("Erro no login:", e)
             flash('Erro interno. Tente novamente.', 'danger')
-
-    return render_template('login.html')
+    return render_template('login.html', recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
 
 # Nova rota: Logout
 @app.route('/logout')
