@@ -937,11 +937,6 @@ def admin_relatorios():
 @app.route('/admin/gerar_relatorio', methods=['POST'])
 @login_required
 def admin_gerar_relatorio():
-    user_id = session.get('user_id')
-    if not is_admin(user_id):
-        flash('Acesso negado.', 'danger')
-        return redirect(url_for('admin_relatorios'))
-
     quantidade = 3  # Fixo em 3, sem opção no form
     data_vencimento = request.form.get('data_vencimento')
 
