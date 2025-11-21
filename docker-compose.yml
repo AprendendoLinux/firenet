@@ -20,7 +20,7 @@ services:
       # Usuário do banco de dados
       DB_USER: root
       # Senha do banco de dados (substitua por valor seguro)
-      DB_PASSWORD: 'fake_db_pass_123'
+      DB_PASSWORD: 'fake_mysql_root_pass_456'
       # Chave API do Google Maps para serviços de mapeamento
       GOOGLE_MAPS_API_KEY: 'fake_google_maps_key_abc123'
       # Chave secreta para gerenciamento de sessões e segurança
