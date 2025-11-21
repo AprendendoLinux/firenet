@@ -207,7 +207,7 @@ def cadastro():
             if vencimento not in ['Dia 5', 'Dia 10', 'Dia 15']:
                 raise ValueError('Dia de vencimento inválido.')
 
-            if plano not in ['500 MEGA', '600 MEGA', '700 MEGA', '800 MEGA']:
+            if plano not in ['500 MEGAS', '700 MEGAS', '1 GIGA']:
                 raise ValueError('Plano inválido.')
 
             if len(senha_rede) < 8 or len(senha_rede) > 10:
