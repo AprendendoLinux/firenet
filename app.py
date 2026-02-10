@@ -15,8 +15,10 @@ from telegram.error import TelegramError  # Para tratar erros
 import threading  # Adicionado para tarefas em background
 from datetime import datetime
 import uuid
+import json # <--- Novo import necessário
 
 app = Flask(__name__)
+
 app.secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')  # Novo para sessions
 app.permanent_session_lifetime = timedelta(days=1)  # Define o tempo de vida da sessão permanente (ajuste conforme necessário)
 app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
@@ -38,6 +40,81 @@ GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
 
 # Fallback para base_url via env var (útil para testes ou crons sem request context)
 APP_BASE_URL = os.environ.get('APP_BASE_URL', 'http://localhost:5000/')
+
+# --- NOVA FUNÇÃO DE LÓGICA DE HORÁRIO ---
+def is_horario_comercial():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT valor FROM configuracoes WHERE chave = 'horario_atendimento'")
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not row:
+            return False # Se não tiver config, assume fechado por segurança
+
+        schedule = json.loads(row[0])
+        agora = datetime.now()
+        dia_semana = agora.weekday() # 0=Segunda ... 6=Domingo
+        hora_atual = agora.strftime('%H:%M')
+
+        config_dia = None
+
+        # Identifica qual regra usar
+        if 0 <= dia_semana <= 4: # Seg a Sex
+            config_dia = schedule.get('weekdays')
+        elif dia_semana == 5: # Sábado
+            config_dia = schedule.get('saturday')
+        elif dia_semana == 6: # Domingo
+            config_dia = schedule.get('sunday')
+
+        # Verifica a regra
+        if config_dia and config_dia.get('active'):
+            start = config_dia.get('start', '00:00')
+            end = config_dia.get('end', '23:59')
+            return start <= hora_atual < end
+            
+        return False # Dia inativo
+
+    except Exception as e:
+        print(f"Erro ao verificar horário: {e}")
+        return False
+
+# --- CONTEXT PROCESSOR ATUALIZADO ---
+# Injeta variáveis em todos os templates automaticamente
+@app.context_processor
+def inject_global_vars():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT chave, valor FROM configuracoes WHERE chave IN ('whatsapp_ativo', 'modo_automatico', 'horario_atendimento')")
+        resultados = dict(cursor.fetchall())
+        cursor.close()
+        conn.close()
+
+        status_manual = (resultados.get('whatsapp_ativo') == '1')
+        modo_auto = (resultados.get('modo_automatico') == '1')
+        
+        # Tenta decodificar o JSON do horário, ou usa um vazio se der erro
+        try:
+            schedule_settings = json.loads(resultados.get('horario_atendimento', '{}'))
+        except:
+            schedule_settings = {}
+
+        if modo_auto:
+            whatsapp_ativo = is_horario_comercial()
+        else:
+            whatsapp_ativo = status_manual
+            
+    except Exception as e:
+        print(f"Erro context processor: {e}")
+        whatsapp_ativo = True
+        modo_auto = False
+        schedule_settings = {}
+        
+    return dict(whatsapp_ativo=whatsapp_ativo, modo_automatico=modo_auto, schedule=schedule_settings)
+
 
 # Função para sanitizar inputs (similar a PHP)
 def sanitize(data):
@@ -1189,6 +1266,66 @@ def delete_cobertura(cobertura_id):
     except Exception as e:
         print("Erro ao deletar endereço de cobertura:", e)
         return jsonify({'error': 'Erro interno ao deletar endereço'}), 500
+
+# --- ROTA DE TOGGLE ATUALIZADA ---
+@app.route('/admin/toggle_whatsapp', methods=['POST'])
+@login_required
+def toggle_whatsapp():
+    try:
+        data = request.get_json()
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Se enviou 'modo_automatico', atualiza essa chave
+        if 'modo_automatico' in data:
+            valor = '1' if data['modo_automatico'] else '0'
+            cursor.execute("""
+                INSERT INTO configuracoes (chave, valor) VALUES ('modo_automatico', %s)
+                ON DUPLICATE KEY UPDATE valor = %s
+            """, (valor, valor))
+            
+        # Se enviou 'ativo' (o botão manual), atualiza essa chave
+        if 'ativo' in data:
+            valor = '1' if data['ativo'] else '0'
+            cursor.execute("""
+                INSERT INTO configuracoes (chave, valor) VALUES ('whatsapp_ativo', %s)
+                ON DUPLICATE KEY UPDATE valor = %s
+            """, (valor, valor))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        # Retorna o status calculado atual para atualizar a interface
+        status_real = is_horario_comercial() if data.get('modo_automatico') else data.get('ativo')
+        
+        return jsonify({'success': True, 'status_real': status_real})
+    except Exception as e:
+        print(f"Erro ao alterar config: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+
+# --- NOVA ROTA: SALVAR HORÁRIO ---
+@app.route('/admin/save_schedule', methods=['POST'])
+@login_required
+def save_schedule():
+    try:
+        data = request.get_json() # Recebe o JSON do frontend
+        json_str = json.dumps(data)
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO configuracoes (chave, valor) VALUES ('horario_atendimento', %s)
+            ON DUPLICATE KEY UPDATE valor = %s
+        """, (json_str, json_str))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():

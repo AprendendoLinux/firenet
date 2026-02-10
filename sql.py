@@ -79,7 +79,7 @@ def init_db():
             `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `data_instalacao` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
             `turno_instalacao` enum('Manhã','Tarde','Horário Comercial') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-            `status_instalacao` enum('N/D','Programada','Concluída','Não Realizada') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,  # Adicionado 'N/D'
+            `status_instalacao` enum('N/D','Programada','Concluída','Não Realizada') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
             `observacoes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         """)
@@ -109,6 +109,26 @@ def init_db():
             )
         """)
 
+    if 'configuracoes' not in existing_tables:
+        cursor.execute("""
+            CREATE TABLE configuracoes (
+                chave VARCHAR(50) PRIMARY KEY,
+                valor VARCHAR(255)
+            )
+        """)
+        cursor.execute("INSERT INTO configuracoes (chave, valor) VALUES ('whatsapp_ativo', '1')")
+        cursor.execute("INSERT INTO configuracoes (chave, valor) VALUES ('modo_automatico', '0')")
+        default_schedule = '{"weekdays": {"start": "09:00", "end": "18:00", "active": true}, "saturday": {"start": "09:00", "end": "14:00", "active": true}, "sunday": {"start": "09:00", "end": "18:00", "active": false}}'
+        cursor.execute("INSERT INTO configuracoes (chave, valor) VALUES ('horario_atendimento', %s)", (default_schedule,))
+        print("Tabela de configurações criada.")
+    else:
+        # Garante que as novas chaves existam mesmo se a tabela já foi criada antes
+        cursor.execute("INSERT IGNORE INTO configuracoes (chave, valor) VALUES ('modo_automatico', '0')")
+        default_schedule = '{"weekdays": {"start": "09:00", "end": "18:00", "active": true}, "saturday": {"start": "09:00", "end": "14:00", "active": true}, "sunday": {"start": "09:00", "end": "18:00", "active": false}}'
+        cursor.execute("INSERT IGNORE INTO configuracoes (chave, valor) VALUES ('horario_atendimento', %s)", (default_schedule,))
+        conn.commit()
+
+    
     if 'usuarios' not in existing_tables:
         cursor.execute("""
             CREATE TABLE usuarios (

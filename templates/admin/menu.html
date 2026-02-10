@@ -1,26 +1,275 @@
-    <header class="bg-white shadow-sm py-3 sticky-top">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="/admin/clientes"><img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet"></a>
-                <nav class="d-none d-md-flex gap-4">
-                    <a href="{{ url_for('clientes') }}" class="nav-link text-dark fw-medium">Clientes</a>
-                    <a href="{{ url_for('admin_usuarios') }}" class="nav-link text-dark fw-medium">Usuários</a>
-                    <a href="{{ url_for('admin_relatorios') }}" class="nav-link text-dark fw-medium">Relatórios</a>
-                    <a href="{{ url_for('admin_cobertura') }}" class="nav-link text-dark fw-medium">Área de Cobertura</a>
-                    <a href="{{ url_for('logout') }}" class="nav-link text-dark fw-medium">Logout</a>
-                </nav>
-                <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile">
-                    <i class="fas fa-bars"></i>
-                </button>
+<header class="bg-white shadow-sm py-3 sticky-top">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/admin/clientes"><img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet"></a>
+            
+            <nav class="d-none d-md-flex gap-3 align-items-center">
+                
+                <div class="d-flex align-items-center bg-light px-3 py-1 rounded border">
+                    
+                    <button class="btn btn-sm btn-outline-secondary me-2 border-0" 
+                            data-bs-toggle="modal" data-bs-target="#modalConfigHorario" 
+                            title="Configurar Horários Automáticos">
+                        <i class="fas fa-cog"></i>
+                    </button>
+
+                    <div class="vr me-2"></div>
+
+                    <div class="form-check me-3" title="Seguir horário configurado">
+                        <input class="form-check-input" type="checkbox" id="checkAuto" {% if modo_automatico %}checked{% endif %}>
+                        <label class="form-check-label small fw-bold text-muted" for="checkAuto">
+                            Auto
+                        </label>
+                    </div>
+
+                    <div class="vr me-3"></div>
+
+                    <div class="form-check form-switch" title="Controle Manual">
+                        <input class="form-check-input" type="checkbox" id="toggleWhatsapp" 
+                               {% if whatsapp_ativo %}checked{% endif %}
+                               {% if modo_automatico %}disabled{% endif %}>
+                        <label class="form-check-label fw-bold {% if whatsapp_ativo %}text-danger{% else %}text-secondary{% endif %}" for="toggleWhatsapp" id="labelWhatsapp">
+                            <i class="fab fa-whatsapp"></i> {% if whatsapp_ativo %}ON{% else %}OFF{% endif %}
+                        </label>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('clientes') }}" class="nav-link text-dark fw-medium">Clientes</a>
+                <a href="{{ url_for('admin_usuarios') }}" class="nav-link text-dark fw-medium">Usuários</a>
+                <a href="{{ url_for('admin_relatorios') }}" class="nav-link text-dark fw-medium">Relatórios</a>
+                <a href="{{ url_for('admin_cobertura') }}" class="nav-link text-dark fw-medium">Cobertura</a>
+                <a href="{{ url_for('logout') }}" class="nav-link text-danger fw-medium">Logout</a>
+            </nav>
+            
+            <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="collapse mt-3" id="navMobile">
+            <nav class="d-flex flex-column text-center gap-2">
+                <div class="py-2 d-flex justify-content-center align-items-center gap-2">
+                    <span>WhatsApp Site:</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggleWhatsappMobile" {% if whatsapp_ativo %}checked{% endif %} {% if modo_automatico %}disabled{% endif %}>
+                    </div>
+                </div>
+                <a href="{{ url_for('clientes') }}" class="py-2 text-dark">Clientes</a>
+                <a href="{{ url_for('admin_usuarios') }}" class="py-2 text-dark">Usuários</a>
+                <a href="{{ url_for('admin_relatorios') }}" class="py-2 text-dark">Relatórios</a>
+                <a href="{{ url_for('admin_cobertura') }}" class="py-2 text-dark">Área de Cobertura</a>
+                <a href="{{ url_for('logout') }}" class="py-2 text-dark">Logout</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="modal fade" id="modalConfigHorario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Configurar Horário Automático</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="collapse mt-3" id="navMobile">
-                <nav class="d-flex flex-column text-center gap-2">
-                    <a href="{{ url_for('clientes') }}" class="py-2 text-dark">Clientes</a>
-                    <a href="{{ url_for('admin_usuarios') }}" class="py-2 text-dark">Usuários</a>
-                    <a href="{{ url_for('admin_relatorios') }}" class="py-2 text-dark">Relatórios</a>
-                    <a href="{{ url_for('admin_cobertura') }}" class="py-2 text-dark">Área de Cobertura</a>
-                    <a href="{{ url_for('logout') }}" class="py-2 text-dark">Logout</a>
-                </nav>
+            <div class="modal-body">
+                <form id="formSchedule">
+                    <div class="mb-3 border-bottom pb-3">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="wd_active" {% if schedule.weekdays.active %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="wd_active">Segunda a Sexta</label>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label class="small text-muted">Início</label>
+                                <input type="time" class="form-control" id="wd_start" value="{{ schedule.weekdays.start }}">
+                            </div>
+                            <div class="col">
+                                <label class="small text-muted">Fim</label>
+                                <input type="time" class="form-control" id="wd_end" value="{{ schedule.weekdays.end }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 border-bottom pb-3">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="sat_active" {% if schedule.saturday.active %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="sat_active">Sábado</label>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label class="small text-muted">Início</label>
+                                <input type="time" class="form-control" id="sat_start" value="{{ schedule.saturday.start }}">
+                            </div>
+                            <div class="col">
+                                <label class="small text-muted">Fim</label>
+                                <input type="time" class="form-control" id="sat_end" value="{{ schedule.saturday.end }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="sun_active" {% if schedule.sunday.active %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="sun_active">Domingo</label>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label class="small text-muted">Início</label>
+                                <input type="time" class="form-control" id="sun_start" value="{{ schedule.sunday.start }}">
+                            </div>
+                            <div class="col">
+                                <label class="small text-muted">Fim</label>
+                                <input type="time" class="form-control" id="sun_end" value="{{ schedule.sunday.end }}">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Salvar Horários</button>
             </div>
         </div>
-    </header>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleManual = document.getElementById('toggleWhatsapp');
+        const toggleMobile = document.getElementById('toggleWhatsappMobile');
+        const checkAuto = document.getElementById('checkAuto');
+        const label = document.getElementById('labelWhatsapp');
+
+        // Função para atualizar a interface visualmente
+        function updateInterface(isAuto, isAtivo) {
+            // Trava/Destrava controles manuais
+            toggleManual.disabled = isAuto;
+            if(toggleMobile) toggleMobile.disabled = isAuto;
+
+            // Atualiza o estado visual (Checked/Unchecked)
+            toggleManual.checked = isAtivo;
+            if(toggleMobile) toggleMobile.checked = isAtivo;
+            
+            // Atualiza Label
+            if(label) {
+                label.innerHTML = `<i class="fab fa-whatsapp"></i> ${isAtivo ? 'ON' : 'OFF'}`;
+                label.className = `form-check-label fw-bold ${isAtivo ? 'text-danger' : 'text-secondary'}`;
+            }
+
+            // Tooltips e Feedback Visual
+            const containerManual = toggleManual.parentElement;
+            if (isAuto) {
+                containerManual.title = "Controlado pelo Horário Comercial (Auto Ligado)";
+                toggleManual.style.cursor = "not-allowed";
+            } else {
+                containerManual.title = "Controle Manual";
+                toggleManual.style.cursor = "pointer";
+            }
+        }
+
+        // 1. EVENTO: Mudar checkbox 'Auto'
+        if(checkAuto) {
+            checkAuto.addEventListener('change', function() {
+                const isAuto = this.checked;
+                
+                // Envia para o backend
+                fetch('/admin/toggle_whatsapp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ modo_automatico: isAuto })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        // Recarrega a página para o backend recalcular o status com base no horário
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao alterar modo automático.');
+                        this.checked = !isAuto; // Reverte
+                    }
+                });
+            });
+        }
+
+        // 2. EVENTO: Mudar switch 'Manual'
+        [toggleManual, toggleMobile].forEach(t => {
+            if(!t) return;
+            t.addEventListener('change', function() {
+                // Se estiver em auto, não deveria ser possível clicar, mas por segurança:
+                if(checkAuto && checkAuto.checked) {
+                    this.checked = !this.checked;
+                    alert('Desative o Modo Automático para controlar manualmente.');
+                    return;
+                }
+
+                const isAtivo = this.checked;
+
+                fetch('/admin/toggle_whatsapp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ativo: isAtivo })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        updateInterface(false, isAtivo);
+                    } else {
+                        alert('Erro ao atualizar status.');
+                        this.checked = !isAtivo; // Reverte
+                    }
+                });
+            });
+        });
+
+        // Inicialização Visual
+        // Pega valores injetados pelo Jinja no carregamento da página
+        const inicialAtivo = {{ 'true' if whatsapp_ativo else 'false' }};
+        const inicialAuto = {{ 'true' if modo_automatico else 'false' }};
+        updateInterface(inicialAuto, inicialAtivo);
+    });
+
+    // Função global para Salvar o JSON de horários
+    function saveSchedule() {
+        const schedule = {
+            weekdays: {
+                active: document.getElementById('wd_active').checked,
+                start: document.getElementById('wd_start').value,
+                end: document.getElementById('wd_end').value
+            },
+            saturday: {
+                active: document.getElementById('sat_active').checked,
+                start: document.getElementById('sat_start').value,
+                end: document.getElementById('sat_end').value
+            },
+            sunday: {
+                active: document.getElementById('sun_active').checked,
+                start: document.getElementById('sun_start').value,
+                end: document.getElementById('sun_end').value
+            }
+        };
+
+        fetch('/admin/save_schedule', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(schedule)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                // Fecha modal
+                const modalEl = document.getElementById('modalConfigHorario');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                alert('Horários atualizados com sucesso!');
+                
+                // Se estiver em Auto, recarrega para aplicar nova regra imediatamente
+                if(document.getElementById('checkAuto').checked) {
+                    window.location.reload();
+                }
+            } else {
+                alert('Erro ao salvar: ' + data.error);
+            }
+        });
+    }
+</script>
