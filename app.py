@@ -19,6 +19,11 @@ import json # <--- Novo import necessário
 
 app = Flask(__name__)
 
+@app.context_processor
+def inject_version():
+    version = os.environ.get('APP_VERSION', 'dev-local')
+    return dict(app_version=version)
+
 app.secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')  # Novo para sessions
 app.permanent_session_lifetime = timedelta(days=1)  # Define o tempo de vida da sessão permanente (ajuste conforme necessário)
 app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')

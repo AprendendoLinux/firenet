@@ -1,6 +1,8 @@
 # Dockerfile
 FROM python:3.11-slim
 
+ARG APP_VERSION=dev-local
+ENV APP_VERSION=${APP_VERSION}
 WORKDIR /app
 
 COPY requirements.txt .
