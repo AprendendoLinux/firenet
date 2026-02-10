@@ -1,5 +1,6 @@
 # Dockerfile
 # This Dockerfile sets up a Python 3.11 environment for a Flask application.
+# It installs the necessary dependencies from requirements.txt, copies the application code, and exposes port 5000 for the Flask app to run.
 FROM python:3.11-slim
 
 ARG APP_VERSION=dev-local
