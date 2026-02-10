@@ -15,6 +15,13 @@ body {
     color: #333;
     overflow-y: scroll;
 }
+
+/* Fix para manter a barra de rolagem visível ao abrir o modal */
+body.modal-open {
+    overflow-y: scroll !important;
+    padding-right: 0 !important;
+}
+
 /* Logo */
 .logo-firenet {
     height: 65px;
@@ -217,7 +224,8 @@ main {
 
 .form-check-input:focus {
     border-color: var(--fire-red);
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); /* Vermelho translúcido */
+    /* Sombra vermelha translúcida */
+    box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.25); 
 }
 
 /* Quando desabilitado (modo automático ou mobile sync), fica visualmente bloqueado */

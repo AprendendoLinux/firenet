@@ -7,35 +7,147 @@
         </a>
     {% else %}
         <a href="#" data-bs-toggle="modal" data-bs-target="#modalWhatsOcupado" title="Atendimento Indisponível no Momento">
-             <img loading="lazy" src="{{ url_for('static', filename='whatsapp.webp') }}" alt="WhatsApp" class="img-fluid" style="filter: grayscale(100%); opacity: 0.8;">
+             <img loading="lazy" src="{{ url_for('static', filename='whatsapp.webp') }}" alt="WhatsApp" class="img-fluid" style="filter: grayscale(100%); opacity: 0.9;">
         </a>
     {% endif %}
 </div>
 
 <div class="modal fade" id="modalWhatsOcupado" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content border-0 shadow">
+      
       <div class="modal-header bg-danger text-white">
         <h5 class="modal-title"><i class="fas fa-headset me-2"></i>Atendimento</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center py-4">
-        <div class="mb-3 text-warning">
-            <i class="fas fa-clock fa-3x"></i>
+
+      <div class="modal-body py-4">
+        
+        <div class="card mb-4 border-danger" style="background-color: rgba(211, 47, 47, 0.08);">
+            <div class="card-body text-center">
+                <div class="text-danger mb-2">
+                    <i class="fas fa-clock fa-3x"></i>
+                </div>
+                <h5 class="fw-bold text-danger">Nossos operadores estão indisponíveis.</h5>
+                <p class="text-dark small mb-0 mt-2">
+                    Nosso atendimento via WhatsApp encerrou por hoje ou estamos com fila alta.
+                </p>
+                <hr class="border-danger opacity-25 my-3">
+                <p class="mb-0 text-dark">
+                    <strong>Mas você não precisa esperar!</strong><br>
+                    Você pode contratar seu plano agora mesmo pelo site.
+                </p>
+            </div>
         </div>
-        <h4>Nossos operadores não estão disponíveis agora.</h4>
-        <p class="text-muted mt-3">
-            Nosso atendimento via WhatsApp está encerrado no momento ou com fila de espera alta.
-            <br>
-            <strong>Mas você não precisa esperar!</strong> Você pode contratar seu plano agora mesmo pelo site.
-        </p>
-        <div class="d-grid gap-2 mt-4">
-            <a href="{{ url_for('cadastro') }}" class="btn btn-danger btn-lg rounded-pill">
-                <i class="fas fa-mouse-pointer me-2"></i>Contratar Online Agora
+
+        <div class="mb-4 px-2">
+            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Consultar Disponibilidade</h6>
+            
+            <div class="input-group mb-2">
+                <input type="text" id="widgetCep" class="form-control" placeholder="Digite seu CEP (apenas números)" maxlength="9">
+                <button class="btn btn-dark" type="button" id="btnWidgetConsultar" onclick="consultarViabilidadeWidget()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <small class="text-muted fst-italic">Verifique agora se atendemos sua rua!</small>
+
+            <div id="widgetResultado" class="mt-3 d-none">
+                </div>
+        </div>
+
+        <hr class="text-muted opacity-25">
+
+        <div class="d-grid gap-2">
+            <a href="{{ url_for('contato') }}" class="btn btn-danger rounded-pill">
+                <i class="fas fa-envelope me-2"></i>Enviar Mensagem (Contato)
             </a>
-            <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Fechar e navegar no site</button>
+            <button type="button" class="btn btn-link text-muted text-decoration-none btn-sm" data-bs-dismiss="modal">Fechar janela</button>
         </div>
+
       </div>
     </div>
   </div>
 </div>
+
+<script>
+    function consultarViabilidadeWidget() {
+        const cepInput = document.getElementById('widgetCep');
+        const btn = document.getElementById('btnWidgetConsultar');
+        const cep = cepInput.value.replace(/\D/g, '');
+
+        if (cep.length !== 8) {
+            mostrarResultado('alert-warning', '<i class="fas fa-exclamation-triangle me-2"></i>CEP incompleto.');
+            return;
+        }
+
+        // Estado de Carregando
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        mostrarResultado('alert-info', '<i class="fas fa-sync fa-spin me-2"></i>Consultando...');
+
+        // 1. Consulta ViaCEP
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.erro) {
+                    throw new Error('CEP não encontrado.');
+                }
+                
+                // Formata o nome da rua em negrito
+                const ruaFormatada = `<strong>${data.logradouro}</strong>`;
+                
+                // 2. Consulta Backend FireNet para checar se atendemos essa rua
+                return fetch('/validar_cobertura', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        rua: data.logradouro,
+                        bairro: data.bairro
+                    })
+                })
+                .then(r => r.json())
+                .then(resp => {
+                    // Aqui combinamos o resultado do backend com o nome da rua do ViaCEP
+                    if (resp.link) {
+                        // Tem Cobertura!
+                        mostrarResultado('alert-success', `
+                            <strong><i class="fas fa-check-circle me-1"></i>Viabilidade Confirmada!</strong><br>
+                            Parabéns! A ${ruaFormatada} possui cobertura da FireNet Telecom.<br>
+                            <a href="${resp.link}" class="btn btn-success btn-sm w-100 mt-2 fw-bold">Contratar Agora</a>
+                        `);
+                    } else {
+                        // Não tem cobertura
+                        mostrarResultado('alert-danger', `
+                            <strong><i class="fas fa-times-circle me-1"></i>Sem viabilidade no momento.</strong><br>
+                            Infelizmente, a ${ruaFormatada} ainda não possui viabilidade técnica para instalação.
+                        `);
+                    }
+                });
+            })
+            .catch(err => {
+                mostrarResultado('alert-secondary', `
+                    <i class="fas fa-search-location me-2"></i>${err.message || 'Erro ao consultar.'}
+                `);
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i>';
+            });
+    }
+
+    function mostrarResultado(classe, html) {
+        const div = document.getElementById('widgetResultado');
+        div.className = `mt-3 alert ${classe} text-start small`;
+        div.innerHTML = html;
+        div.classList.remove('d-none');
+    }
+
+    // Máscara simples para o CEP no input
+    document.getElementById('widgetCep').addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 5) {
+            v = v.substring(0, 5) + '-' + v.substring(5, 8);
+        }
+        e.target.value = v;
+    });
+</script>
