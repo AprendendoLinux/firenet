@@ -1,4 +1,5 @@
 # Dockerfile
+# This Dockerfile sets up a Python 3.11 environment for a Flask application.
 FROM python:3.11-slim
 
 ARG APP_VERSION=dev-local
