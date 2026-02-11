@@ -94,8 +94,6 @@ def is_horario_comercial():
             whatsapp_support=os.environ.get('WHATSAPP_SUPPORT', '5500000000000')
         )
 
-# --- CONTEXT PROCESSOR ATUALIZADO ---
-# Injeta variáveis em todos os templates automaticamente
 @app.context_processor
 def inject_global_vars():
     try:
@@ -125,8 +123,15 @@ def inject_global_vars():
         whatsapp_ativo = True
         modo_auto = False
         schedule_settings = {}
-        
-    return dict(whatsapp_ativo=whatsapp_ativo, modo_automatico=modo_auto, schedule=schedule_settings)
+    
+    # --- CORREÇÃO AQUI: Passando os números do Docker para o Template ---
+    return dict(
+        whatsapp_ativo=whatsapp_ativo, 
+        modo_automatico=modo_auto, 
+        schedule=schedule_settings,
+        whatsapp_sales=os.environ.get('WHATSAPP_SALES', '5521981176211'),   # Valor do Docker ou Default
+        whatsapp_support=os.environ.get('WHATSAPP_SUPPORT', '5521981176211') # Valor do Docker ou Default
+    )
 
 
 # Função para sanitizar inputs (similar a PHP)
@@ -1592,13 +1597,75 @@ def enviar_atualizacao_instalacao(email_destino, nome, data_instalacao, turno_in
         except Exception as e:
             print(f"Erro ao enviar email de atualização para {email_destino}: {e}")
 
+# --- Substitua a função api_consultar_cpf inteira por esta ---
+
 @app.route('/api/consultar_cpf', methods=['POST'])
 def api_consultar_cpf():
+    try:
+        # Debug: Mostra o que chegou
+        data = request.get_json()
+        print(f"DEBUG API: Dados recebidos: {data}")
+        
+        cpf_raw = data.get('cpf', '')
+        
+        # Limpeza Python: Remove tudo que não for número do input
+        cpf_limpo = re.sub(r'\D', '', str(cpf_raw))
+        print(f"DEBUG API: CPF limpo para busca: '{cpf_limpo}'")
+        
+        if not cpf_limpo:
+            print("DEBUG API: CPF vazio após limpeza.")
+            return jsonify({'found': False, 'reason': 'CPF inválido'})
+
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # Query Corrigida: Removido ', cidade' do SELECT
+        query = """
+            SELECT nome, rua, numero, bairro, cpf 
+            FROM cadastros 
+            WHERE REGEXP_REPLACE(cpf, '[^0-9]', '') = %s
+            LIMIT 1
+        """
+        
+        cursor.execute(query, (cpf_limpo,))
+        cliente = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if cliente:
+            print(f"DEBUG API: Cliente encontrado! Nome: {cliente['nome']}")
+            
+            # Formata endereço sem cidade (já que não tem no banco)
+            rua = cliente['rua'] or 'Rua não cadastrada'
+            num = cliente['numero'] or 'S/N'
+            bairro = cliente['bairro'] or ''
+            
+            # Monta endereço: Rua X, 123 - Bairro
+            endereco = f"{rua}, {num} - {bairro}"
+            
+            return jsonify({
+                'found': True,
+                'nome': cliente['nome'],
+                'endereco': endereco
+            })
+        else:
+            print(f"DEBUG API: NENHUM cliente encontrado para o CPF {cpf_limpo}")
+            return jsonify({'found': False, 'reason': 'Não encontrado no banco'})
+            
+    except Exception as e:
+        print(f"ERRO CRÍTICO NA API: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'found': False, 'error': str(e)})
+
+@app.route('/api/check_status', methods=['POST'])
+def api_check_status():
     data = request.get_json()
     cpf_raw = data.get('cpf', '')
-    # Limpa o CPF para comparar apenas números
+    # Limpa CPF para comparar apenas números
     cpf_limpo = re.sub(r'\D', '', cpf_raw)
-    
+
     if not cpf_limpo:
         return jsonify({'found': False})
 
@@ -1606,33 +1673,31 @@ def api_consultar_cpf():
         conn = get_db_connection()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         
-        # Busca por CPF (considerando que no banco pode ter pontos/traços ou não)
-        # A query compara o CPF limpo do banco com o CPF limpo enviado
+        # Busca status e data de instalação
         cursor.execute("""
-            SELECT nome, rua, numero, bairro, cidade 
+            SELECT status_instalacao, data_instalacao 
             FROM cadastros 
             WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = %s
             LIMIT 1
         """, (cpf_limpo,))
         
-        cliente = cursor.fetchone()
+        result = cursor.fetchone()
         cursor.close()
         conn.close()
-        
-        if cliente:
-            # Monta endereço formatado
-            endereco = f"{cliente['rua']}, {cliente['numero']} - {cliente['bairro']}"
+
+        if result:
             return jsonify({
                 'found': True,
-                'nome': cliente['nome'],
-                'endereco': endereco
+                'status': result['status_instalacao'],
+                'data': result['data_instalacao']
             })
         else:
             return jsonify({'found': False})
-            
+
     except Exception as e:
-        print(f"Erro na API CPF: {e}")
+        print(f"Erro ao verificar status: {e}")
         return jsonify({'found': False, 'error': str(e)})
+
 
 if __name__ == '__main__':
     if wait_for_db():

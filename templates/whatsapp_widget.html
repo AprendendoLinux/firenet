@@ -12,7 +12,9 @@
 
 <div class="modal fade" id="modalAtendenteVirtual" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg" style="min-height: 600px;"> <div class="modal-header bg-danger text-white">
+        <div class="modal-content border-0 shadow-lg" style="min-height: 600px;">
+            
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title"><i class="fas fa-robot me-2"></i>Atendimento FireNet</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="resetChat()"></button>
             </div>
@@ -39,7 +41,7 @@
                             <button class="btn btn-outline-danger btn-lg text-start" onclick="goToStep('viabilidade')">
                                 <i class="fas fa-map-marker-alt me-2"></i> Consultar disponibilidade no endereço
                             </button>
-                            <button class="btn btn-outline-secondary btn-lg text-start" onclick="selectOption('vendas', 'Status do meu pedido')">
+                            <button class="btn btn-outline-secondary btn-lg text-start" onclick="goToStep('status')">
                                 <i class="fas fa-clipboard-list me-2"></i> Status do meu pedido de instalação
                             </button>
                             <button class="btn btn-outline-dark btn-lg text-start" onclick="goToStep(2)">
@@ -55,7 +57,8 @@
                             <div class="carousel-inner px-5">
                                 
                                 <div class="carousel-item active">
-                                    <div class="card border-primary shadow-sm text-center" style="height: 400px;"> <div class="card-header bg-primary text-white fw-bold">GAMER</div>
+                                    <div class="card border-primary shadow-sm text-center" style="height: 400px;">
+                                        <div class="card-header bg-primary text-white fw-bold">GAMER</div>
                                         <div class="card-body d-flex flex-column justify-content-center">
                                             <h2 class="text-primary fw-bold">1 GIGA</h2>
                                             <h3 class="card-title text-dark">R$ 99,99<small class="text-muted fs-6">/mês</small></h3>
@@ -73,8 +76,9 @@
                                 </div>
 
                                 <div class="carousel-item">
-                                    <div class="card border-warning shadow-sm text-center position-relative" style="height: 400px;"> <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-warning text-dark" style="z-index: 10;">MAIS VENDIDO</span>
-                                        <div class="card-header bg-dark text-white fw-bold mt-2">TURBO</div>
+                                    <div class="card border-warning shadow-sm text-center position-relative" style="height: 400px;">
+                                        <span class="position-absolute top-0 start-50 translate-middle-x mt-2 badge rounded-pill bg-warning text-dark" style="z-index: 10;">MAIS VENDIDO</span>
+                                        <div class="card-header bg-dark text-white fw-bold mt-4">TURBO</div>
                                         <div class="card-body d-flex flex-column justify-content-center">
                                             <h2 class="text-danger fw-bold">700 MEGA</h2>
                                             <h3 class="card-title text-dark">R$ 89,90<small class="text-muted fs-6">/mês</small></h3>
@@ -92,7 +96,8 @@
                                 </div>
 
                                 <div class="carousel-item">
-                                    <div class="card border-danger shadow-sm text-center" style="height: 400px;"> <div class="card-header bg-danger text-white fw-bold">BÁSICO</div>
+                                    <div class="card border-danger shadow-sm text-center" style="height: 400px;">
+                                        <div class="card-header bg-danger text-white fw-bold">BÁSICO</div>
                                         <div class="card-body d-flex flex-column justify-content-center">
                                             <h2 class="text-danger fw-bold">500 MEGA</h2>
                                             <h3 class="card-title text-dark">R$ 79,90<small class="text-muted fs-6">/mês</small></h3>
@@ -119,6 +124,24 @@
                                 <span class="visually-hidden">Próximo</span>
                             </button>
                         </div>
+                    </div>
+
+                    <div id="step-status" class="step-content d-none animate__animated animate__fadeIn">
+                        <h5 class="fw-bold mb-3"><button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i></button> Status do Pedido</h5>
+                        
+                        <p class="text-muted mb-3">Informe seu CPF para verificarmos o agendamento:</p>
+
+                        <div class="input-group input-group-lg mb-3">
+                            <input type="text" id="inputCpfStatus" class="form-control" placeholder="000.000.000-00" 
+                                   oninput="mascaraCpf(this)" 
+                                   onkeyup="if(event.key === 'Enter') consultarStatusPedido()">
+                            <button class="btn btn-danger" type="button" id="btnCheckStatus" onclick="consultarStatusPedido()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+
+                        <div id="resultadoStatus" class="d-none">
+                            </div>
                     </div>
 
                     <div id="step-taxa" class="step-content d-none animate__animated animate__fadeIn">
@@ -167,7 +190,7 @@
                         <div class="input-group input-group-lg mb-3">
                             <input type="text" id="inputCepModal" class="form-control" placeholder="00000-000" maxlength="9" 
                                    oninput="mascaraCep(this)" 
-                                   onkeypress="if(event.keyCode == 13) event.preventDefault();">
+                                   onkeyup="if(event.key === 'Enter') consultarViabilidadeModal()">
                             <button class="btn btn-danger" type="button" id="btnConsultarModal" onclick="consultarViabilidadeModal()">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -238,7 +261,9 @@
 
                         <div class="form-group mb-3">
                             <label class="fw-bold small">Seu CPF</label>
-                            <input type="text" id="inputCpfChat" class="form-control form-control-lg" placeholder="000.000.000-00" oninput="mascaraCpf(this)">
+                            <input type="text" id="inputCpfChat" class="form-control form-control-lg" placeholder="000.000.000-00" 
+                                   oninput="mascaraCpf(this)" 
+                                   onkeyup="if(event.key === 'Enter') processarIdentificacao()">
                             <small class="text-danger d-none" id="msgErroCpf">CPF inválido ou não informado.</small>
                         </div>
 
@@ -248,11 +273,13 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="fw-bold small">Nome Completo</label>
-                                <input type="text" id="inputNomeChat" class="form-control" placeholder="Seu nome">
+                                <input type="text" id="inputNomeChat" class="form-control" placeholder="Seu nome"
+                                       onkeyup="if(event.key === 'Enter') processarIdentificacao()">
                             </div>
                             <div class="form-group mb-3">
                                 <label class="fw-bold small">Endereço de Instalação</label>
-                                <input type="text" id="inputEndChat" class="form-control" placeholder="Rua, Número e Bairro">
+                                <input type="text" id="inputEndChat" class="form-control" placeholder="Rua, Número e Bairro"
+                                       onkeyup="if(event.key === 'Enter') processarIdentificacao()">
                             </div>
                         </div>
 
@@ -320,38 +347,53 @@
         dadosCliente: { nome: '', endereco: '', cpf: '' }
     };
 
-    // Números (Do Backend)
     const NUMERO_VENDAS = "{{ whatsapp_sales }}";
     const NUMERO_SUPORTE = "{{ whatsapp_support }}";
+
+    // Mapeamento de mensagens humanizadas
+    const mensagensPorAssunto = {
+        'Lentidão na internet': 'Estou enfrentando lentidão na minha internet e preciso de suporte.',
+        'Sem internet': 'Estou sem conexão de internet e preciso de ajuda para restabelecer o sinal.',
+        'Oscilação no sinal': 'Minha internet está oscilando muito e preciso de verificação técnica.',
+        'Outros problemas técnicos': 'Estou com um problema técnico específico e preciso de atendimento.',
+        'Emissão ou 2ª via de boletos': 'Gostaria de solicitar a emissão da segunda via do meu boleto.',
+        'Reativação após pagamento': 'Efetuei o pagamento da minha fatura e gostaria de solicitar a reativação do sinal.',
+        'Mudança de endereço': 'Vou me mudar e gostaria de solicitar a transferência de endereço da minha instalação.',
+        'Cancelamento de plano': 'Gostaria de solicitar o cancelamento do meu plano de internet.',
+        'Outros assuntos': 'Gostaria de tratar de um assunto administrativo sobre meu plano.'
+    };
 
     function resetChat() {
         goToStep(1);
         flowState = { assunto: '', tipo: '', isBoleto: false, dadosCliente: { nome: '', endereco: '', cpf: '' } };
-        document.getElementById('inputCpfChat').value = '';
-        document.getElementById('inputNomeChat').value = '';
-        document.getElementById('inputEndChat').value = '';
-        document.getElementById('inputCepModal').value = '';
-        document.getElementById('resultadoViabilidadeModal').classList.add('d-none');
-        document.getElementById('camposManuais').classList.add('d-none');
+        
+        // Limpa inputs
+        ['inputCpfChat', 'inputNomeChat', 'inputEndChat', 'inputCepModal', 'inputCpfStatus'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = '';
+        });
+        
+        // Esconde áreas de resultado
+        ['resultadoViabilidadeModal', 'camposManuais', 'resultadoStatus', 'msgErroCpf'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.add('d-none');
+        });
+        
         document.getElementById('btnBuscarCpf').innerHTML = 'Continuar <i class="fas fa-arrow-right ms-2"></i>';
     }
 
     function goToStep(step) {
-        // Esconde todos
         document.querySelectorAll('.step-content').forEach(el => el.classList.add('d-none'));
         
-        // Determina ID
         let id = `step-${step}`;
         if(step === 'identificacao') id = 'step-identificacao';
         if(step === 'apps') id = 'step-apps';
         
-        // Mostra o alvo
         const target = document.getElementById(id);
         if(target) target.classList.remove('d-none');
 
-        // Atualiza barra
         let progress = 10;
-        if(step === 'planos' || step === 'taxa' || step === 'viabilidade') progress = 30;
+        if(step === 'planos' || step === 'taxa' || step === 'viabilidade' || step === 'status') progress = 30;
         if(step === 2) progress = 40;
         if(step === 3) progress = 60;
         if(step === 'identificacao') progress = 80;
@@ -363,6 +405,92 @@
         let v = i.value.replace(/\D/g, '');
         if (v.length > 5) v = v.substring(0, 5) + '-' + v.substring(5, 8);
         i.value = v;
+    }
+
+    function mascaraCpf(i) {
+        let v = i.value.replace(/\D/g,"");
+        v = v.replace(/(\d{3})(\d)/,"$1.$2");
+        v = v.replace(/(\d{3})(\d)/,"$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+        i.value = v;
+    }
+
+    function consultarStatusPedido() {
+        const cpfInput = document.getElementById('inputCpfStatus');
+        const resDiv = document.getElementById('resultadoStatus');
+        const btn = document.getElementById('btnCheckStatus');
+        const cpf = cpfInput.value.replace(/\D/g, '');
+
+        if (cpf.length < 11) {
+            resDiv.className = 'alert alert-warning mt-3';
+            resDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Digite um CPF válido.';
+            resDiv.classList.remove('d-none');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        fetch('/api/check_status', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ cpf: cpf })
+        })
+        .then(r => r.json())
+        .then(data => {
+            resDiv.classList.remove('d-none');
+            
+            if (data.found) {
+                const status = data.status;
+                const dataInstalacao = data.data || 'Data não definida';
+                let mensagem = '';
+                let icone = '';
+                let cor = '';
+
+                if (status === 'N/D') {
+                    icone = 'fa-clock';
+                    cor = 'alert-warning';
+                    mensagem = 'Sua instalação ainda não foi agendada. Fique atento ao seu e-mail, pois novas informações serão enviadas em breve.';
+                } else if (status === 'Programada') {
+                    icone = 'fa-calendar-check';
+                    cor = 'alert-info';
+                    mensagem = `Sua instalação está programada para o dia <strong>${dataInstalacao}</strong>.`;
+                } else if (status === 'Concluída') {
+                    icone = 'fa-check-circle';
+                    cor = 'alert-success';
+                    mensagem = `Sua instalação foi concluída no dia <strong>${dataInstalacao}</strong>.`;
+                } else {
+                    icone = 'fa-info-circle';
+                    cor = 'alert-secondary';
+                    mensagem = `Status atual: ${status}`;
+                }
+
+                resDiv.className = `alert ${cor} mt-3 text-center`;
+                resDiv.innerHTML = `<i class="fas ${icone} fa-2x mb-2"></i><br>${mensagem}`;
+
+            } else {
+                resDiv.className = 'alert alert-danger mt-3 text-center';
+                resDiv.innerHTML = `
+                    <i class="fas fa-times-circle mb-2"></i><br>
+                    <strong>Não existe nenhuma instalação cadastrada para este CPF.</strong><br>
+                    <hr>
+                    <p class="mb-2">Quer se tornar nosso cliente?</p>
+                    <button class="btn btn-danger btn-sm w-100 rounded-pill" onclick="goToStep('planos')">
+                        Conhecer Planos e Contratar
+                    </button>
+                `;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            resDiv.className = 'alert alert-danger mt-3';
+            resDiv.innerHTML = 'Erro ao consultar. Tente novamente.';
+            resDiv.classList.remove('d-none');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-search"></i>';
+        });
     }
 
     function consultarViabilidadeModal() {
@@ -384,13 +512,10 @@
         resDiv.innerHTML = 'Consultando...';
         resDiv.classList.remove('d-none');
 
-        // Lógica duplicada do site (ViaCEP + Backend)
         fetch(`https://viacep.com.br/ws/${cep}/json/`)
         .then(r => r.json())
         .then(data => {
             if (data.erro) throw new Error('CEP não encontrado.');
-            
-            // Backend Check
             return fetch('/check_cobertura', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -404,7 +529,6 @@
         })
         .then(info => {
             if (info.coberta) {
-                // REDIRECIONAMENTO AUTOMÁTICO (Funil de Vendas)
                 resDiv.className = 'alert alert-success mt-3';
                 resDiv.innerHTML = `
                     <strong><i class="fas fa-check-circle"></i> Temos Cobertura!</strong><br>
@@ -414,7 +538,6 @@
                     </a>
                 `;
             } else {
-                // SEM COBERTURA
                 resDiv.className = 'alert alert-danger mt-3';
                 resDiv.innerHTML = `
                     <strong><i class="fas fa-times-circle"></i> Sem Cobertura.</strong><br>
@@ -451,14 +574,6 @@
         else goToStep(2);
     }
 
-    function mascaraCpf(i) {
-        let v = i.value.replace(/\D/g,"");
-        v = v.replace(/(\d{3})(\d)/,"$1.$2");
-        v = v.replace(/(\d{3})(\d)/,"$1.$2");
-        v = v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
-        i.value = v;
-    }
-
     function processarIdentificacao() {
         const cpf = document.getElementById('inputCpfChat').value;
         const btn = document.getElementById('btnBuscarCpf');
@@ -470,6 +585,7 @@
         }
         document.getElementById('msgErroCpf').classList.add('d-none');
 
+        // Se user já preencheu campos manuais, usa eles
         if (!manualDiv.classList.contains('d-none')) {
             const nome = document.getElementById('inputNomeChat').value;
             const end = document.getElementById('inputEndChat').value;
@@ -506,16 +622,23 @@
         else finalizarParaWhatsapp();
     }
 
+    // --- FUNÇÃO FINAL: MONTA MENSAGEM NATURAL ---
     function finalizarParaWhatsapp() {
         const h = new Date().getHours();
         let saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
         let texto = '';
 
         if (flowState.tipo === 'vendas') {
+            // Vendas Simples
             texto = `${saudacao}! ${flowState.assunto}.`;
         } else {
+            // Suporte Humanizado
             const { nome, endereco } = flowState.dadosCliente;
-            texto = `${saudacao}. Meu nome é *${nome}*, endereço *${endereco}* e estou com: *${flowState.assunto}*.`;
+            
+            // Busca frase natural ou usa o assunto como fallback
+            const fraseNatural = mensagensPorAssunto[flowState.assunto] || `Gostaria de falar sobre: ${flowState.assunto}.`;
+            
+            texto = `${saudacao}. Meu nome é *${nome}*, meu endereço de instalação é *${endereco}*. ${fraseNatural}`;
         }
 
         const numero = flowState.tipo === 'vendas' ? NUMERO_VENDAS : NUMERO_SUPORTE;
