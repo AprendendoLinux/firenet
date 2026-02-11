@@ -98,6 +98,176 @@ def is_horario_comercial():
         print(f"Erro ao verificar horário: {e}")
         return False
 
+def obter_mensagem_indisponibilidade():
+    """
+    Gera uma mensagem explicativa sobre o motivo da indisponibilidade,
+    com lógica inteligente para agrupar Segunda a Sexta, Sábado e Domingo.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT valor FROM configuracoes WHERE chave = 'horario_atendimento'")
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not row:
+            return "Consulte nosso horário de atendimento."
+
+        schedule = json.loads(row[0])
+        agora = datetime.now()
+        hoje_str = agora.strftime('%Y-%m-%d')
+        hora_atual = agora.strftime('%H:%M')
+        dia_semana = agora.weekday() # 0=Seg, 6=Dom
+
+        # 1. VERIFICA FERIADOS (Prioridade Máxima)
+        feriados = schedule.get('feriados', [])
+        feriado_hoje = next((item for item in feriados if item['data'] == hoje_str), None)
+
+        if feriado_hoje:
+            if not feriado_hoje.get('ativo'):
+                return "Hoje, por motivo de feriado, não estamos funcionando."
+            else:
+                inicio = feriado_hoje.get('inicio', '00:00')
+                fim = feriado_hoje.get('fim', '23:59')
+                
+                if hora_atual > fim:
+                    return f"Hoje, em razão do feriado, nosso atendimento se encerrou às {fim}."
+                elif hora_atual < inicio:
+                    return f"Hoje, em razão do feriado, nosso atendimento iniciará às {inicio}."
+
+        # 2. MONTA A FRASE DE HORÁRIOS (Lógica Completa: Seg-Sex, Sáb e Dom)
+        wd = schedule.get('weekdays', {})
+        sat = schedule.get('saturday', {})
+        sun = schedule.get('sunday', {})
+
+        # Dados da Semana
+        w_start = wd.get('start', '09:00')
+        w_end = wd.get('end', '18:00')
+        w_active = wd.get('active', True)
+
+        # Dados de Sábado
+        s_start = sat.get('start', '09:00')
+        s_end = sat.get('end', '13:00')
+        s_active = sat.get('active', True)
+
+        # Dados de Domingo
+        su_start = sun.get('start', '09:00')
+        su_end = sun.get('end', '13:00')
+        su_active = sun.get('active', False)
+
+        msg_horarios = ""
+
+        # Cenário 1: Tudo igual e ativo (Segunda a Domingo)
+        if w_active and s_active and su_active and (w_start == s_start == su_start) and (w_end == s_end == su_end):
+            msg_horarios = f"de segunda a domingo é das {w_start} às {w_end}."
+
+        # Cenário 2: Segunda a Sábado iguais. Domingo diferente (ou inativo).
+        elif w_active and s_active and (w_start == s_start) and (w_end == s_end):
+            msg_horarios = f"de segunda a sábado é das {w_start} às {w_end}."
+            if su_active:
+                msg_horarios += f" E aos domingos, das {su_start} às {su_end}."
+
+        # Cenário 3: Apenas Segunda a Sexta iguais. Fim de semana varia.
+        elif w_active:
+            msg_horarios = f"de segunda a sexta é das {w_start} às {w_end}."
+            
+            # Verifica se Sábado e Domingo são iguais entre si (Fim de Semana)
+            if s_active and su_active and (s_start == su_start) and (s_end == su_end):
+                msg_horarios += f" E aos fins de semana, das {s_start} às {s_end}."
+            else:
+                # Sábado e Domingo diferentes um do outro
+                if s_active:
+                    # Se tiver domingo também, usa ponto. Se for só sábado, usa "E".
+                    conector = " Aos" if su_active else " E aos"
+                    msg_horarios += f"{conector} sábados, das {s_start} às {s_end}."
+                
+                if su_active:
+                    msg_horarios += f" E aos domingos, das {su_start} às {su_end}."
+
+        # Caso de fallback (raro, ex: só fim de semana funciona)
+        else:
+             partes = []
+             if s_active: partes.append(f"aos sábados das {s_start} às {s_end}")
+             if su_active: partes.append(f"aos domingos das {su_start} às {su_end}")
+             if partes: msg_horarios = " e ".join(partes) + "."
+
+        # 3. VERIFICA DIA ATUAL (Para decidir o prefixo da mensagem)
+        config_dia = None
+        
+        if 0 <= dia_semana <= 4: # Seg-Sex
+            config_dia = wd
+        elif dia_semana == 5: # Sábado
+            config_dia = sat
+        elif dia_semana == 6: # Domingo
+            config_dia = sun
+
+        # Se hoje está FECHADO (ex: Domingo ou dia desativado)
+        if not config_dia or not config_dia.get('active'):
+            return f"Hoje não haverá expediente. Nosso funcionamento {msg_horarios}"
+
+        # Se hoje está ABERTO, mas fora do horário
+        start = config_dia.get('start', '00:00')
+        end = config_dia.get('end', '23:59')
+
+        if hora_atual > end or hora_atual < start:
+             return f"No momento, estamos fora do horário de atendimento. Nosso funcionamento {msg_horarios}"
+
+        return "Atendimento temporariamente indisponível."
+
+    except Exception as e:
+        print(f"Erro msg indisponibilidade: {e}")
+        return "No momento, estamos fora do horário de atendimento."
+
+@app.context_processor
+def inject_globals():
+    """
+    Injeta variáveis globais em todos os templates.
+    """
+    whatsapp_ativo = False
+    modo_automatico = False
+    whatsapp_sales = "5521999999999" # Valor default
+    whatsapp_support = "5521999999999" # Valor default
+    mensagem_indisponibilidade = "Fora do horário de atendimento."
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Carrega Configurações Gerais
+        cursor.execute("SELECT chave, valor FROM configuracoes")
+        configs = {row[0]: row[1] for row in cursor.fetchall()}
+        
+        # Lógica de Ativo/Inativo
+        is_comercial = is_horario_comercial()
+        modo_auto = configs.get('modo_automatico', '0') == '1'
+        
+        if modo_auto:
+            whatsapp_ativo = is_comercial
+        else:
+            whatsapp_ativo = configs.get('whatsapp_ativo', '0') == '1'
+            
+        whatsapp_sales = os.environ.get('WHATSAPP_SALES', '552100000000')
+        whatsapp_support = os.environ.get('WHATSAPP_SUPPORT', '552100000000')
+        
+        # Gera a mensagem dinâmica SOMENTE se estiver fechado
+        if not whatsapp_ativo:
+            mensagem_indisponibilidade = obter_mensagem_indisponibilidade()
+
+        cursor.close()
+        conn.close()
+        
+    except Exception as e:
+        print(f"Erro context processor: {e}")
+
+    return dict(
+        whatsapp_ativo=whatsapp_ativo,
+        modo_automatico=modo_auto,
+        whatsapp_sales=whatsapp_sales,
+        whatsapp_support=whatsapp_support,
+        mensagem_indisponibilidade=mensagem_indisponibilidade 
+    )
+
 @app.context_processor
 def inject_global_vars():
     try:
