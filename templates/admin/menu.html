@@ -64,17 +64,52 @@
     </div>
 </header>
 
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3 text-warning animate__animated animate__pulse animate__infinite">
+                    <i class="fas fa-exclamation-triangle fa-3x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Tem certeza?</h5>
+                <p class="text-muted small mb-0">Você vai remover esta data da configuração.</p>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmarExclusao()" style="border-radius: 4px; padding: 6px 12px;">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalSucessoConfig" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3 text-success animate__animated animate__bounceIn">
+                    <i class="fas fa-check-circle fa-3x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Sucesso!</h5>
+                <p class="text-muted small mb-0">Configurações de horário salvas.</p>
+            </div>
+            <div class="modal-footer bg-light border-0 justify-content-center">
+                <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal" onclick="checkReload()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="modalConfigHorario" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Configurar Horário Automático</h5>
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-clock me-2 text-primary"></i>Configurar Horário Automático</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form id="formSchedule">
                     
-                    <h6 class="fw-bold border-bottom pb-2 mb-3 text-secondary">Semana Padrão</h6>
+                    <h6 class="fw-bold border-bottom pb-2 mb-3 text-secondary small text-uppercase">Semana Padrão</h6>
                     
                     <div class="row mb-3">
                         <div class="col-12 mb-3 border-bottom pb-2">
@@ -87,11 +122,11 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <label class="small text-muted">Abertura</label>
-                                    <input type="time" class="form-control form-control-sm" id="wd_start" value="{{ schedule.weekdays.start }}">
+                                    <input type="time" class="form-control" id="wd_start" value="{{ schedule.weekdays.start }}">
                                 </div>
                                 <div class="col-6">
                                     <label class="small text-muted">Fechamento</label>
-                                    <input type="time" class="form-control form-control-sm" id="wd_end" value="{{ schedule.weekdays.end }}">
+                                    <input type="time" class="form-control" id="wd_end" value="{{ schedule.weekdays.end }}">
                                 </div>
                             </div>
                         </div>
@@ -106,11 +141,11 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <label class="small text-muted">Abertura</label>
-                                    <input type="time" class="form-control form-control-sm" id="sat_start" value="{{ schedule.saturday.start }}">
+                                    <input type="time" class="form-control" id="sat_start" value="{{ schedule.saturday.start }}">
                                 </div>
                                 <div class="col-6">
                                     <label class="small text-muted">Fechamento</label>
-                                    <input type="time" class="form-control form-control-sm" id="sat_end" value="{{ schedule.saturday.end }}">
+                                    <input type="time" class="form-control" id="sat_end" value="{{ schedule.saturday.end }}">
                                 </div>
                             </div>
                         </div>
@@ -125,28 +160,28 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <label class="small text-muted">Abertura</label>
-                                    <input type="time" class="form-control form-control-sm" id="sun_start" value="{{ schedule.sunday.start }}">
+                                    <input type="time" class="form-control" id="sun_start" value="{{ schedule.sunday.start }}">
                                 </div>
                                 <div class="col-6">
                                     <label class="small text-muted">Fechamento</label>
-                                    <input type="time" class="form-control form-control-sm" id="sun_end" value="{{ schedule.sunday.end }}">
+                                    <input type="time" class="form-control" id="sun_end" value="{{ schedule.sunday.end }}">
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 mt-4">
-                        <h6 class="fw-bold text-secondary mb-0">Feriados e Datas Específicas</h6>
+                        <h6 class="fw-bold text-secondary mb-0 small text-uppercase">Feriados e Datas Específicas</h6>
                         <button type="button" class="btn btn-sm btn-outline-success" onclick="addFeriadoRow()">
-                            <i class="fas fa-plus"></i> Adicionar Data
+                            <i class="fas fa-plus me-1"></i> Adicionar
                         </button>
                     </div>
                     
                     <div class="table-responsive bg-white border rounded">
                         <table class="table table-sm table-hover mb-0 align-middle">
-                            <thead class="table-light small">
+                            <thead class="table-light small text-muted text-uppercase">
                                 <tr>
-                                    <th style="width: 35%;">Data</th>
+                                    <th style="width: 35%;" class="ps-3">Data</th>
                                     <th style="width: 20%;">Status</th>
                                     <th style="width: 20%;">Início</th>
                                     <th style="width: 20%;">Fim</th>
@@ -158,16 +193,14 @@
                         </table>
                     </div>
                     <small class="text-muted d-block mt-2 fst-italic">
-                        <i class="fas fa-info-circle me-1"></i> Datas específicas têm prioridade sobre a configuração semanal.
+                        <i class="fas fa-info-circle me-1 text-primary"></i> Datas específicas têm prioridade sobre a configuração semanal.
                     </small>
 
                 </form>
             </div>
-            <div class="modal-footer bg-light">
+            <div class="modal-footer bg-light border-0">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveSchedule()">
-                    <i class="fas fa-save me-2"></i>Salvar Horários
-                </button>
+                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Salvar Horários</button>
             </div>
         </div>
     </div>
@@ -175,8 +208,9 @@
 
 <script>
     // Recupera os feriados existentes do backend via Jinja2
-    // Se não existir (None), inicia como array vazio
     let feriados = {{ schedule.feriados|tojson if schedule.feriados else '[]' }};
+    // Variável para armazenar qual índice será excluído
+    let indexParaExcluir = null;
 
     document.addEventListener('DOMContentLoaded', function() {
         const toggleManual = document.getElementById('toggleWhatsapp');
@@ -274,38 +308,36 @@
         tbody.innerHTML = '';
 
         if(feriados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted small py-3">Nenhuma data específica configurada.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted small py-4 fw-light">Nenhuma data específica configurada.</td></tr>';
             return;
         }
 
         feriados.forEach((f, index) => {
             const tr = document.createElement('tr');
-            
-            // Define se os inputs de hora estão habilitados (apenas se Status = Aberto)
-            const disabledAttr = !f.ativo ? 'disabled style="background-color: #e9ecef;"' : '';
+            const disabledAttr = !f.ativo ? 'disabled style="background-color: #f8f9fa;"' : '';
 
             tr.innerHTML = `
-                <td>
-                    <input type="date" class="form-control form-control-sm" value="${f.data}" 
+                <td class="ps-3">
+                    <input type="date" class="form-control form-control-sm border-0 bg-transparent fw-bold text-dark" value="${f.data}" 
                            onchange="updateFeriado(${index}, 'data', this.value)">
                 </td>
                 <td>
-                    <select class="form-select form-select-sm ${f.ativo ? 'text-success fw-bold' : 'text-danger fw-bold'}" 
-                            onchange="updateFeriado(${index}, 'ativo', this.value === 'true')">
-                        <option value="true" ${f.ativo ? 'selected' : ''}>Aberto</option>
-                        <option value="false" ${!f.ativo ? 'selected' : ''}>Fechado</option>
+                    <select class="form-select form-select-sm border-0 bg-transparent fw-bold ${f.ativo ? 'text-success' : 'text-danger'}" 
+                            onchange="updateFeriado(${index}, 'ativo', this.value === 'true')" style="cursor: pointer;">
+                        <option value="true" ${f.ativo ? 'selected' : ''} class="text-success fw-bold">Aberto</option>
+                        <option value="false" ${!f.ativo ? 'selected' : ''} class="text-danger fw-bold">Fechado</option>
                     </select>
                 </td>
                 <td>
-                    <input type="time" class="form-control form-control-sm" value="${f.inicio}" ${disabledAttr} 
+                    <input type="time" class="form-control form-control-sm border-0 bg-transparent" value="${f.inicio}" ${disabledAttr} 
                            onchange="updateFeriado(${index}, 'inicio', this.value)">
                 </td>
                 <td>
-                    <input type="time" class="form-control form-control-sm" value="${f.fim}" ${disabledAttr} 
+                    <input type="time" class="form-control form-control-sm border-0 bg-transparent" value="${f.fim}" ${disabledAttr} 
                            onchange="updateFeriado(${index}, 'fim', this.value)">
                 </td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-link text-danger p-0" onclick="removeFeriado(${index})" title="Remover">
+                    <button type="button" class="btn btn-link text-muted p-0 opacity-50 hover-danger" onclick="prepararExclusao(${index})" title="Remover">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </td>
@@ -315,33 +347,45 @@
     }
 
     function addFeriadoRow() {
-        // Adiciona um novo registro com data de hoje e padrão "Fechado"
         const hoje = new Date().toISOString().split('T')[0];
         feriados.push({
             data: hoje,
-            ativo: false,   // Padrão: Feriado = Fechado
+            ativo: false,
             inicio: '09:00',
             fim: '18:00'
         });
         renderFeriados();
     }
 
-    function removeFeriado(index) {
-        if(confirm('Deseja remover esta data da configuração?')) {
-            feriados.splice(index, 1);
+    // Abre o modal de confirmação em vez de excluir direto
+    function prepararExclusao(index) {
+        indexParaExcluir = index;
+        const modalDelete = new bootstrap.Modal(document.getElementById('modalConfirmDelete'));
+        modalDelete.show();
+    }
+
+    // Executa a exclusão após confirmação
+    function confirmarExclusao() {
+        if (indexParaExcluir !== null) {
+            feriados.splice(indexParaExcluir, 1);
             renderFeriados();
+            indexParaExcluir = null;
+            
+            // Fecha o modal de delete
+            const modalEl = document.getElementById('modalConfirmDelete');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
         }
     }
 
     function updateFeriado(index, field, value) {
         feriados[index][field] = value;
-        // Se mudou o status (ativo/inativo), re-renderiza para bloquear/desbloquear campos de hora
         if(field === 'ativo') {
             renderFeriados();
         }
     }
 
-    // --- FUNÇÃO DE SALVAR GERAL ---
+    // --- FUNÇÃO DE SALVAR GERAL COM MODAL BONITO ---
     function saveSchedule() {
         const schedule = {
             weekdays: {
@@ -359,8 +403,13 @@
                 start: document.getElementById('sun_start').value,
                 end: document.getElementById('sun_end').value
             },
-            feriados: feriados // Envia o array atualizado de feriados
+            feriados: feriados
         };
+
+        const btnSave = document.querySelector('#modalConfigHorario .btn-primary');
+        const originalText = btnSave.innerHTML;
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
 
         fetch('/admin/save_schedule', {
             method: 'POST',
@@ -369,20 +418,47 @@
         })
         .then(r => r.json())
         .then(data => {
+            btnSave.disabled = false;
+            btnSave.innerHTML = originalText;
+
             if(data.success) {
-                const modalEl = document.getElementById('modalConfigHorario');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
+                // 1. Fecha o modal de configuração
+                const modalConfigEl = document.getElementById('modalConfigHorario');
+                const modalConfig = bootstrap.Modal.getInstance(modalConfigEl);
+                modalConfig.hide();
                 
-                alert('Configurações de horário salvas com sucesso!');
+                // 2. Abre o modal de sucesso (BONITO)
+                const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucessoConfig'));
+                modalSucesso.show();
                 
-                // Se estiver em modo automático, recarrega para aplicar as novas regras imediatamente
-                if(document.getElementById('checkAuto').checked) {
-                    window.location.reload();
-                }
             } else {
                 alert('Erro ao salvar: ' + data.error);
             }
+        })
+        .catch(err => {
+            btnSave.disabled = false;
+            btnSave.innerHTML = originalText;
+            alert('Erro de conexão ao salvar.');
         });
     }
+
+    function checkReload() {
+        if(document.getElementById('checkAuto').checked) {
+            window.location.reload();
+        }
+    }
 </script>
+
+<style>
+    /* Hover do botão de lixeira */
+    .hover-danger:hover {
+        color: #dc3545 !important;
+        opacity: 1 !important;
+    }
+    /* Limpeza visual dos inputs na tabela */
+    .form-control:focus, .form-select:focus {
+        box-shadow: none;
+        border-color: #dee2e6; 
+        background-color: #f8f9fa;
+    }
+</style>
