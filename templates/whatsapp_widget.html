@@ -413,12 +413,70 @@
         i.value = v;
     }
 
+// --- FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DO CPF ---
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/[^\d]+/g, ''); // Limpa tudo que não é número
+        if (cpf == '') return false;
+        
+        // Elimina CPFs invalidos conhecidos (ex: 111.111.111-11)
+        if (cpf.length != 11 || 
+            cpf == "00000000000" || 
+            cpf == "11111111111" || 
+            cpf == "22222222222" || 
+            cpf == "33333333333" || 
+            cpf == "44444444444" || 
+            cpf == "55555555555" || 
+            cpf == "66666666666" || 
+            cpf == "77777777777" || 
+            cpf == "88888888888" || 
+            cpf == "99999999999")
+                return false;
+        
+        // Valida 1º digito
+        let add = 0;
+        for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
+        let rev = 11 - (add % 11);
+        if (rev == 10 || rev == 11) rev = 0;
+        if (rev != parseInt(cpf.charAt(9))) return false;
+        
+        // Valida 2º digito
+        add = 0;
+        for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
+        rev = 11 - (add % 11);
+        if (rev == 10 || rev == 11) rev = 0;
+        if (rev != parseInt(cpf.charAt(10))) return false;
+        
+        return true;   
+    }
+
     function mascaraCpf(i) {
-        let v = i.value.replace(/\D/g,"");
-        v = v.replace(/(\d{3})(\d)/,"$1.$2");
-        v = v.replace(/(\d{3})(\d)/,"$1.$2");
-        v = v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+        let v = i.value.replace(/\D/g, "");
+        
+        // Limita a 11 dígitos
+        if (v.length > 11) v = v.slice(0, 11);
+        
+        // Aplica a formatação
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        
         i.value = v;
+
+        // FEEDBACK VISUAL:
+        // Remove classes de validação anteriores
+        i.classList.remove('is-invalid', 'is-valid');
+        document.getElementById('msgErroCpf').classList.add('d-none');
+
+        // Se completou os 14 caracteres (formatação completa), valida!
+        if (i.value.length === 14) {
+            if (validarCPF(i.value)) {
+                i.classList.add('is-valid'); // Borda Verde
+            } else {
+                i.classList.add('is-invalid'); // Borda Vermelha
+                // Opcional: mostrar mensagem imediatamente
+                // document.getElementById('msgErroCpf').classList.remove('d-none');
+            }
+        }
     }
 
     function consultarStatusPedido() {
@@ -586,33 +644,44 @@
         else goToStep(2);
     }
 
-function processarIdentificacao() {
-        const cpf = document.getElementById('inputCpfChat').value;
+    function processarIdentificacao() {
+        const cpfInput = document.getElementById('inputCpfChat');
+        const cpf = cpfInput.value;
         const btn = document.getElementById('btnBuscarCpf');
         const manualDiv = document.getElementById('camposManuais');
+        const msgErro = document.getElementById('msgErroCpf');
 
-        // Validação básica do CPF
-        if (cpf.length < 14) {
-            document.getElementById('msgErroCpf').classList.remove('d-none');
+        // VALIDAÇÃO RIGOROSA
+        if (!validarCPF(cpf)) {
+            msgErro.innerHTML = "CPF inválido. Verifique os números digitados.";
+            msgErro.classList.remove('d-none');
+            cpfInput.classList.add('is-invalid');
+            cpfInput.focus();
             return;
         }
-        document.getElementById('msgErroCpf').classList.add('d-none');
+        
+        // Se passou, limpa erros
+        msgErro.classList.add('d-none');
+        cpfInput.classList.remove('is-invalid');
+        cpfInput.classList.add('is-valid');
 
-        // Se os campos manuais (Nome e Endereço) já estão visíveis
+        // ... (RESTANTE DO CÓDIGO PERMANECE IGUAL AO ANTERIOR) ...
+        
         if (!manualDiv.classList.contains('d-none')) {
+            // ... (Lógica de Nome e Endereço que já fizemos) ...
             const nomeInput = document.getElementById('inputNomeChat');
             const endInput = document.getElementById('inputEndChat');
-            
-            // AQUI ESTÁ A CORREÇÃO: .trim() remove espaços do início e do fim
-            const nome = nomeInput.value.trim();
-            const end = endInput.value.trim();
 
-            if(!nome || !end) { 
-                alert('Por favor, preencha seu Nome e Endereço para continuar.'); 
-                return; 
-            }
+            const formatarTexto = (texto) => {
+                if (!texto) return "";
+                return texto.trim().toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            };
 
-            // Atualiza os inputs visualmente para o usuário ver que limpou
+            const nome = formatarTexto(nomeInput.value);
+            const end = formatarTexto(endInput.value);
+
+            if(!nome || !end) { alert('Por favor, preencha seu Nome e Endereço.'); return; }
+
             nomeInput.value = nome;
             endInput.value = end;
 
@@ -621,7 +690,6 @@ function processarIdentificacao() {
             return;
         }
 
-        // Fluxo normal (Busca automática)
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
@@ -633,11 +701,9 @@ function processarIdentificacao() {
         .then(r => r.json())
         .then(data => {
             if (data.found) {
-                // Se achou no banco, usa os dados do banco (que supomos estarem corretos)
                 flowState.dadosCliente = { nome: data.nome, endereco: data.endereco, cpf: cpf };
                 posIdentificacao();
             } else {
-                // Se não achou, mostra os campos para digitar
                 manualDiv.classList.remove('d-none');
                 btn.innerHTML = 'Confirmar Dados e Continuar';
             }
@@ -655,6 +721,7 @@ function processarIdentificacao() {
     }
 
     function finalizarParaWhatsapp() {
+        // Última verificação de segurança (Horário)
         if (!LOJA_ABERTA) {
             const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
             modalOcupado.show();
@@ -668,18 +735,25 @@ function processarIdentificacao() {
         if (flowState.tipo === 'vendas') {
             texto = `${saudacao}! ${flowState.assunto}.`;
         } else {
-            const { nome, endereco } = flowState.dadosCliente;
+            // AQUI ESTÁ A MUDANÇA: Extraímos também o CPF e o incluímos na mensagem
+            const { nome, endereco, cpf } = flowState.dadosCliente;
             
             const fraseNatural = mensagensPorAssunto[flowState.assunto] || `Gostaria de falar sobre: ${flowState.assunto}.`;
             
-            texto = `${saudacao}. Meu nome é *${nome}*, meu endereço de instalação é *${endereco}*. ${fraseNatural}`;
+            // Nova formatação incluindo o CPF
+            texto = `${saudacao}. Meu nome é *${nome}*, CPF *${cpf}*, meu endereço de instalação é *${endereco}*. ${fraseNatural}`;
         }
 
         const numero = flowState.tipo === 'vendas' ? NUMERO_VENDAS : NUMERO_SUPORTE;
         window.open(`https://wa.me/${numero}?text=${encodeURIComponent(texto)}`, '_blank');
         
         setTimeout(() => {
-            bootstrap.Modal.getInstance(document.getElementById('modalAtendenteVirtual')).hide();
+            // Fecha o modal após abrir o WhatsApp
+            const modalEl = document.getElementById('modalAtendenteVirtual');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
             resetChat();
         }, 2000);
     }
