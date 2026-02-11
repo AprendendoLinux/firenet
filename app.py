@@ -86,6 +86,14 @@ def is_horario_comercial():
         print(f"Erro ao verificar horário: {e}")
         return False
 
+    return dict(
+            whatsapp_ativo=whatsapp_ativo, 
+            modo_automatico=modo_auto, 
+            schedule=schedule_settings,
+            whatsapp_sales=os.environ.get('WHATSAPP_SALES', '5500000000000'),
+            whatsapp_support=os.environ.get('WHATSAPP_SUPPORT', '5500000000000')
+        )
+
 # --- CONTEXT PROCESSOR ATUALIZADO ---
 # Injeta variáveis em todos os templates automaticamente
 @app.context_processor
@@ -1583,6 +1591,48 @@ def enviar_atualizacao_instalacao(email_destino, nome, data_instalacao, turno_in
             mail.send(msg)
         except Exception as e:
             print(f"Erro ao enviar email de atualização para {email_destino}: {e}")
+
+@app.route('/api/consultar_cpf', methods=['POST'])
+def api_consultar_cpf():
+    data = request.get_json()
+    cpf_raw = data.get('cpf', '')
+    # Limpa o CPF para comparar apenas números
+    cpf_limpo = re.sub(r'\D', '', cpf_raw)
+    
+    if not cpf_limpo:
+        return jsonify({'found': False})
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # Busca por CPF (considerando que no banco pode ter pontos/traços ou não)
+        # A query compara o CPF limpo do banco com o CPF limpo enviado
+        cursor.execute("""
+            SELECT nome, rua, numero, bairro, cidade 
+            FROM cadastros 
+            WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = %s
+            LIMIT 1
+        """, (cpf_limpo,))
+        
+        cliente = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if cliente:
+            # Monta endereço formatado
+            endereco = f"{cliente['rua']}, {cliente['numero']} - {cliente['bairro']}"
+            return jsonify({
+                'found': True,
+                'nome': cliente['nome'],
+                'endereco': endereco
+            })
+        else:
+            return jsonify({'found': False})
+            
+    except Exception as e:
+        print(f"Erro na API CPF: {e}")
+        return jsonify({'found': False, 'error': str(e)})
 
 if __name__ == '__main__':
     if wait_for_db():
