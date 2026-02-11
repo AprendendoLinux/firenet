@@ -586,26 +586,42 @@
         else goToStep(2);
     }
 
-    function processarIdentificacao() {
+function processarIdentificacao() {
         const cpf = document.getElementById('inputCpfChat').value;
         const btn = document.getElementById('btnBuscarCpf');
         const manualDiv = document.getElementById('camposManuais');
 
+        // Validação básica do CPF
         if (cpf.length < 14) {
             document.getElementById('msgErroCpf').classList.remove('d-none');
             return;
         }
         document.getElementById('msgErroCpf').classList.add('d-none');
 
+        // Se os campos manuais (Nome e Endereço) já estão visíveis
         if (!manualDiv.classList.contains('d-none')) {
-            const nome = document.getElementById('inputNomeChat').value;
-            const end = document.getElementById('inputEndChat').value;
-            if(!nome || !end) { alert('Preencha os dados.'); return; }
+            const nomeInput = document.getElementById('inputNomeChat');
+            const endInput = document.getElementById('inputEndChat');
+            
+            // AQUI ESTÁ A CORREÇÃO: .trim() remove espaços do início e do fim
+            const nome = nomeInput.value.trim();
+            const end = endInput.value.trim();
+
+            if(!nome || !end) { 
+                alert('Por favor, preencha seu Nome e Endereço para continuar.'); 
+                return; 
+            }
+
+            // Atualiza os inputs visualmente para o usuário ver que limpou
+            nomeInput.value = nome;
+            endInput.value = end;
+
             flowState.dadosCliente = { nome: nome, endereco: end, cpf: cpf };
             posIdentificacao();
             return;
         }
 
+        // Fluxo normal (Busca automática)
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
@@ -617,14 +633,19 @@
         .then(r => r.json())
         .then(data => {
             if (data.found) {
+                // Se achou no banco, usa os dados do banco (que supomos estarem corretos)
                 flowState.dadosCliente = { nome: data.nome, endereco: data.endereco, cpf: cpf };
                 posIdentificacao();
             } else {
+                // Se não achou, mostra os campos para digitar
                 manualDiv.classList.remove('d-none');
                 btn.innerHTML = 'Confirmar Dados e Continuar';
             }
         })
-        .catch(() => manualDiv.classList.remove('d-none'))
+        .catch(() => {
+            manualDiv.classList.remove('d-none');
+            btn.innerHTML = 'Confirmar Dados e Continuar';
+        })
         .finally(() => btn.disabled = false);
     }
 
