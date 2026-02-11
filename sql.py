@@ -83,15 +83,13 @@ def init_db():
             `observacoes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         """)
-        # Adiciona a chave primária
         cursor.execute("ALTER TABLE `cadastros` ADD PRIMARY KEY (`id`);")
-        # Adiciona AUTO_INCREMENT
         cursor.execute("ALTER TABLE `cadastros` MODIFY `id` int NOT NULL AUTO_INCREMENT;")
 
-    # Para tabelas existentes: Atualiza o enum de status_instalacao para incluir 'N/D' (se não existir)
+    # Atualiza enum status_instalacao se necessário
     cursor.execute("SHOW COLUMNS FROM cadastros LIKE 'status_instalacao'")
     column_info = cursor.fetchone()
-    if column_info and "'N/D'" not in column_info[1]:  # Verifica se 'N/D' já está no enum
+    if column_info and "'N/D'" not in column_info[1]:
         cursor.execute("""
             ALTER TABLE cadastros MODIFY status_instalacao 
             ENUM('N/D', 'Programada', 'Concluída', 'Não Realizada') 
@@ -110,10 +108,11 @@ def init_db():
         """)
 
     if 'configuracoes' not in existing_tables:
+        # CORREÇÃO AQUI: Usando TEXT em vez de VARCHAR(255)
         cursor.execute("""
             CREATE TABLE configuracoes (
                 chave VARCHAR(50) PRIMARY KEY,
-                valor VARCHAR(255)
+                valor TEXT
             )
         """)
         cursor.execute("INSERT INTO configuracoes (chave, valor) VALUES ('whatsapp_ativo', '1')")
@@ -122,13 +121,19 @@ def init_db():
         cursor.execute("INSERT INTO configuracoes (chave, valor) VALUES ('horario_atendimento', %s)", (default_schedule,))
         print("Tabela de configurações criada.")
     else:
-        # Garante que as novas chaves existam mesmo se a tabela já foi criada antes
+        # CORREÇÃO AQUI: Alterar coluna existente para TEXT se ela já existir como VARCHAR
+        try:
+            cursor.execute("ALTER TABLE configuracoes MODIFY valor TEXT")
+            print("Coluna 'valor' da tabela configuracoes atualizada para TEXT.")
+        except Exception as e:
+            print(f"Nota: Tentativa de alterar coluna valor: {e}")
+
+        # Insere chaves padrão se não existirem
         cursor.execute("INSERT IGNORE INTO configuracoes (chave, valor) VALUES ('modo_automatico', '0')")
         default_schedule = '{"weekdays": {"start": "09:00", "end": "18:00", "active": true}, "saturday": {"start": "09:00", "end": "14:00", "active": true}, "sunday": {"start": "09:00", "end": "18:00", "active": false}}'
         cursor.execute("INSERT IGNORE INTO configuracoes (chave, valor) VALUES ('horario_atendimento', %s)", (default_schedule,))
         conn.commit()
 
-    
     if 'usuarios' not in existing_tables:
         cursor.execute("""
             CREATE TABLE usuarios (
@@ -140,7 +145,6 @@ def init_db():
                 telegram_id BIGINT DEFAULT NULL
             )
         """)
-        # Após criar a tabela, criar admin
         hashed_password = generate_password_hash('admin')
         cursor.execute("""
             INSERT INTO usuarios (username, password, email, telegram_id)
@@ -149,7 +153,6 @@ def init_db():
         conn.commit()
         print("Usuário admin criado com sucesso.")
 
-    # Para tabelas existentes: Adiciona a coluna telegram_id se não existir
     cursor.execute("SHOW COLUMNS FROM usuarios LIKE 'telegram_id'")
     if not cursor.fetchone():
         cursor.execute("""
@@ -169,23 +172,18 @@ def init_db():
         cursor.execute("ALTER TABLE `relatorios` ADD PRIMARY KEY (`id`);")
         cursor.execute("ALTER TABLE `relatorios` MODIFY `id` int NOT NULL AUTO_INCREMENT;")
 
-    # Novo: Para tabelas existentes, drop unique se existir e ajusta tamanho de identificador para 4
     if 'relatorios' in existing_tables:
-        # Drop unique index se existir
         cursor.execute("SHOW INDEX FROM relatorios WHERE Key_name = 'identificador'")
         if cursor.fetchone():
             cursor.execute("ALTER TABLE relatorios DROP INDEX identificador")
-            print("Unique key em 'identificador' removida.")
         
-        # Verifica e altera o tamanho da coluna se necessário
         cursor.execute("SHOW COLUMNS FROM relatorios LIKE 'identificador'")
         column_info = cursor.fetchone()
-        if column_info and 'varchar(10)' in column_info[1]:  # Se for 10, altera para 4
+        if column_info and 'varchar(10)' in column_info[1]: 
             cursor.execute("""
                 ALTER TABLE relatorios MODIFY identificador 
                 VARCHAR(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
             """)
-            print("Coluna 'identificador' alterada para VARCHAR(4).")
 
     if 'cobertura' not in existing_tables:
         cursor.execute("""
@@ -199,7 +197,6 @@ def init_db():
                 pais VARCHAR(255) NOT NULL
             )
         """)
-        # Inserir endereços padrão
         cursor.execute("""
             INSERT INTO cobertura (tipo_logradouro, nome_logradouro, bairro, cidade, estado, pais)
             VALUES ('Rua', 'Mateus Silva', 'Inhaúma', 'Rio de Janeiro', 'RJ', 'Brasil')

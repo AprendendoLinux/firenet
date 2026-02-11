@@ -1,13 +1,7 @@
 <div class="whats-button">
-    {% if whatsapp_ativo %}
-        <a href="#" data-bs-toggle="modal" data-bs-target="#modalAtendenteVirtual" title="Falar com a FireNet">
-            <img loading="lazy" src="{{ url_for('static', filename='whatsapp.webp') }}" alt="WhatsApp" class="img-fluid">
-        </a>
-    {% else %}
-        <a href="#" data-bs-toggle="modal" data-bs-target="#modalWhatsOcupado" title="Atendimento Indisponível">
-            <img loading="lazy" src="{{ url_for('static', filename='whatsapp.webp') }}" alt="WhatsApp" class="img-fluid" style="filter: grayscale(100%); opacity: 0.9;">
-        </a>
-    {% endif %}
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalAtendenteVirtual" title="Falar com a FireNet">
+        <img loading="lazy" src="{{ url_for('static', filename='whatsapp.webp') }}" alt="WhatsApp" class="img-fluid">
+    </a>
 </div>
 
 <div class="modal fade" id="modalAtendenteVirtual" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -29,7 +23,7 @@
 
                     <div id="step-1" class="step-content animate__animated animate__fadeIn">
                         <h4 class="fw-bold text-dark mb-3">Olá! Bem-vindo à FireNet.</h4>
-                        <p class="text-muted mb-4">Este canal é exclusivo para vendas. O que deseja saber?</p>
+                        <p class="text-muted mb-4">Selecione uma opção abaixo para começar:</p>
                         
                         <div class="d-grid gap-3">
                             <button class="btn btn-outline-danger btn-lg text-start" onclick="goToStep('planos')">
@@ -44,7 +38,7 @@
                             <button class="btn btn-outline-secondary btn-lg text-start" onclick="goToStep('status')">
                                 <i class="fas fa-clipboard-list me-2"></i> Status do meu pedido de instalação
                             </button>
-                            <button class="btn btn-outline-dark btn-lg text-start" onclick="goToStep(2)">
+                            <button class="btn btn-outline-dark btn-lg text-start" onclick="verificarAtendimento('suporte')">
                                 <i class="fas fa-headset me-2"></i> Outros assuntos (Suporte/Financeiro)
                             </button>
                         </div>
@@ -312,25 +306,25 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalWhatsOcupado" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalWhatsOcupado" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
       <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title"><i class="fas fa-headset me-2"></i>Atendimento</h5>
+        <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Fora do Horário</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body py-4">
         <div class="card mb-4 border-danger" style="background-color: rgba(211, 47, 47, 0.08);">
             <div class="card-body text-center">
-                <div class="text-danger mb-2"><i class="fas fa-clock fa-3x"></i></div>
+                <div class="text-danger mb-2"><i class="fas fa-store-slash fa-3x"></i></div>
                 <h5 class="fw-bold text-danger">Atendimento Encerrado</h5>
-                <p class="text-dark small mb-0 mt-2">Nossos operadores estão indisponíveis no momento.</p>
+                <p class="text-dark small mb-0 mt-2">No momento, estamos fora do nosso horário de atendimento via WhatsApp.</p>
                 <hr class="border-danger opacity-25 my-3">
-                <p class="mb-0 text-dark"><strong>Mas você não precisa esperar!</strong><br>Contrate agora pelo site.</p>
+                <p class="mb-0 text-dark"><strong>Você ainda pode:</strong><br>Consultar planos e disponibilidade e realizar o pré-cadastro pelo site.</p>
             </div>
         </div>
         <div class="d-grid gap-2">
-            <a href="{{ url_for('contato') }}" class="btn btn-danger rounded-pill"><i class="fas fa-envelope me-2"></i>Enviar Mensagem</a>
+            <a href="{{ url_for('contato') }}" class="btn btn-danger rounded-pill"><i class="fas fa-envelope me-2"></i>Deixar Mensagem</a>
             <button type="button" class="btn btn-link text-muted text-decoration-none btn-sm" data-bs-dismiss="modal">Fechar</button>
         </div>
       </div>
@@ -339,7 +333,10 @@
 </div>
 
 <script>
-    // Variáveis de Estado
+    const LOJA_ABERTA = {{ 'true' if whatsapp_ativo else 'false' }};
+    const NUMERO_VENDAS = "{{ whatsapp_sales }}";
+    const NUMERO_SUPORTE = "{{ whatsapp_support }}";
+
     let flowState = {
         assunto: '',
         tipo: '', 
@@ -347,10 +344,6 @@
         dadosCliente: { nome: '', endereco: '', cpf: '' }
     };
 
-    const NUMERO_VENDAS = "{{ whatsapp_sales }}";
-    const NUMERO_SUPORTE = "{{ whatsapp_support }}";
-
-    // Mapeamento de mensagens humanizadas
     const mensagensPorAssunto = {
         'Lentidão na internet': 'Estou enfrentando lentidão na minha internet e preciso de suporte.',
         'Sem internet': 'Estou sem conexão de internet e preciso de ajuda para restabelecer o sinal.',
@@ -366,20 +359,29 @@
     function resetChat() {
         goToStep(1);
         flowState = { assunto: '', tipo: '', isBoleto: false, dadosCliente: { nome: '', endereco: '', cpf: '' } };
-        
-        // Limpa inputs
         ['inputCpfChat', 'inputNomeChat', 'inputEndChat', 'inputCepModal', 'inputCpfStatus'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.value = '';
         });
-        
-        // Esconde áreas de resultado
         ['resultadoViabilidadeModal', 'camposManuais', 'resultadoStatus', 'msgErroCpf'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.classList.add('d-none');
         });
-        
         document.getElementById('btnBuscarCpf').innerHTML = 'Continuar <i class="fas fa-arrow-right ms-2"></i>';
+    }
+
+    function verificarAtendimento(destino) {
+        if (!LOJA_ABERTA) {
+            const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
+            modalOcupado.show();
+            return;
+        }
+
+        if (destino === 'suporte') {
+            goToStep(2);
+        } else if (destino === 'vendas_direta') {
+            selectOption('vendas', 'Gostaria de contratar um plano');
+        }
     }
 
     function goToStep(step) {
@@ -556,6 +558,12 @@
     }
 
     function selectOption(tipo, assunto, isBoleto = false) {
+        if (!LOJA_ABERTA) {
+            const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
+            modalOcupado.show();
+            return;
+        }
+
         flowState.tipo = tipo;
         flowState.assunto = assunto;
         flowState.isBoleto = isBoleto;
@@ -585,7 +593,6 @@
         }
         document.getElementById('msgErroCpf').classList.add('d-none');
 
-        // Se user já preencheu campos manuais, usa eles
         if (!manualDiv.classList.contains('d-none')) {
             const nome = document.getElementById('inputNomeChat').value;
             const end = document.getElementById('inputEndChat').value;
@@ -622,20 +629,22 @@
         else finalizarParaWhatsapp();
     }
 
-    // --- FUNÇÃO FINAL: MONTA MENSAGEM NATURAL ---
     function finalizarParaWhatsapp() {
+        if (!LOJA_ABERTA) {
+            const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
+            modalOcupado.show();
+            return;
+        }
+
         const h = new Date().getHours();
         let saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
         let texto = '';
 
         if (flowState.tipo === 'vendas') {
-            // Vendas Simples
             texto = `${saudacao}! ${flowState.assunto}.`;
         } else {
-            // Suporte Humanizado
             const { nome, endereco } = flowState.dadosCliente;
             
-            // Busca frase natural ou usa o assunto como fallback
             const fraseNatural = mensagensPorAssunto[flowState.assunto] || `Gostaria de falar sobre: ${flowState.assunto}.`;
             
             texto = `${saudacao}. Meu nome é *${nome}*, meu endereço de instalação é *${endereco}*. ${fraseNatural}`;

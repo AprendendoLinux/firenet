@@ -9,7 +9,7 @@
                     
                     <button class="btn btn-sm btn-outline-secondary me-2 border-0" 
                             data-bs-toggle="modal" data-bs-target="#modalConfigHorario" 
-                            title="Configurar Horários Automáticos">
+                            title="Configurar Horários e Feriados">
                         <i class="fas fa-cog"></i>
                     </button>
 
@@ -65,7 +65,7 @@
 </header>
 
 <div class="modal fade" id="modalConfigHorario" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Configurar Horário Automático</h5>
@@ -73,90 +73,133 @@
             </div>
             <div class="modal-body">
                 <form id="formSchedule">
-                    <div class="mb-3 border-bottom pb-3">
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" id="wd_active" {% if schedule.weekdays.active %}checked{% endif %}>
-                            <label class="form-check-label fw-bold" for="wd_active">Segunda a Sexta</label>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col">
-                                <label class="small text-muted">Início</label>
-                                <input type="time" class="form-control" id="wd_start" value="{{ schedule.weekdays.start }}">
+                    
+                    <h6 class="fw-bold border-bottom pb-2 mb-3 text-secondary">Semana Padrão</h6>
+                    
+                    <div class="row mb-3">
+                        <div class="col-12 mb-3 border-bottom pb-2">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="wd_active" {% if schedule.weekdays.active %}checked{% endif %}>
+                                    <label class="form-check-label fw-bold" for="wd_active">Segunda a Sexta</label>
+                                </div>
                             </div>
-                            <div class="col">
-                                <label class="small text-muted">Fim</label>
-                                <input type="time" class="form-control" id="wd_end" value="{{ schedule.weekdays.end }}">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="small text-muted">Abertura</label>
+                                    <input type="time" class="form-control form-control-sm" id="wd_start" value="{{ schedule.weekdays.start }}">
+                                </div>
+                                <div class="col-6">
+                                    <label class="small text-muted">Fechamento</label>
+                                    <input type="time" class="form-control form-control-sm" id="wd_end" value="{{ schedule.weekdays.end }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mb-3 border-bottom pb-2">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sat_active" {% if schedule.saturday.active %}checked{% endif %}>
+                                    <label class="form-check-label fw-bold" for="sat_active">Sábado</label>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="small text-muted">Abertura</label>
+                                    <input type="time" class="form-control form-control-sm" id="sat_start" value="{{ schedule.saturday.start }}">
+                                </div>
+                                <div class="col-6">
+                                    <label class="small text-muted">Fechamento</label>
+                                    <input type="time" class="form-control form-control-sm" id="sat_end" value="{{ schedule.saturday.end }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sun_active" {% if schedule.sunday.active %}checked{% endif %}>
+                                    <label class="form-check-label fw-bold" for="sun_active">Domingo</label>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="small text-muted">Abertura</label>
+                                    <input type="time" class="form-control form-control-sm" id="sun_start" value="{{ schedule.sunday.start }}">
+                                </div>
+                                <div class="col-6">
+                                    <label class="small text-muted">Fechamento</label>
+                                    <input type="time" class="form-control form-control-sm" id="sun_end" value="{{ schedule.sunday.end }}">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3 border-bottom pb-3">
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" id="sat_active" {% if schedule.saturday.active %}checked{% endif %}>
-                            <label class="form-check-label fw-bold" for="sat_active">Sábado</label>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col">
-                                <label class="small text-muted">Início</label>
-                                <input type="time" class="form-control" id="sat_start" value="{{ schedule.saturday.start }}">
-                            </div>
-                            <div class="col">
-                                <label class="small text-muted">Fim</label>
-                                <input type="time" class="form-control" id="sat_end" value="{{ schedule.saturday.end }}">
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 mt-4">
+                        <h6 class="fw-bold text-secondary mb-0">Feriados e Datas Específicas</h6>
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="addFeriadoRow()">
+                            <i class="fas fa-plus"></i> Adicionar Data
+                        </button>
                     </div>
+                    
+                    <div class="table-responsive bg-white border rounded">
+                        <table class="table table-sm table-hover mb-0 align-middle">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th style="width: 35%;">Data</th>
+                                    <th style="width: 20%;">Status</th>
+                                    <th style="width: 20%;">Início</th>
+                                    <th style="width: 20%;">Fim</th>
+                                    <th style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaFeriados">
+                                </tbody>
+                        </table>
+                    </div>
+                    <small class="text-muted d-block mt-2 fst-italic">
+                        <i class="fas fa-info-circle me-1"></i> Datas específicas têm prioridade sobre a configuração semanal.
+                    </small>
 
-                    <div class="mb-3">
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" id="sun_active" {% if schedule.sunday.active %}checked{% endif %}>
-                            <label class="form-check-label fw-bold" for="sun_active">Domingo</label>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col">
-                                <label class="small text-muted">Início</label>
-                                <input type="time" class="form-control" id="sun_start" value="{{ schedule.sunday.start }}">
-                            </div>
-                            <div class="col">
-                                <label class="small text-muted">Fim</label>
-                                <input type="time" class="form-control" id="sun_end" value="{{ schedule.sunday.end }}">
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer bg-light">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Salvar Horários</button>
+                <button type="button" class="btn btn-primary" onclick="saveSchedule()">
+                    <i class="fas fa-save me-2"></i>Salvar Horários
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Recupera os feriados existentes do backend via Jinja2
+    // Se não existir (None), inicia como array vazio
+    let feriados = {{ schedule.feriados|tojson if schedule.feriados else '[]' }};
+
     document.addEventListener('DOMContentLoaded', function() {
         const toggleManual = document.getElementById('toggleWhatsapp');
         const toggleMobile = document.getElementById('toggleWhatsappMobile');
         const checkAuto = document.getElementById('checkAuto');
         const label = document.getElementById('labelWhatsapp');
 
+        // Renderiza a tabela de feriados ao carregar
+        renderFeriados();
+
         // Função para atualizar a interface visualmente
         function updateInterface(isAuto, isAtivo) {
-            // Trava/Destrava controles manuais
             toggleManual.disabled = isAuto;
             if(toggleMobile) toggleMobile.disabled = isAuto;
 
-            // Atualiza o estado visual (Checked/Unchecked)
             toggleManual.checked = isAtivo;
             if(toggleMobile) toggleMobile.checked = isAtivo;
             
-            // Atualiza Label
             if(label) {
                 label.innerHTML = `<i class="fab fa-whatsapp"></i> ${isAtivo ? 'ON' : 'OFF'}`;
                 label.className = `form-check-label fw-bold ${isAtivo ? 'text-danger' : 'text-secondary'}`;
             }
 
-            // Tooltips e Feedback Visual
             const containerManual = toggleManual.parentElement;
             if (isAuto) {
                 containerManual.title = "Controlado pelo Horário Comercial (Auto Ligado)";
@@ -172,7 +215,6 @@
             checkAuto.addEventListener('change', function() {
                 const isAuto = this.checked;
                 
-                // Envia para o backend
                 fetch('/admin/toggle_whatsapp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -181,11 +223,10 @@
                 .then(r => r.json())
                 .then(data => {
                     if(data.success) {
-                        // Recarrega a página para o backend recalcular o status com base no horário
                         window.location.reload();
                     } else {
                         alert('Erro ao alterar modo automático.');
-                        this.checked = !isAuto; // Reverte
+                        this.checked = !isAuto;
                     }
                 });
             });
@@ -195,7 +236,6 @@
         [toggleManual, toggleMobile].forEach(t => {
             if(!t) return;
             t.addEventListener('change', function() {
-                // Se estiver em auto, não deveria ser possível clicar, mas por segurança:
                 if(checkAuto && checkAuto.checked) {
                     this.checked = !this.checked;
                     alert('Desative o Modo Automático para controlar manualmente.');
@@ -215,20 +255,93 @@
                         updateInterface(false, isAtivo);
                     } else {
                         alert('Erro ao atualizar status.');
-                        this.checked = !isAtivo; // Reverte
+                        this.checked = !isAtivo;
                     }
                 });
             });
         });
 
         // Inicialização Visual
-        // Pega valores injetados pelo Jinja no carregamento da página
         const inicialAtivo = {{ 'true' if whatsapp_ativo else 'false' }};
         const inicialAuto = {{ 'true' if modo_automatico else 'false' }};
         updateInterface(inicialAuto, inicialAtivo);
     });
 
-    // Função global para Salvar o JSON de horários
+    // --- FUNÇÕES DE FERIADOS ---
+
+    function renderFeriados() {
+        const tbody = document.getElementById('listaFeriados');
+        tbody.innerHTML = '';
+
+        if(feriados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted small py-3">Nenhuma data específica configurada.</td></tr>';
+            return;
+        }
+
+        feriados.forEach((f, index) => {
+            const tr = document.createElement('tr');
+            
+            // Define se os inputs de hora estão habilitados (apenas se Status = Aberto)
+            const disabledAttr = !f.ativo ? 'disabled style="background-color: #e9ecef;"' : '';
+
+            tr.innerHTML = `
+                <td>
+                    <input type="date" class="form-control form-control-sm" value="${f.data}" 
+                           onchange="updateFeriado(${index}, 'data', this.value)">
+                </td>
+                <td>
+                    <select class="form-select form-select-sm ${f.ativo ? 'text-success fw-bold' : 'text-danger fw-bold'}" 
+                            onchange="updateFeriado(${index}, 'ativo', this.value === 'true')">
+                        <option value="true" ${f.ativo ? 'selected' : ''}>Aberto</option>
+                        <option value="false" ${!f.ativo ? 'selected' : ''}>Fechado</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="time" class="form-control form-control-sm" value="${f.inicio}" ${disabledAttr} 
+                           onchange="updateFeriado(${index}, 'inicio', this.value)">
+                </td>
+                <td>
+                    <input type="time" class="form-control form-control-sm" value="${f.fim}" ${disabledAttr} 
+                           onchange="updateFeriado(${index}, 'fim', this.value)">
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-link text-danger p-0" onclick="removeFeriado(${index})" title="Remover">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function addFeriadoRow() {
+        // Adiciona um novo registro com data de hoje e padrão "Fechado"
+        const hoje = new Date().toISOString().split('T')[0];
+        feriados.push({
+            data: hoje,
+            ativo: false,   // Padrão: Feriado = Fechado
+            inicio: '09:00',
+            fim: '18:00'
+        });
+        renderFeriados();
+    }
+
+    function removeFeriado(index) {
+        if(confirm('Deseja remover esta data da configuração?')) {
+            feriados.splice(index, 1);
+            renderFeriados();
+        }
+    }
+
+    function updateFeriado(index, field, value) {
+        feriados[index][field] = value;
+        // Se mudou o status (ativo/inativo), re-renderiza para bloquear/desbloquear campos de hora
+        if(field === 'ativo') {
+            renderFeriados();
+        }
+    }
+
+    // --- FUNÇÃO DE SALVAR GERAL ---
     function saveSchedule() {
         const schedule = {
             weekdays: {
@@ -245,7 +358,8 @@
                 active: document.getElementById('sun_active').checked,
                 start: document.getElementById('sun_start').value,
                 end: document.getElementById('sun_end').value
-            }
+            },
+            feriados: feriados // Envia o array atualizado de feriados
         };
 
         fetch('/admin/save_schedule', {
@@ -256,14 +370,13 @@
         .then(r => r.json())
         .then(data => {
             if(data.success) {
-                // Fecha modal
                 const modalEl = document.getElementById('modalConfigHorario');
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 modal.hide();
                 
-                alert('Horários atualizados com sucesso!');
+                alert('Configurações de horário salvas com sucesso!');
                 
-                // Se estiver em Auto, recarrega para aplicar nova regra imediatamente
+                // Se estiver em modo automático, recarrega para aplicar as novas regras imediatamente
                 if(document.getElementById('checkAuto').checked) {
                     window.location.reload();
                 }

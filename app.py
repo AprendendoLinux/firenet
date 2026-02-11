@@ -57,16 +57,29 @@ def is_horario_comercial():
         conn.close()
 
         if not row:
-            return False # Se não tiver config, assume fechado por segurança
+            return False 
 
         schedule = json.loads(row[0])
         agora = datetime.now()
-        dia_semana = agora.weekday() # 0=Segunda ... 6=Domingo
+        hoje_str = agora.strftime('%Y-%m-%d') # Formato AAAA-MM-DD
         hora_atual = agora.strftime('%H:%M')
+        
+        # 1. Verifica se hoje é um feriado/data específica
+        feriados = schedule.get('feriados', [])
+        regra_hoje = next((item for item in feriados if item['data'] == hoje_str), None)
 
+        if regra_hoje:
+            # Se a data existe na lista, segue a regra dela (aberto ou fechado)
+            if not regra_hoje.get('ativo'):
+                return False
+            start = regra_hoje.get('inicio', '00:00')
+            end = regra_hoje.get('fim', '23:59')
+            return start <= hora_atual < end
+
+        # 2. Se não for feriado, segue a regra da semana
+        dia_semana = agora.weekday() # 0=Segunda ... 6=Domingo
         config_dia = None
 
-        # Identifica qual regra usar
         if 0 <= dia_semana <= 4: # Seg a Sex
             config_dia = schedule.get('weekdays')
         elif dia_semana == 5: # Sábado
@@ -74,25 +87,16 @@ def is_horario_comercial():
         elif dia_semana == 6: # Domingo
             config_dia = schedule.get('sunday')
 
-        # Verifica a regra
         if config_dia and config_dia.get('active'):
             start = config_dia.get('start', '00:00')
             end = config_dia.get('end', '23:59')
             return start <= hora_atual < end
             
-        return False # Dia inativo
+        return False 
 
     except Exception as e:
         print(f"Erro ao verificar horário: {e}")
         return False
-
-    return dict(
-            whatsapp_ativo=whatsapp_ativo, 
-            modo_automatico=modo_auto, 
-            schedule=schedule_settings,
-            whatsapp_sales=os.environ.get('WHATSAPP_SALES', '5500000000000'),
-            whatsapp_support=os.environ.get('WHATSAPP_SUPPORT', '5500000000000')
-        )
 
 @app.context_processor
 def inject_global_vars():
@@ -1328,7 +1332,9 @@ def toggle_whatsapp():
 @login_required
 def save_schedule():
     try:
-        data = request.get_json() # Recebe o JSON do frontend
+        data = request.get_json() 
+        # data agora inclui 'weekdays', 'saturday', 'sunday' E 'feriados'
+        
         json_str = json.dumps(data)
         
         conn = get_db_connection()
