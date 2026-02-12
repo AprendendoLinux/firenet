@@ -235,26 +235,42 @@
     </style>
 </section>
 
-<div class="modal fade" id="modalCheckAssinatura" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalCheckAssinatura" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title"><i class="fas fa-map-marker-alt me-2"></i>Verificar Disponibilidade</h5>
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            
+            <div class="modal-header bg-danger text-white border-0 rounded-top-4">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-rocket me-2"></i>Quase lá!
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body p-4 text-center">
-                <p class="text-muted mb-3">Para assinar o plano selecionado, primeiro confirme se atendemos o seu endereço.</p>
+                
+                <div class="mb-4 text-danger opacity-75">
+                    <i class="fas fa-map-marked-alt fa-4x animate__animated animate__pulse animate__infinite"></i>
+                </div>
+
+                <h4 class="fw-bold text-dark mb-2">Verificar Disponibilidade</h4>
+                <p class="text-muted small mb-4">
+                    Para ativar seu plano <span class="fw-bold text-danger" id="nomePlanoModal">selecionado</span>, precisamos confirmar se nossa fibra já chega na sua rua.
+                </p>
                 
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="cepAssinatura" placeholder="00000-000" maxlength="9">
-                    <label for="cepAssinatura">Digite seu CEP</label>
+                    <input type="text" class="form-control rounded-3 border-danger" id="cepAssinatura" placeholder="00000-000" maxlength="9" style="background-color: #fff5f5;">
+                    <label for="cepAssinatura"><i class="fas fa-search me-2 text-muted"></i>Digite seu CEP</label>
                 </div>
                 
-                <button class="btn btn-danger w-100 rounded-pill btn-lg" id="btnCheckAssinatura" onclick="checkAssinaturaCep()">
-                    Consultar Viabilidade
+                <button class="btn btn-danger w-100 rounded-pill btn-lg fw-bold shadow-sm" id="btnCheckAssinatura" onclick="checkAssinaturaCep()">
+                    CONSULTAR VIABILIDADE
                 </button>
 
-                <div id="feedbackAssinatura" class="d-none text-start mt-3"></div>
+                <div id="feedbackAssinatura" class="d-none text-start mt-3 rounded-3 shadow-sm"></div>
+            </div>
+            
+            <div class="modal-footer justify-content-center bg-light border-0 rounded-bottom-4 py-3">
+                <small class="text-muted"><i class="fas fa-lock me-1"></i> Site 100% Seguro</small>
             </div>
         </div>
     </div>
@@ -473,16 +489,22 @@
     // Função chamada pelos botões "Assinar"
     function abrirModalAssinatura(plano) {
         planoParaAssinar = plano;
+        
+        // Atualiza o texto visual do modal (NOVO)
+        const spanPlano = document.getElementById('nomePlanoModal');
+        if (spanPlano) spanPlano.innerText = plano;
+
         const modalEl = document.getElementById('modalCheckAssinatura');
         const modal = new bootstrap.Modal(modalEl);
         
         // Limpa estado anterior
         document.getElementById('cepAssinatura').value = '';
-        document.getElementById('feedbackAssinatura').className = 'd-none';
+        const feedback = document.getElementById('feedbackAssinatura');
+        feedback.className = 'd-none'; // Esconde
+        feedback.innerHTML = ''; // Limpa texto
         
         modal.show();
         
-        // Foco no input após abrir
         modalEl.addEventListener('shown.bs.modal', () => {
             document.getElementById('cepAssinatura').focus();
         });
@@ -510,13 +532,15 @@
         const cep = cepInput.value.replace(/\D/g, '');
         const feedback = document.getElementById('feedbackAssinatura');
         const btn = document.getElementById('btnCheckAssinatura');
-        const originalText = btn.innerHTML;
+        const originalText = btn.innerHTML; // Guarda o texto original do botão
 
+        // Limpa feedback anterior
         feedback.className = 'd-none';
         
         if (cep.length !== 8) {
-            feedback.className = 'alert alert-warning';
-            feedback.innerHTML = 'CEP inválido.';
+            // Adicionado mt-4 para desgrudar do botão
+            feedback.className = 'alert alert-warning mt-4 shadow-sm';
+            feedback.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>CEP inválido. Digite 8 números.';
             feedback.classList.remove('d-none');
             return;
         }
@@ -525,12 +549,13 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
         try {
-            // 1. ViaCEP
+            // 1. Busca no ViaCEP para pegar Rua e Bairro
             const r1 = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
             const d1 = await r1.json();
+            
             if (d1.erro) throw new Error('CEP inexistente');
 
-            // 2. Validação Backend
+            // 2. Validação no Backend da FireNet
             const r2 = await fetch('/validar_cobertura', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -539,28 +564,47 @@
             const d2 = await r2.json();
 
             if (d2.link) {
-                // Sucesso: Redireciona com CEP e PLANO
-                feedback.className = 'alert alert-success';
-                feedback.innerHTML = '<strong>Cobertura confirmada!</strong> Redirecionando...';
+                // SUCESSO
+                feedback.className = 'alert alert-success mt-4 shadow-sm border-0';
+                feedback.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle fa-2x me-3"></i>
+                        <div>
+                            <strong>Cobertura confirmada!</strong><br>
+                            Redirecionando para o cadastro...
+                        </div>
+                    </div>`;
                 feedback.classList.remove('d-none');
                 
                 setTimeout(() => {
-                    // Monta a URL com os dois parâmetros
                     const url = `/cadastro?cep=${cep}&plano=${encodeURIComponent(planoParaAssinar)}`;
                     window.location.href = url;
                 }, 1500);
+
             } else {
-                feedback.className = 'alert alert-danger';
-                feedback.innerHTML = `Desculpe, ainda não atendemos a <b>${d1.logradouro}</b>.`;
+                // SEM COBERTURA
+                feedback.className = 'alert alert-danger mt-4 shadow-sm border-0';
+                feedback.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-times-circle fa-2x me-3"></i>
+                        <div>
+                            <strong>Sem viabilidade técnica.</strong><br>
+                            Ainda não atendemos a rua <b>${d1.logradouro}</b>.
+                        </div>
+                    </div>`;
                 feedback.classList.remove('d-none');
+                
+                // Restaura o botão
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
 
         } catch (e) {
-            feedback.className = 'alert alert-warning';
-            feedback.innerHTML = 'Não foi possível localizar este CEP.';
+            // ERRO / CEP NÃO ENCONTRADO
+            feedback.className = 'alert alert-warning mt-4 shadow-sm border-0';
+            feedback.innerHTML = '<i class="fas fa-search-location me-2"></i>Não conseguimos localizar este CEP.';
             feedback.classList.remove('d-none');
+            
             btn.disabled = false;
             btn.innerHTML = originalText;
         }
