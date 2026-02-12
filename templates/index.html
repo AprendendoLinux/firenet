@@ -97,7 +97,6 @@
         </p>
         <div class="row g-4 justify-content-center">
 
-            <!-- 1 GIGA -->
             <div class="col-lg-4 col-md-6">
                 <div class="card plan-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
@@ -106,12 +105,11 @@
                         </div>
                         <h3 class="text-danger fw-bold">1 GIGA</h3>
                         <h4 class="price">R$ 159,99</h4>
-                        <a href="/cadastro?plano=1 GIGA" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                        <button onclick="abrirModalAssinatura('1 GIGA')" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 700 MEGAS -->
             <div class="col-lg-4 col-md-6">
                 <div class="card plan-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
@@ -120,12 +118,11 @@
                         </div>
                         <h3 class="text-danger fw-bold">700 MEGAS</h3>
                         <h4 class="price">R$ 129,90</h4>
-                        <a href="/cadastro?plano=700 MEGAS" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                        <button onclick="abrirModalAssinatura('700 MEGAS')" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 500 MEGAS -->
             <div class="col-lg-4 col-md-6">
                 <div class="card plan-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
@@ -134,7 +131,7 @@
                         </div>
                         <h3 class="text-danger fw-bold">500 MEGAS</h3>
                         <h4 class="price">R$ 99,90</h4>
-                        <a href="/cadastro?plano=500 MEGAS" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                        <button onclick="abrirModalAssinatura('500 MEGAS')" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</button>
                     </div>
                 </div>
             </div>
@@ -238,6 +235,31 @@
     </style>
 </section>
 
+<div class="modal fade" id="modalCheckAssinatura" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-map-marker-alt me-2"></i>Verificar Disponibilidade</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <p class="text-muted mb-3">Para assinar o plano selecionado, primeiro confirme se atendemos o seu endereço.</p>
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="cepAssinatura" placeholder="00000-000" maxlength="9">
+                    <label for="cepAssinatura">Digite seu CEP</label>
+                </div>
+                
+                <button class="btn btn-danger w-100 rounded-pill btn-lg" id="btnCheckAssinatura" onclick="checkAssinaturaCep()">
+                    Consultar Viabilidade
+                </button>
+
+                <div id="feedbackAssinatura" class="d-none text-start mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Cadastro -->
 <section id="cadastro" class="py-5 bg-white text-center">
     <div class="container">
@@ -321,20 +343,21 @@
     let map;
     let geocoder;
     let marker = null;
+    
+    // Variável para guardar o plano selecionado no clique do botão "Assinar"
+    let planoParaAssinar = '';
 
+    // --- 1. Inicialização do Mapa (Lógica Existente) ---
     function initMap() {
         geocoder = new google.maps.Geocoder();
         const mapEl = document.getElementById('map');
-        
-        // Proteção caso o elemento map não exista
         if (!mapEl) return;
 
         map = new google.maps.Map(mapEl, {
-            center: {lat: -22.889, lng: -43.289}, // Centralizado na região geral
+            center: {lat: -22.889, lng: -43.289},
             zoom: 13
         });
 
-        // Clique no mapa continua funcionando
         map.addListener('click', function(event) {
             geocoder.geocode({ location: event.latLng }, function(results, status) {
                 if (status === 'OK' && results[0]) {
@@ -346,20 +369,15 @@
                         confirmButtonColor: '#dc3545'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                             // Tenta extrair a rua do resultado do Google
                              let ruaGoogle = '';
                              let bairroGoogle = '';
                              results[0].address_components.forEach(comp => {
                                 if (comp.types.includes('route')) ruaGoogle = comp.long_name;
-                                if (comp.types.includes('sublocality_level_1') || comp.types.includes('sublocality') || comp.types.includes('neighborhood')) {
-                                    bairroGoogle = comp.long_name;
-                                }
+                                if (comp.types.includes('sublocality')) bairroGoogle = comp.long_name;
                              });
-                             // Passa null no CEP pois veio do clique no mapa
                              validarNoBackend(ruaGoogle, bairroGoogle, null);
                         }
                     });
-
                     if (marker) marker.setMap(null);
                     marker = new google.maps.Marker({ position: event.latLng, map: map });
                 }
@@ -367,152 +385,187 @@
         });
     }
 
-    // Configura o campo de busca se ele existir na página
+    // --- 2. Lógica da Busca Principal (Mapa) ---
     const ruaSearch = document.getElementById('ruaSearch');
     if (ruaSearch) {
-        // Formata o CEP enquanto digita (12345-678)
+        // Máscara
         ruaSearch.addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, "");
-            if (value.length > 5) {
-                value = value.substring(0, 5) + "-" + value.substring(5, 8);
-            }
-            e.target.value = value;
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 5) v = v.substring(0, 5) + "-" + v.substring(5, 8);
+            e.target.value = v;
         });
-
-        // Permitir tecla ENTER
+        // Enter Key
         ruaSearch.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Evita recarregar a página
-                checkCoverage(); // Chama a busca
-            }
+            if (event.key === 'Enter') { event.preventDefault(); checkCoverage(); }
         });
     }
 
-    // Função principal de busca
     async function checkCoverage() {
         const inputEl = document.getElementById('ruaSearch');
         if (!inputEl) return;
-
         let cep = inputEl.value.replace(/\D/g, '');
 
         if (cep.length !== 8) {
-            Swal.fire({
-                title: 'CEP Inválido',
-                text: 'Por favor, digite um CEP válido com 8 dígitos.',
-                icon: 'warning',
-                confirmButtonColor: '#dc3545'
-            });
+            Swal.fire({ title: 'CEP Inválido', text: 'Digite 8 dígitos.', icon: 'warning', confirmButtonColor: '#dc3545' });
             return;
         }
 
-        // 1. Loading...
         Swal.showLoading();
-
         try {
-            // 2. Busca o endereço no ViaCEP
-            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-            const data = await response.json();
+            const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const d = await r.json();
+            if (d.erro) { Swal.fire({ title: 'CEP não encontrado', icon: 'error', confirmButtonColor: '#dc3545' }); return; }
 
-            if (data.erro) {
-                Swal.fire({
-                    title: 'CEP não encontrado',
-                    text: 'Não localizamos este CEP. Verifique e tente novamente.',
-                    icon: 'error',
-                    confirmButtonColor: '#dc3545'
-                });
-                return;
-            }
-
-            // Endereço encontrado pelo CEP
-            const logradouro = data.logradouro; 
-            const bairro = data.bairro;
-            const cidade = data.localidade;
-            const uf = data.uf;
-
-            // 3. Centraliza o mapa no endereço encontrado
             if (geocoder && map) {
-                geocoder.geocode({ 'address': `${logradouro}, ${bairro}, ${cidade} - ${uf}` }, function(results, status) {
+                geocoder.geocode({ 'address': `${d.logradouro}, ${d.bairro}, ${d.localidade} - ${d.uf}` }, function(results, status) {
                     if (status === 'OK') {
                         map.setCenter(results[0].geometry.location);
                         map.setZoom(17);
                         if (marker) marker.setMap(null);
-                        marker = new google.maps.Marker({
-                            map: map,
-                            position: results[0].geometry.location
-                        });
+                        marker = new google.maps.Marker({ map: map, position: results[0].geometry.location });
                     }
                 });
             }
-
-            // 4. Manda para o backend validar e passa o CEP
-            validarNoBackend(logradouro, bairro, cep);
-
-        } catch (error) {
-            console.error(error);
-            Swal.fire({
-                title: 'Erro',
-                text: 'Ocorreu um erro ao consultar o CEP.',
-                icon: 'error',
-                confirmButtonColor: '#dc3545'
-            });
+            validarNoBackend(d.logradouro, d.bairro, cep);
+        } catch (e) {
+            console.error(e);
+            Swal.fire({ title: 'Erro', text: 'Erro ao consultar CEP.', icon: 'error', confirmButtonColor: '#dc3545' });
         }
     }
 
-    // Função unificada para validar no backend e redirecionar
     function validarNoBackend(rua, bairro, cep = null) {
-        // Mostra loading se não estiver mostrando (caso venha do clique no mapa)
         if (!Swal.isVisible()) Swal.showLoading();
-
         fetch('/validar_cobertura', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ rua: rua, bairro: bairro })
         })
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
             if (data.link) {
-                // Tem cobertura
                 Swal.fire({
                     title: 'Cobertura Disponível!',
-                    html: `Encontramos viabilidade na <b>${rua}</b>!<br>Faça seu cadastro agora.`,
+                    html: `Viabilidade em <b>${rua}</b>!<br>Cadastre-se agora.`,
                     icon: 'success',
                     confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Cadastre-se agora',
                     showCloseButton: true
                 }).then(result => {
                     if (result.isConfirmed) {
-                        // LÓGICA DE PERSISTÊNCIA DO CEP
-                        let destino = data.link; // Geralmente /cadastro
-                        if (cep) {
-                            // Adiciona ?cep=12345678 ou &cep=12345678 se já houver params na URL
-                            destino += (destino.includes('?') ? '&' : '?') + `cep=${cep}`;
-                        }
+                        let destino = data.link;
+                        if (cep) destino += (destino.includes('?') ? '&' : '?') + `cep=${cep}`;
                         window.location.href = destino;
                     }
                 });
             } else {
-                // Não tem cobertura
-                Swal.fire({
-                    title: 'Sem Cobertura',
-                    html: `Infelizmente a <b>${rua}</b> ainda não possui viabilidade técnica.`,
-                    icon: 'info',
-                    confirmButtonColor: '#dc3545'
-                });
+                Swal.fire({ title: 'Sem Cobertura', html: `Sem viabilidade para <b>${rua}</b> no momento.`, icon: 'info', confirmButtonColor: '#dc3545' });
             }
         })
-        .catch(error => {
-            console.error(error);
-            Swal.fire({ title: 'Erro', text: 'Erro de conexão.', icon: 'error', confirmButtonColor: '#dc3545' });
+        .catch(() => Swal.fire({ title: 'Erro', text: 'Erro de conexão.', icon: 'error', confirmButtonColor: '#dc3545' }));
+    }
+
+    const btnCoverage = document.getElementById('checkCoverageBtn');
+    if (btnCoverage) btnCoverage.addEventListener('click', checkCoverage);
+
+
+    // --- 3. NOVA LÓGICA: Modal de Assinatura (Planos) ---
+    
+    // Função chamada pelos botões "Assinar"
+    function abrirModalAssinatura(plano) {
+        planoParaAssinar = plano;
+        const modalEl = document.getElementById('modalCheckAssinatura');
+        const modal = new bootstrap.Modal(modalEl);
+        
+        // Limpa estado anterior
+        document.getElementById('cepAssinatura').value = '';
+        document.getElementById('feedbackAssinatura').className = 'd-none';
+        
+        modal.show();
+        
+        // Foco no input após abrir
+        modalEl.addEventListener('shown.bs.modal', () => {
+            document.getElementById('cepAssinatura').focus();
         });
     }
 
-    // Vincula o botão de busca
-    const btnCoverage = document.getElementById('checkCoverageBtn');
-    if (btnCoverage) {
-        btnCoverage.addEventListener('click', checkCoverage);
+    // Configura input do Modal (Máscara e Enter)
+    const cepModalInput = document.getElementById('cepAssinatura');
+    if (cepModalInput) {
+        cepModalInput.addEventListener('input', function (e) {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 5) v = v.substring(0, 5) + "-" + v.substring(5, 8);
+            e.target.value = v;
+        });
+        
+        cepModalInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkAssinaturaCep();
+            }
+        });
     }
-    
-    // Inicia o mapa (expondo globalmente para o callback da API)
+
+    async function checkAssinaturaCep() {
+        const cepInput = document.getElementById('cepAssinatura');
+        const cep = cepInput.value.replace(/\D/g, '');
+        const feedback = document.getElementById('feedbackAssinatura');
+        const btn = document.getElementById('btnCheckAssinatura');
+        const originalText = btn.innerHTML;
+
+        feedback.className = 'd-none';
+        
+        if (cep.length !== 8) {
+            feedback.className = 'alert alert-warning';
+            feedback.innerHTML = 'CEP inválido.';
+            feedback.classList.remove('d-none');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+        try {
+            // 1. ViaCEP
+            const r1 = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const d1 = await r1.json();
+            if (d1.erro) throw new Error('CEP inexistente');
+
+            // 2. Validação Backend
+            const r2 = await fetch('/validar_cobertura', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rua: d1.logradouro, bairro: d1.bairro })
+            });
+            const d2 = await r2.json();
+
+            if (d2.link) {
+                // Sucesso: Redireciona com CEP e PLANO
+                feedback.className = 'alert alert-success';
+                feedback.innerHTML = '<strong>Cobertura confirmada!</strong> Redirecionando...';
+                feedback.classList.remove('d-none');
+                
+                setTimeout(() => {
+                    // Monta a URL com os dois parâmetros
+                    const url = `/cadastro?cep=${cep}&plano=${encodeURIComponent(planoParaAssinar)}`;
+                    window.location.href = url;
+                }, 1500);
+            } else {
+                feedback.className = 'alert alert-danger';
+                feedback.innerHTML = `Desculpe, ainda não atendemos a <b>${d1.logradouro}</b>.`;
+                feedback.classList.remove('d-none');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+
+        } catch (e) {
+            feedback.className = 'alert alert-warning';
+            feedback.innerHTML = 'Não foi possível localizar este CEP.';
+            feedback.classList.remove('d-none');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
     window.initMap = initMap;
 </script>
 
