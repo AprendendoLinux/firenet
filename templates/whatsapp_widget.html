@@ -68,7 +68,8 @@
                                             <li><i class="fas fa-check text-success me-2"></i>Prioridade de Banda</li>
                                             <li><i class="fas fa-check text-success me-2"></i>Latência Mínima</li>
                                         </ul>
-                                        <button class="btn btn-danger w-100 rounded-pill mt-auto" onclick="goToStep('viabilidade')">
+                                        
+                                        <button class="btn btn-danger w-100 rounded-pill mt-auto" onclick="selecionarPlano('1 GIGA')">
                                             Contratar Agora
                                         </button>
                                     </div>
@@ -94,7 +95,8 @@
                                             <li><i class="fas fa-check text-success me-2"></i>Ultra Velocidade</li>
                                             <li><i class="fas fa-check text-success me-2"></i>Streaming 4K</li>
                                         </ul>
-                                        <button class="btn btn-danger w-100 rounded-pill mt-auto" onclick="goToStep('viabilidade')">
+                                        
+                                        <button class="btn btn-danger w-100 rounded-pill mt-auto" onclick="selecionarPlano('700 MEGAS')">
                                             Contratar Agora
                                         </button>
                                     </div>
@@ -119,7 +121,8 @@
                                             <li><i class="fas fa-check text-success me-2"></i>Sinal Estável</li>
                                             <li><i class="fas fa-check text-success me-2"></i>Download Ilimitado</li>
                                         </ul>
-                                        <button class="btn btn-danger w-100 rounded-pill mt-auto" onclick="goToStep('viabilidade')">
+                                        
+                                        <button class="btn btn-danger w-100 rounded-pill mt-auto" onclick="selecionarPlano('500 MEGAS')">
                                             Contratar Agora
                                         </button>
                                     </div>
@@ -363,7 +366,8 @@
         assunto: '',
         tipo: '', 
         isBoleto: false,
-        dadosCliente: { nome: '', endereco: '', cpf: '' }
+        dadosCliente: { nome: '', endereco: '', cpf: '' },
+        plano: '' // NOVO: Armazena o plano selecionado
     };
 
     const mensagensPorAssunto = {
@@ -380,7 +384,7 @@
 
     function resetChat() {
         goToStep(1);
-        flowState = { assunto: '', tipo: '', isBoleto: false, dadosCliente: { nome: '', endereco: '', cpf: '' } };
+        flowState = { assunto: '', tipo: '', isBoleto: false, dadosCliente: { nome: '', endereco: '', cpf: '' }, plano: '' };
         ['inputCpfChat', 'inputNomeChat', 'inputEndChat', 'inputCepModal', 'inputCpfStatus'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.value = '';
@@ -425,6 +429,12 @@
         document.getElementById('progressBar').style.width = `${progress}%`;
     }
 
+    // --- NOVA FUNÇÃO: Seleciona Plano e vai para Viabilidade ---
+    function selecionarPlano(plano) {
+        flowState.plano = plano; // Guarda o plano
+        goToStep('viabilidade'); // Vai para a tela de CEP
+    }
+
     function mascaraCep(i) {
         let v = i.value.replace(/\D/g, '');
         if (v.length > 5) v = v.substring(0, 5) + '-' + v.substring(5, 8);
@@ -433,31 +443,19 @@
 
 // --- FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DO CPF ---
     function validarCPF(cpf) {
-        cpf = cpf.replace(/[^\d]+/g, ''); // Limpa tudo que não é número
+        cpf = cpf.replace(/[^\d]+/g, ''); 
         if (cpf == '') return false;
         
-        // Elimina CPFs invalidos conhecidos (ex: 111.111.111-11)
         if (cpf.length != 11 || 
-            cpf == "00000000000" || 
-            cpf == "11111111111" || 
-            cpf == "22222222222" || 
-            cpf == "33333333333" || 
-            cpf == "44444444444" || 
-            cpf == "55555555555" || 
-            cpf == "66666666666" || 
-            cpf == "77777777777" || 
-            cpf == "88888888888" || 
-            cpf == "99999999999")
+            /^(\d)\1{10}$/.test(cpf)) // Regex que pega 111..., 222...
                 return false;
         
-        // Valida 1º digito
         let add = 0;
         for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
         let rev = 11 - (add % 11);
         if (rev == 10 || rev == 11) rev = 0;
         if (rev != parseInt(cpf.charAt(9))) return false;
         
-        // Valida 2º digito
         add = 0;
         for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
         rev = 11 - (add % 11);
@@ -469,30 +467,20 @@
 
     function mascaraCpf(i) {
         let v = i.value.replace(/\D/g, "");
-        
-        // Limita a 11 dígitos
         if (v.length > 11) v = v.slice(0, 11);
-        
-        // Aplica a formatação
         v = v.replace(/(\d{3})(\d)/, "$1.$2");
         v = v.replace(/(\d{3})(\d)/, "$1.$2");
         v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-        
         i.value = v;
 
-        // FEEDBACK VISUAL:
-        // Remove classes de validação anteriores
         i.classList.remove('is-invalid', 'is-valid');
         document.getElementById('msgErroCpf').classList.add('d-none');
 
-        // Se completou os 14 caracteres (formatação completa), valida!
         if (i.value.length === 14) {
             if (validarCPF(i.value)) {
-                i.classList.add('is-valid'); // Borda Verde
+                i.classList.add('is-valid'); 
             } else {
-                i.classList.add('is-invalid'); // Borda Vermelha
-                // Opcional: mostrar mensagem imediatamente
-                // document.getElementById('msgErroCpf').classList.remove('d-none');
+                i.classList.add('is-invalid'); 
             }
         }
     }
@@ -611,11 +599,17 @@
         })
         .then(info => {
             if (info.coberta) {
+                // ATUALIZADO: Constrói o link com CEP e, se existir, o PLANO
+                let linkCadastro = `/cadastro?cep=${cep}`;
+                if (flowState.plano) {
+                    linkCadastro += `&plano=${encodeURIComponent(flowState.plano)}`;
+                }
+                
                 resDiv.className = 'alert alert-success mt-3';
                 resDiv.innerHTML = `
                     <strong><i class="fas fa-check-circle"></i> Temos Cobertura!</strong><br>
                     Atendemos a <strong>${info.logradouro}</strong>.<br>
-                    <a href="{{ url_for('cadastro') }}" class="btn btn-success btn-sm w-100 mt-2 fw-bold">
+                    <a href="${linkCadastro}" class="btn btn-success btn-sm w-100 mt-2 fw-bold">
                         Ir para Cadastro <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 `;
@@ -669,7 +663,6 @@
         const manualDiv = document.getElementById('camposManuais');
         const msgErro = document.getElementById('msgErroCpf');
 
-        // VALIDAÇÃO RIGOROSA
         if (!validarCPF(cpf)) {
             msgErro.innerHTML = "CPF inválido. Verifique os números digitados.";
             msgErro.classList.remove('d-none');
@@ -678,15 +671,11 @@
             return;
         }
         
-        // Se passou, limpa erros
         msgErro.classList.add('d-none');
         cpfInput.classList.remove('is-invalid');
         cpfInput.classList.add('is-valid');
 
-        // ... (RESTANTE DO CÓDIGO PERMANECE IGUAL AO ANTERIOR) ...
-        
         if (!manualDiv.classList.contains('d-none')) {
-            // ... (Lógica de Nome e Endereço que já fizemos) ...
             const nomeInput = document.getElementById('inputNomeChat');
             const endInput = document.getElementById('inputEndChat');
 
@@ -739,7 +728,6 @@
     }
 
     function finalizarParaWhatsapp() {
-        // Última verificação de segurança (Horário)
         if (!LOJA_ABERTA) {
             const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
             modalOcupado.show();
@@ -753,12 +741,8 @@
         if (flowState.tipo === 'vendas') {
             texto = `${saudacao}! ${flowState.assunto}.`;
         } else {
-            // AQUI ESTÁ A MUDANÇA: Extraímos também o CPF e o incluímos na mensagem
             const { nome, endereco, cpf } = flowState.dadosCliente;
-            
             const fraseNatural = mensagensPorAssunto[flowState.assunto] || `Gostaria de falar sobre: ${flowState.assunto}.`;
-            
-            // Nova formatação incluindo o CPF
             texto = `${saudacao}. Meu nome é *${nome}*, CPF *${cpf}*, meu endereço de instalação é *${endereco}*. ${fraseNatural}`;
         }
 
@@ -766,7 +750,6 @@
         window.open(`https://wa.me/${numero}?text=${encodeURIComponent(texto)}`, '_blank');
         
         setTimeout(() => {
-            // Fecha o modal após abrir o WhatsApp
             const modalEl = document.getElementById('modalAtendenteVirtual');
             const modalInstance = bootstrap.Modal.getInstance(modalEl);
             if (modalInstance) {

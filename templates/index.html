@@ -106,7 +106,7 @@
                         </div>
                         <h3 class="text-danger fw-bold">1 GIGA</h3>
                         <h4 class="price">R$ 159,99</h4>
-                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                        <a href="/cadastro?plano=1 GIGA" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
                     </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
                         </div>
                         <h3 class="text-danger fw-bold">700 MEGAS</h3>
                         <h4 class="price">R$ 129,90</h4>
-                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                        <a href="/cadastro?plano=700 MEGAS" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
                     </div>
                 </div>
             </div>
@@ -134,7 +134,7 @@
                         </div>
                         <h3 class="text-danger fw-bold">500 MEGAS</h3>
                         <h4 class="price">R$ 99,90</h4>
-                        <a href="#cadastro" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
+                        <a href="/cadastro?plano=500 MEGAS" class="btn btn-danger w-100 mt-3 rounded-pill">Assinar</a>
                     </div>
                 </div>
             </div>
@@ -324,7 +324,12 @@
 
     function initMap() {
         geocoder = new google.maps.Geocoder();
-        map = new google.maps.Map(document.getElementById('map'), {
+        const mapEl = document.getElementById('map');
+        
+        // Proteção caso o elemento map não exista
+        if (!mapEl) return;
+
+        map = new google.maps.Map(mapEl, {
             center: {lat: -22.889, lng: -43.289}, // Centralizado na região geral
             zoom: 13
         });
@@ -350,7 +355,8 @@
                                     bairroGoogle = comp.long_name;
                                 }
                              });
-                             validarNoBackend(ruaGoogle, bairroGoogle);
+                             // Passa null no CEP pois veio do clique no mapa
+                             validarNoBackend(ruaGoogle, bairroGoogle, null);
                         }
                     });
 
@@ -361,26 +367,33 @@
         });
     }
 
-    // Formata o CEP enquanto digita (12345-678)
-    document.getElementById('ruaSearch').addEventListener('input', function (e) {
-        let value = e.target.value.replace(/\D/g, "");
-        if (value.length > 5) {
-            value = value.substring(0, 5) + "-" + value.substring(5, 8);
-        }
-        e.target.value = value;
-    });
+    // Configura o campo de busca se ele existir na página
+    const ruaSearch = document.getElementById('ruaSearch');
+    if (ruaSearch) {
+        // Formata o CEP enquanto digita (12345-678)
+        ruaSearch.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, "");
+            if (value.length > 5) {
+                value = value.substring(0, 5) + "-" + value.substring(5, 8);
+            }
+            e.target.value = value;
+        });
 
-    // --- CORREÇÃO: Permitir tecla ENTER ---
-    document.getElementById('ruaSearch').addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Evita recarregar a página
-            checkCoverage(); // Chama a busca
-        }
-    });
+        // Permitir tecla ENTER
+        ruaSearch.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Evita recarregar a página
+                checkCoverage(); // Chama a busca
+            }
+        });
+    }
 
     // Função principal de busca
     async function checkCoverage() {
-        let cep = document.getElementById('ruaSearch').value.replace(/\D/g, '');
+        const inputEl = document.getElementById('ruaSearch');
+        if (!inputEl) return;
+
+        let cep = inputEl.value.replace(/\D/g, '');
 
         if (cep.length !== 8) {
             Swal.fire({
@@ -431,8 +444,8 @@
                 });
             }
 
-            // 4. Manda para o seu backend validar se ESSA RUA tem cobertura
-            validarNoBackend(logradouro, bairro);
+            // 4. Manda para o backend validar e passa o CEP
+            validarNoBackend(logradouro, bairro, cep);
 
         } catch (error) {
             console.error(error);
@@ -445,8 +458,8 @@
         }
     }
 
-    // Função separada que chama o seu Python (app.py)
-    function validarNoBackend(rua, bairro) {
+    // Função unificada para validar no backend e redirecionar
+    function validarNoBackend(rua, bairro, cep = null) {
         // Mostra loading se não estiver mostrando (caso venha do clique no mapa)
         if (!Swal.isVisible()) Swal.showLoading();
 
@@ -468,7 +481,13 @@
                     showCloseButton: true
                 }).then(result => {
                     if (result.isConfirmed) {
-                        window.location.href = data.link;
+                        // LÓGICA DE PERSISTÊNCIA DO CEP
+                        let destino = data.link; // Geralmente /cadastro
+                        if (cep) {
+                            // Adiciona ?cep=12345678 ou &cep=12345678 se já houver params na URL
+                            destino += (destino.includes('?') ? '&' : '?') + `cep=${cep}`;
+                        }
+                        window.location.href = destino;
                     }
                 });
             } else {
@@ -487,9 +506,13 @@
         });
     }
 
-    document.getElementById('checkCoverageBtn').addEventListener('click', checkCoverage);
+    // Vincula o botão de busca
+    const btnCoverage = document.getElementById('checkCoverageBtn');
+    if (btnCoverage) {
+        btnCoverage.addEventListener('click', checkCoverage);
+    }
     
-    // Inicia o mapa
+    // Inicia o mapa (expondo globalmente para o callback da API)
     window.initMap = initMap;
 </script>
 

@@ -549,5 +549,42 @@ nomeInput.addEventListener('input', function (e) {
   // Inicializa estado
   setStep(0);
 </script>
+
+<script>
+  // --- LÓGICA DE PERSISTÊNCIA (AUTO-PREENCHIMENTO VIA URL) ---
+  document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // 1. Preencher Plano
+    const planoParam = params.get('plano');
+    const planoSelect = document.getElementById('plano');
+    
+    if (planoParam && planoSelect) {
+      // Tenta definir o valor. Se o valor existir nas <option>, será selecionado.
+      planoSelect.value = planoParam;
+      // Dispara evento 'change' para garantir que qualquer lógica visual atrelada ao select corra
+      planoSelect.dispatchEvent(new Event('change'));
+    }
+
+    // 2. Preencher CEP e disparar busca automática
+    const cepParam = params.get('cep');
+    const cepInput = document.getElementById('cep');
+    
+    if (cepParam && cepInput) {
+      // Garante que usamos apenas números
+      let cleanCep = cepParam.replace(/\D/g, '');
+      
+      if (cleanCep.length === 8) {
+        // Define o valor "cru" primeiro
+        cepInput.value = cleanCep;
+        
+        // Dispara o evento 'input'. 
+        // Isto é CRUCIAL: fará com que o seu script existente (que tem o listener de máscara e o debounce)
+        // detete a mudança, aplique a máscara (XXXXX-XXX) e chame o ViaCEP automaticamente.
+        cepInput.dispatchEvent(new Event('input'));
+      }
+    }
+  });
+</script>
 </body>
 </html>
