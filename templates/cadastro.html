@@ -224,6 +224,44 @@
     </form>
   </div>
 </section>
+
+<div class="modal fade" id="modalConfirmEmail" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-danger text-white border-0">
+        <h5 class="modal-title fw-bold"><i class="fas fa-check-double me-2"></i>Confirmação de E-mail</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="alert alert-light border-start border-danger border-4 shadow-sm mb-4">
+          <small class="text-muted fw-bold text-uppercase">Importante:</small>
+          <p class="mb-0 text-dark small">
+            Toda a comunicação sobre agendamento e instalação será enviada para este endereço. 
+            <strong>Garanta que você tem acesso a ele.</strong>
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small">E-mail informado anteriormente:</label>
+          <input type="text" class="form-control bg-light" id="email_display_readonly" readonly>
+        </div>
+
+        <div class="mb-1">
+          <label for="email_confirma_input" class="form-label fw-bold">Confirme seu e-mail (digite novamente):</label>
+          <input type="email" class="form-control form-control-lg" id="email_confirma_input" placeholder="seuemail@exemplo.com" onpaste="return false;">
+        </div>
+        <div id="email-match-error" class="text-danger small mt-1 d-none">
+          <i class="fas fa-times-circle me-1"></i> Os e-mails não coincidem. Verifique a digitação.
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Corrigir</button>
+        <button type="button" class="btn btn-danger rounded-pill px-4" onclick="validarEmailEAvancar()">Confirmar e Prosseguir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
 {% include 'whatsapp_widget.html' %}
 
@@ -521,7 +559,61 @@ nomeInput.addEventListener('input', function (e) {
     if (validateStep(1)) setStep(2);
   });
   document.getElementById('back-3').addEventListener('click', () => setStep(1));
-  document.getElementById('next-3').addEventListener('click', () => { if (validateStep(2)) setStep(3); });
+  
+  // --- Alteração: Botão da Etapa 3 agora abre o Modal ---
+  document.getElementById('next-3').addEventListener('click', () => { 
+    if (validateStep(2)) {
+      // 1. Pega o e-mail digitado
+      const emailOriginal = document.getElementById('email').value;
+      
+      // 2. Preenche o campo 'readonly' do modal para referência
+      document.getElementById('email_display_readonly').value = emailOriginal;
+      
+      // 3. Limpa o campo de confirmação e erro
+      const inputConfirm = document.getElementById('email_confirma_input');
+      inputConfirm.value = '';
+      inputConfirm.classList.remove('is-invalid');
+      document.getElementById('email-match-error').classList.add('d-none');
+      
+      // 4. Abre o modal
+      const modalEmail = new bootstrap.Modal(document.getElementById('modalConfirmEmail'));
+      modalEmail.show();
+
+      // Foca no input após abrir
+      document.getElementById('modalConfirmEmail').addEventListener('shown.bs.modal', () => {
+          inputConfirm.focus();
+      }, { once: true });
+    } 
+  });
+
+  // Função chamada pelo botão "Confirmar" dentro do Modal
+  function validarEmailEAvancar() {
+    const emailOriginal = document.getElementById('email').value.trim();
+    const emailConfirm = document.getElementById('email_confirma_input').value.trim();
+    const errorDiv = document.getElementById('email-match-error');
+    const inputConfirm = document.getElementById('email_confirma_input');
+
+    if (emailOriginal.toLowerCase() === emailConfirm.toLowerCase()) {
+      // SUCESSO: E-mails batem
+      // 1. Fecha modal
+      const modalEl = document.getElementById('modalConfirmEmail');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+
+      // 2. Avança para a próxima etapa (Plano)
+      setStep(3); 
+    } else {
+      // ERRO: E-mails diferentes
+      errorDiv.classList.remove('d-none');
+      inputConfirm.classList.add('is-invalid');
+    }
+  }
+
+  // Permitir dar "Enter" no modal para confirmar
+  document.getElementById('email_confirma_input').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') validarEmailEAvancar();
+  });
+  
   document.getElementById('back-4').addEventListener('click', () => setStep(2));
 
   // Submit habilitado somente quando a última etapa estiver válida
