@@ -262,6 +262,90 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalTaxaInstalacao" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      
+      <div class="modal-header bg-danger text-white border-0 rounded-top-4">
+        <h5 class="modal-title fw-bold"><i class="fas fa-file-invoice-dollar me-2"></i>Taxa de Instalação</h5>
+      </div>
+      
+      <div class="modal-body p-4 text-center"> <div class="alert alert-warning border-warning shadow-sm mb-4 text-start">
+          <div class="d-flex align-items-center">
+            <div class="me-3"><i class="fas fa-info-circle fa-2x text-warning"></i></div>
+            <div>
+              <p class="mb-0 fw-bold text-dark lh-sm">Para prosseguir, confirme a ciência do valor.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light border-0 p-3 mb-4 text-center">
+          <p class="mb-0 fw-medium text-muted text-uppercase small">Valor da Taxa Única</p>
+          <p class="text-danger display-6 fw-bold mb-1">R$ 120,00</p>
+          <div class="badge bg-dark rounded-pill px-3 py-2 mt-2">
+            <i class="fas fa-wallet me-1"></i> Pagamento em Dinheiro (Espécie) ou PIX
+          </div>
+          <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+            *O pagamento é realizado diretamente ao técnico após a instalação.
+          </small>
+        </div>
+
+        <div class="p-3 border rounded-3 bg-white hover-shadow">
+            <div class="form-check d-flex justify-content-center align-items-center text-start">
+                <input class="form-check-input mt-0 me-3" type="checkbox" id="checkAceiteTaxa" style="cursor: pointer; transform: scale(1.4); flex-shrink: 0;">
+                <label class="form-check-label lh-sm" for="checkAceiteTaxa" style="cursor: pointer; user-select: none;">
+                    Declaro que estou ciente que deverei efetuar o pagamento de <strong>R$ 120,00</strong> em <strong>Dinheiro ou PIX</strong> após a conclusão da instalação.
+                </label>
+            </div>
+        </div>
+
+      </div>
+      
+      <div class="modal-footer border-0 bg-light rounded-bottom-4 justify-content-between p-3">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" id="btnAbortarCadastro">
+          <i class="fas fa-times me-2"></i>Cancelar
+        </button>
+        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" id="btnConfirmarTaxa" disabled>
+          Continuar <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+      
+      <div class="modal-footer border-0 bg-light rounded-bottom-4 justify-content-between p-3">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" id="btnAbortarCadastro">
+          <i class="fas fa-times me-2"></i>Cancelar
+        </button>
+        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" id="btnConfirmarTaxa" disabled>
+          Continuar <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalAbortoCadastro" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3 text-secondary opacity-50">
+            <i class="fas fa-door-open fa-4x"></i>
+        </div>
+        <h5 class="fw-bold text-danger mb-2">Cadastro Cancelado</h5>
+        <p class="text-muted small mb-4">
+            Entendemos. Caso mude de ideia, estaremos por aqui esperando por você!
+        </p>
+        <a href="/" class="btn btn-dark w-100 rounded-pill">
+            Voltar ao Início
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
 {% include 'whatsapp_widget.html' %}
 
@@ -547,7 +631,49 @@ nomeInput.addEventListener('input', function (e) {
   }
 
   // Botões de navegação
-  document.getElementById('next-1').addEventListener('click', () => { if (validateStep(0)) setStep(1); });
+  // --- Lógica do Modal de Taxa e Cancelamento ---
+  // 1. Abrir Modal ao clicar em Prosseguir na Etapa 1
+  document.getElementById('next-1').addEventListener('click', async () => {
+    if (validateStep(0)) {
+      // Abre o modal de Taxa
+      const modalTaxa = new bootstrap.Modal(document.getElementById('modalTaxaInstalacao'));
+      modalTaxa.show();
+    }
+  });
+
+  // 2. Habilita o botão "Continuar" apenas se marcar o checkbox
+  document.getElementById('checkAceiteTaxa').addEventListener('change', function() {
+      const btnConfirmar = document.getElementById('btnConfirmarTaxa');
+      btnConfirmar.disabled = !this.checked;
+      
+      // Efeito visual opcional: muda a cor do checkbox container
+      if(this.checked) {
+          this.parentElement.classList.add('border-danger', 'bg-light');
+      } else {
+          this.parentElement.classList.remove('border-danger', 'bg-light');
+      }
+  });
+
+  // 3. Botão "Continuar" do Modal -> Vai para a Etapa 2
+  document.getElementById('btnConfirmarTaxa').addEventListener('click', function() {
+      const modalEl = document.getElementById('modalTaxaInstalacao');
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      modalInstance.hide();
+      setStep(1); // Avança para Dados Pessoais
+  });
+
+  // 4. Botão "Cancelar" -> Abre o Modal Bonito de Aborto
+  document.getElementById('btnAbortarCadastro').addEventListener('click', function() {
+      // Fecha o modal da taxa
+      const modalTaxaEl = document.getElementById('modalTaxaInstalacao');
+      const modalTaxa = bootstrap.Modal.getInstance(modalTaxaEl);
+      modalTaxa.hide();
+
+      // Abre o modal de cancelamento
+      const modalAborto = new bootstrap.Modal(document.getElementById('modalAbortoCadastro'));
+      modalAborto.show();
+  });
+
   document.getElementById('back-2').addEventListener('click', () => setStep(0));
   document.getElementById('next-2').addEventListener('click', async () => {
     // segurança extra: rechecagem de CPF duplicado
