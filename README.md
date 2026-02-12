@@ -718,4 +718,4 @@ MIT License - veja [LICENSE](LICENSE).
 
 Agradecimentos à comunidade open-source!
 
-Última atualização: Novembro 2025.
+Última atualização: Fevereiro 2026.
