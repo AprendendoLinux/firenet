@@ -90,11 +90,17 @@ jobs:
 
       # --- WEBHOOKS DO PORTAINER ---
 
+      # - name: Atualizar Portainer (Produção)
+      #   # Só roda se o push for na branch MAIN
+      #   if: github.ref == 'refs/heads/main'
+      #   run: |
+      #     echo "🚀 Branch Main: Disparando webhook de Produção..."
+      #     curl -k -X POST "${{ secrets.PORTAINER_WEBHOOK_PROD }}"
       - name: Atualizar Portainer (Produção)
-        # Só roda se o push for na branch MAIN
-        if: github.ref == 'refs/heads/main'
+        # Roda se for uma TAG de versão (pois é ela que atualiza o 'latest')
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          echo "🚀 Branch Main: Disparando webhook de Produção..."
+          echo "🚀 Nova Tag Detectada: Disparando webhook de Produção..."
           curl -k -X POST "${{ secrets.PORTAINER_WEBHOOK_PROD }}"
           
       - name: Atualizar Portainer (Dev)
