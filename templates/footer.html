@@ -1,7 +1,7 @@
 <footer class="bg-dark text-white py-4 text-center">
   <div class="container">
     <p class="mb-0">
-      &copy; 2025 FireNet Telecom | Desenvolvido por 
+      &copy; <span id="anoAtual"></span> FireNet Telecom | Desenvolvido por 
       <a href="https://www.henrique.tec.br" target="_blank" class="text-white text-decoration-none fw-bold">
         Henrique Fagundes
       </a>
@@ -11,4 +11,9 @@
       </span>
     </p>
   </div>
+
+  <script>
+    // Pega o elemento pelo ID e define o texto como o ano atual
+    document.getElementById("anoAtual").innerText = new Date().getFullYear();
+  </script>
 </footer>
