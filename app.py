@@ -98,10 +98,14 @@ def is_horario_comercial():
         print(f"Erro ao verificar horário: {e}")
         return False
 
+# Em app.py
+
+# Em app.py
+
 def obter_mensagem_indisponibilidade():
     """
-    Gera uma mensagem explicativa sobre o motivo da indisponibilidade,
-    com lógica inteligente para agrupar Segunda a Sexta, Sábado e Domingo.
+    Gera mensagem de indisponibilidade com Motivo e Preposição personalizados.
+    Ex: "Por motivo de Natal" ou "Por motivo do Carnaval"
     """
     try:
         conn = get_db_connection()
@@ -118,95 +122,80 @@ def obter_mensagem_indisponibilidade():
         agora = datetime.now()
         hoje_str = agora.strftime('%Y-%m-%d')
         hora_atual = agora.strftime('%H:%M')
-        dia_semana = agora.weekday() # 0=Seg, 6=Dom
+        dia_semana = agora.weekday()
 
         # 1. VERIFICA FERIADOS (Prioridade Máxima)
         feriados = schedule.get('feriados', [])
         feriado_hoje = next((item for item in feriados if item['data'] == hoje_str), None)
 
         if feriado_hoje:
+            # Pega motivo e preposição (com defaults)
+            motivo = feriado_hoje.get('motivo', 'feriado')
+            prep = feriado_hoje.get('preposicao', 'de') 
+            
+            # Monta o prefixo: "Por motivo do Carnaval"
+            prefixo = f"Por motivo {prep} {motivo}"
+
             if not feriado_hoje.get('ativo'):
-                return "Hoje, por motivo de feriado, não estamos funcionando."
+                return f"{prefixo}, hoje não haverá atendimento."
             else:
                 inicio = feriado_hoje.get('inicio', '00:00')
                 fim = feriado_hoje.get('fim', '23:59')
                 
                 if hora_atual > fim:
-                    return f"Hoje, em razão do feriado, nosso atendimento se encerrou às {fim}."
+                    return f"{prefixo}, nosso atendimento se encerrou às {fim}."
                 elif hora_atual < inicio:
-                    return f"Hoje, em razão do feriado, nosso atendimento iniciará às {inicio}."
+                    return f"{prefixo}, nosso atendimento iniciará às {inicio}."
 
-        # 2. MONTA A FRASE DE HORÁRIOS (Lógica Completa: Seg-Sex, Sáb e Dom)
+        # 2. LÓGICA PADRÃO (Semana/Fim de semana) - Sem alterações aqui
         wd = schedule.get('weekdays', {})
         sat = schedule.get('saturday', {})
         sun = schedule.get('sunday', {})
 
-        # Dados da Semana
         w_start = wd.get('start', '09:00')
         w_end = wd.get('end', '18:00')
         w_active = wd.get('active', True)
 
-        # Dados de Sábado
         s_start = sat.get('start', '09:00')
         s_end = sat.get('end', '13:00')
         s_active = sat.get('active', True)
 
-        # Dados de Domingo
         su_start = sun.get('start', '09:00')
         su_end = sun.get('end', '13:00')
         su_active = sun.get('active', False)
 
         msg_horarios = ""
 
-        # Cenário 1: Tudo igual e ativo (Segunda a Domingo)
         if w_active and s_active and su_active and (w_start == s_start == su_start) and (w_end == s_end == su_end):
             msg_horarios = f"de segunda a domingo é das {w_start} às {w_end}."
-
-        # Cenário 2: Segunda a Sábado iguais. Domingo diferente (ou inativo).
         elif w_active and s_active and (w_start == s_start) and (w_end == s_end):
             msg_horarios = f"de segunda a sábado é das {w_start} às {w_end}."
             if su_active:
                 msg_horarios += f" E aos domingos, das {su_start} às {su_end}."
-
-        # Cenário 3: Apenas Segunda a Sexta iguais. Fim de semana varia.
         elif w_active:
             msg_horarios = f"de segunda a sexta é das {w_start} às {w_end}."
-            
-            # Verifica se Sábado e Domingo são iguais entre si (Fim de Semana)
             if s_active and su_active and (s_start == su_start) and (s_end == su_end):
                 msg_horarios += f" E aos fins de semana, das {s_start} às {s_end}."
             else:
-                # Sábado e Domingo diferentes um do outro
                 if s_active:
-                    # Se tiver domingo também, usa ponto. Se for só sábado, usa "E".
                     conector = " Aos" if su_active else " E aos"
                     msg_horarios += f"{conector} sábados, das {s_start} às {s_end}."
-                
                 if su_active:
                     msg_horarios += f" E aos domingos, das {su_start} às {su_end}."
-
-        # Caso de fallback (raro, ex: só fim de semana funciona)
         else:
              partes = []
              if s_active: partes.append(f"aos sábados das {s_start} às {s_end}")
              if su_active: partes.append(f"aos domingos das {su_start} às {su_end}")
              if partes: msg_horarios = " e ".join(partes) + "."
 
-        # 3. VERIFICA DIA ATUAL (Para decidir o prefixo da mensagem)
         config_dia = None
-        
-        if 0 <= dia_semana <= 4: # Seg-Sex
-            config_dia = wd
-        elif dia_semana == 5: # Sábado
-            config_dia = sat
-        elif dia_semana == 6: # Domingo
-            config_dia = sun
+        if 0 <= dia_semana <= 4: config_dia = wd
+        elif dia_semana == 5: config_dia = sat
+        elif dia_semana == 6: config_dia = sun
 
-        # Se hoje está FECHADO (ex: Domingo ou dia desativado)
         if not config_dia or not config_dia.get('active'):
             return f"Hoje não haverá expediente. Nosso funcionamento {msg_horarios}"
 
-        # Se hoje está ABERTO, mas fora do horário
         start = config_dia.get('start', '00:00')
         end = config_dia.get('end', '23:59')
 

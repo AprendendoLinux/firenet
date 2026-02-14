@@ -181,10 +181,9 @@
                         <table class="table table-sm table-hover mb-0 align-middle">
                             <thead class="table-light small text-muted text-uppercase">
                                 <tr>
-                                    <th style="width: 35%;" class="ps-3">Data</th>
-                                    <th style="width: 20%;">Status</th>
-                                    <th style="width: 20%;">Início</th>
-                                    <th style="width: 20%;">Fim</th>
+                                    <th style="width: 25%;" class="ps-3">Data</th> <th style="width: 30%;">Motivo</th>           <th style="width: 15%;">Status</th>
+                                    <th style="width: 15%;">Início</th>
+                                    <th style="width: 15%;">Fim</th>
                                     <th style="width: 5%;"></th>
                                 </tr>
                             </thead>
@@ -303,23 +302,42 @@
 
     // --- FUNÇÕES DE FERIADOS ---
 
+// --- FUNÇÃO DE RENDERIZAÇÃO CORRIGIDA (VISUAL DA SETINHA) ---
+
     function renderFeriados() {
         const tbody = document.getElementById('listaFeriados');
         tbody.innerHTML = '';
 
         if(feriados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted small py-4 fw-light">Nenhuma data específica configurada.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted small py-4 fw-light">Nenhuma data específica configurada.</td></tr>';
             return;
         }
 
         feriados.forEach((f, index) => {
             const tr = document.createElement('tr');
             const disabledAttr = !f.ativo ? 'disabled style="background-color: #f8f9fa;"' : '';
+            
+            const motivoVal = f.motivo || ''; 
+            const prepVal = f.preposicao || 'de';
 
             tr.innerHTML = `
                 <td class="ps-3">
                     <input type="date" class="form-control form-control-sm border-0 bg-transparent fw-bold text-dark" value="${f.data}" 
                            onchange="updateFeriado(${index}, 'data', this.value)">
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <select class="form-select border-0 bg-transparent text-muted" style="max-width: 75px;"
+                                onchange="updateFeriado(${index}, 'preposicao', this.value)">
+                            <option value="de" ${prepVal === 'de' ? 'selected' : ''}>de</option>
+                            <option value="do" ${prepVal === 'do' ? 'selected' : ''}>do</option>
+                            <option value="da" ${prepVal === 'da' ? 'selected' : ''}>da</option>
+                            <option value="dos" ${prepVal === 'dos' ? 'selected' : ''}>dos</option>
+                            <option value="das" ${prepVal === 'das' ? 'selected' : ''}>das</option>
+                        </select>
+                        <input type="text" class="form-control border-0 bg-transparent ps-2" placeholder="Ex: Carnaval" value="${motivoVal}" 
+                               onchange="updateFeriado(${index}, 'motivo', this.value)">
+                    </div>
                 </td>
                 <td>
                     <select class="form-select form-select-sm border-0 bg-transparent fw-bold ${f.ativo ? 'text-success' : 'text-danger'}" 
@@ -344,6 +362,31 @@
             `;
             tbody.appendChild(tr);
         });
+    }
+
+    function addFeriadoRow() {
+        const hoje = new Date().toISOString().split('T')[0];
+        feriados.push({
+            data: hoje,
+            motivo: '',
+            preposicao: 'de', // Novo padrão
+            ativo: false,
+            inicio: '09:00',
+            fim: '18:00'
+        });
+        renderFeriados();
+    }
+
+    function addFeriadoRow() {
+        const hoje = new Date().toISOString().split('T')[0];
+        feriados.push({
+            data: hoje,
+            motivo: '', // Novo campo inicia vazio
+            ativo: false,
+            inicio: '09:00',
+            fim: '18:00'
+        });
+        renderFeriados();
     }
 
     function addFeriadoRow() {
