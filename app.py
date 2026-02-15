@@ -1126,27 +1126,53 @@ def admin_relatorios():
     per_page = 20
     page = request.args.get('page', 1, type=int)
     offset = (page - 1) * per_page
+    
+    # Filtros
+    data_inicio = request.args.get('data_inicio')
+    data_fim = request.args.get('data_fim')
+    status_filtro = request.args.get('status') # Opcional, se quiser filtrar visualmente
 
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Contar total de relatórios
-    cursor.execute("SELECT COUNT(*) AS total FROM relatorios")
-    total = cursor.fetchone()['total']
-    total_pages = (total // per_page) + (1 if total % per_page > 0 else 0)
+    # 1. Contadores para os Badges do Topo (Estatísticas Gerais)
+    cursor.execute("SELECT status_instalacao, COUNT(*) as count FROM cadastros GROUP BY status_instalacao")
+    stats = {row['status_instalacao']: row['count'] for row in cursor.fetchall()}
+    total_concluidas = stats.get('Concluída', 0)
+    total_programadas = stats.get('Programada', 0)
+    total_nao_realizadas = stats.get('Não Realizada', 0)
 
-    # Relatórios com paginação (ordenados por created_at DESC)
-    cursor.execute("""
+    # 2. Query Base de Relatórios
+    sql_base = """
         SELECT r.*, GROUP_CONCAT(c.nome SEPARATOR ', ') as clientes_nomes
         FROM relatorios r
         LEFT JOIN cadastros c ON FIND_IN_SET(c.id, r.clientes_ids)
-        GROUP BY r.id
-        ORDER BY r.created_at DESC
-        LIMIT %s OFFSET %s
-    """, (per_page, offset))
+        WHERE 1=1
+    """
+    params = []
+
+    if data_inicio:
+        sql_base += " AND r.created_at >= %s"
+        params.append(f"{data_inicio} 00:00:00")
+    if data_fim:
+        sql_base += " AND r.created_at <= %s"
+        params.append(f"{data_fim} 23:59:59")
+    
+    sql_base += " GROUP BY r.id ORDER BY r.created_at DESC"
+
+    # Paginação
+    sql_paginated = sql_base + " LIMIT %s OFFSET %s"
+    params_paginated = params + [per_page, offset]
+
+    cursor.execute(sql_paginated, params_paginated)
     relatorios_antigos = cursor.fetchall()
 
-    # Concluídas elegíveis (ainda não usadas em nenhum relatório)
+    # Contar total para paginação
+    cursor.execute(f"SELECT COUNT(*) as total FROM ({sql_base}) as sub", params)
+    total = cursor.fetchone()['total']
+    total_pages = (total // per_page) + (1 if total % per_page > 0 else 0)
+
+    # 3. Lógica do "Gatilho" (Instalações Concluídas Pendentes de Relatório)
     cursor.execute("""
         SELECT COUNT(*) AS total
         FROM cadastros c
@@ -1157,18 +1183,20 @@ def admin_relatorios():
     row = cursor.fetchone()
     total_instalacoes = (row['total'] if row and 'total' in row else 0)
 
-    # Sugerir vencimento com base no último relatório (ou próximo mês se não houver)
-    # Em app.py, na rota /admin/relatorios
+    # 4. Sugestão de Vencimento
     suggested_vencimento = ''
     cursor.execute("SELECT data_vencimento FROM relatorios ORDER BY created_at DESC LIMIT 1")
     ultimo = cursor.fetchone()
     if ultimo and ultimo.get('data_vencimento'):
-        dd, mm, yyyy = ultimo['data_vencimento'].split('/')
-        from datetime import date
-        d = date(int(yyyy), int(mm), int(dd))
-        next_mm = (d.month % 12) + 1
-        next_yyyy = d.year + (1 if next_mm == 1 else 0)
-        suggested_vencimento = f"{dd}/{next_mm:02d}/{next_yyyy}"
+        try:
+            dd, mm, yyyy = ultimo['data_vencimento'].split('/')
+            from datetime import date
+            d = date(int(yyyy), int(mm), int(dd))
+            next_mm = (d.month % 12) + 1
+            next_yyyy = d.year + (1 if next_mm == 1 else 0)
+            suggested_vencimento = f"{dd}/{next_mm:02d}/{next_yyyy}"
+        except:
+             suggested_vencimento = datetime.now().strftime('%d/%m/%Y')
     else:
         today = datetime.now()
         next_mm = (today.month % 12) + 1
@@ -1182,12 +1210,18 @@ def admin_relatorios():
     return render_template('admin/relatorios.html', 
                            relatorios_antigos=relatorios_antigos, 
                            is_admin=admin, 
-                           total_instalacoes=total_instalacoes, 
-                           suggested_vencimento=suggested_vencimento, 
+                           total_instalacoes=total_instalacoes, # Quantas pendentes
+                           total_concluidas=total_concluidas,
+                           total_programadas=total_programadas,
+                           total_nao_realizadas=total_nao_realizadas,
+                           suggested_vencimento=suggested_vencimento,
                            current_year=current_year,
                            current_page=page,
-                           total_pages=total_pages)
-    
+                           total_pages=total_pages,
+                           data_inicio=data_inicio,
+                           data_fim=data_fim,
+                           status_filtro=status_filtro)
+
 @app.route('/admin/gerar_relatorio', methods=['POST'])
 @login_required
 def admin_gerar_relatorio():
