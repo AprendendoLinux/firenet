@@ -6,135 +6,211 @@
     <title>Área de Cobertura - FireNet Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        // Inicializa tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    </script>
 </head>
-<body>
-    <!-- Navbar Admin -->
+<body class="bg-light">
+    
     {% include 'admin/menu.html' %}
 
-    <main><section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center text-danger mb-4">Área de Cobertura</h2>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            <!-- Botão para Novo Endereço -->
-            <div class="mb-3 text-end">
-                <button class="btn btn-success btn-novo-endereco" data-bs-toggle="modal" data-bs-target="#modalEditarCobertura" data-cobertura-id=""><i class="fas fa-plus"></i> Novo Endereço</button>
-            </div>
-            <!-- Campos de busca por Nome Logradouro e Bairro -->
-            <!-- Campos de busca por Nome Logradouro e Bairro -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <form method="GET" action="{{ url_for('admin_cobertura') }}" class="input-group">
-                        <input type="text" id="busca-nome-logradouro" name="busca_nome_logradouro" class="form-control" placeholder="Buscar por Nome Logradouro" value="{{ busca_nome_logradouro or '' }}">
-                        <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>  <!-- Lupa clicável -->
-                    </form>
-                </div>
-                <div class="col-md-6">
-                    <form method="GET" action="{{ url_for('admin_cobertura') }}" class="input-group">
-                        <input type="text" id="busca-bairro" name="busca_bairro" class="form-control" placeholder="Buscar por Bairro" value="{{ busca_bairro or '' }}">
-                        <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>  <!-- Lupa clicável -->
-                    </form>
-                </div>
-            </div>
-            <div class="table-responsive">  <!-- Adicionado para responsividade em mobile -->
-                <table class="table table-striped" id="cobertura-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Tipo Logradouro</th>
-                            <th>Nome Logradouro</th>
-                            <th>Bairro</th>
-                            <th>Cidade</th>
-                            <th>Estado</th>
-                            <th>País</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cobertura in coberturas %}
-                        <tr data-cobertura-id="{{ cobertura.id }}">
-                            <td>{{ cobertura.id }}</td>
-                            <td class="tipo-logradouro text-nowrap">{{ cobertura.tipo_logradouro }}</td>
-                            <td class="nome-logradouro text-nowrap">{{ cobertura.nome_logradouro }}</td>
-                            <td class="bairro text-nowrap">{{ cobertura.bairro }}</td>
-                            <td class="cidade text-nowrap">{{ cobertura.cidade }}</td>
-                            <td class="estado text-nowrap">{{ cobertura.estado }}</td>
-                            <td class="pais text-nowrap">{{ cobertura.pais }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary btn-editar-cobertura" data-bs-toggle="modal" data-bs-target="#modalEditarCobertura" data-cobertura-id="{{ cobertura.id }}" data-bs-tooltip="tooltip" title="Editar"><i class="fas fa-pencil-alt"></i></button>
-                                <button class="btn btn-sm btn-danger btn-apagar-cobertura" data-cobertura-id="{{ cobertura.id }}"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
+    <main>
+        <section class="py-4 py-md-5">
+            <div class="container">
+                <h2 class="text-center text-danger mb-4">Área de Cobertura</h2>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} shadow-sm">{{ message }}</div>
                         {% endfor %}
-                    </tbody>
-                </table>
-                <!-- Paginação no rodapé -->
-                <div class="d-flex justify-content-center mt-3">
-                    <a href="{{ url_for('admin_cobertura', page=current_page - 1, busca_nome_logradouro=busca_nome_logradouro, busca_bairro=busca_bairro) }}" class="btn btn-outline-primary me-2 {% if current_page == 1 %}disabled{% endif %}"><i class="fas fa-chevron-left"></i></a>
-                    <span class="align-self-center mx-3">Página {{ current_page }} de {{ total_pages }}</span>
-                    <a href="{{ url_for('admin_cobertura', page=current_page + 1, busca_nome_logradouro=busca_nome_logradouro, busca_bairro=busca_bairro) }}" class="btn btn-outline-primary ms-2 {% if current_page >= total_pages %}disabled{% endif %}"><i class="fas fa-chevron-right"></i></a>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="d-flex justify-content-end mb-4">
+                    <button class="btn btn-success fw-bold shadow-sm btn-novo-endereco" data-bs-toggle="modal" data-bs-target="#modalEditarCobertura" data-cobertura-id="">
+                        <i class="fas fa-plus me-2"></i> Novo Endereço
+                    </button>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body bg-white rounded">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <form method="GET" action="{{ url_for('admin_cobertura') }}" class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-road text-muted"></i></span>
+                                    <input type="text" id="busca-nome-logradouro" name="busca_nome_logradouro" class="form-control border-start-0 ps-0" placeholder="Buscar por Rua" value="{{ busca_nome_logradouro or '' }}">
+                                    <button class="btn btn-danger" type="submit">Buscar</button>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form method="GET" action="{{ url_for('admin_cobertura') }}" class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                                    <input type="text" id="busca-bairro" name="busca_bairro" class="form-control border-start-0 ps-0" placeholder="Buscar por Bairro" value="{{ busca_bairro or '' }}">
+                                    <button class="btn btn-danger" type="submit">Buscar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 d-none d-lg-block">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="cobertura-table">
+                                <thead class="bg-light text-secondary small text-uppercase">
+                                    <tr>
+                                        <th class="ps-4">Tipo</th>
+                                        <th>Logradouro</th>
+                                        <th>Bairro</th>
+                                        <th>Cidade/UF</th>
+                                        <th class="text-end pe-4">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cobertura in coberturas %}
+                                    <tr data-cobertura-id="{{ cobertura.id }}">
+                                        <td class="ps-4 fw-bold text-secondary">{{ cobertura.tipo_logradouro }}</td>
+                                        <td class="fw-bold text-dark">{{ cobertura.nome_logradouro }}</td>
+                                        <td>{{ cobertura.bairro }}</td>
+                                        <td>{{ cobertura.cidade }} / {{ cobertura.estado }}</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-dark btn-editar-cobertura me-1" data-bs-toggle="modal" data-bs-target="#modalEditarCobertura" data-cobertura-id="{{ cobertura.id }}" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="btn btn-sm btn-outline-dark btn-apagar-cobertura" data-cobertura-id="{{ cobertura.id }}" title="Excluir"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-lg-none d-flex flex-column gap-3">
+                    {% for cobertura in coberturas %}
+                    <div class="card shadow-sm border-0" data-cobertura-id="{{ cobertura.id }}">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">{{ cobertura.tipo_logradouro }}</small>
+                                    <h6 class="fw-bold text-dark mb-0 fs-5">{{ cobertura.nome_logradouro }}</h6>
+                                </div>
+                                <span class="badge bg-light text-dark border">{{ cobertura.bairro }}</span>
+                            </div>
+                            
+                            <div class="text-muted small mb-3">
+                                <i class="fas fa-map-marked-alt me-1"></i> {{ cobertura.cidade }} - {{ cobertura.estado }}
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-dark flex-grow-1 btn-editar-cobertura" data-bs-toggle="modal" data-bs-target="#modalEditarCobertura" data-cobertura-id="{{ cobertura.id }}">
+                                    <i class="fas fa-pencil-alt"></i> Editar
+                                </button>
+                                <button class="btn btn-outline-dark flex-grow-1 btn-apagar-cobertura" data-cobertura-id="{{ cobertura.id }}">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <a href="{{ url_for('admin_cobertura', page=current_page - 1, busca_nome_logradouro=busca_nome_logradouro, busca_bairro=busca_bairro) }}" class="btn btn-outline-danger me-2 {% if current_page == 1 %}disabled{% endif %}">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                    <span class="align-self-center mx-3 fw-bold text-muted">Página {{ current_page }} de {{ total_pages }}</span>
+                    <a href="{{ url_for('admin_cobertura', page=current_page + 1, busca_nome_logradouro=busca_nome_logradouro, busca_bairro=busca_bairro) }}" class="btn btn-outline-danger ms-2 {% if current_page >= total_pages %}disabled{% endif %}">
+                        Próxima <i class="fas fa-chevron-right"></i>
+                    </a>
                 </div>             
             </div>
-        </div>
-    </section></main>
+        </section>
+    </main>
 
-    <!-- Modal para Editar/Criar Cobertura -->
     <div class="modal fade" id="modalEditarCobertura" tabindex="-1" aria-labelledby="modalEditarCoberturaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalEditarCoberturaLabel">Editar Endereço de Cobertura</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold" id="modalEditarCoberturaLabel">
+                        <i class="fas fa-map-marker-alt me-2"></i>Endereço de Cobertura
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <form id="formEditarCobertura" method="POST">
                         <input type="hidden" id="editar-cobertura-id" name="cobertura_id">
-                        <div class="mb-3">
-                            <label for="editar-tipo_logradouro" class="form-label">Tipo Logradouro *</label>
-                            <input type="text" class="form-control" id="editar-tipo_logradouro" name="tipo_logradouro" required>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="editar-cep" class="form-label small fw-bold text-muted">CEP (Busca Auto)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="editar-cep" placeholder="00000-000" maxlength="9">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted" id="icon-search-cep"></i></span>
+                                </div>
+                                <div id="cep-feedback" class="form-text text-danger d-none">CEP não encontrado.</div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editar-nome_logradouro" class="form-label">Nome Logradouro *</label>
-                            <input type="text" class="form-control" id="editar-nome_logradouro" name="nome_logradouro" required>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="editar-tipo_logradouro" class="form-label small fw-bold text-muted">Tipo</label>
+                                <input type="text" class="form-control" id="editar-tipo_logradouro" name="tipo_logradouro" placeholder="Ex: Rua" required>
+                            </div>
+                            <div class="col-md-9">
+                                <label for="editar-nome_logradouro" class="form-label small fw-bold text-muted">Nome do Logradouro</label>
+                                <input type="text" class="form-control" id="editar-nome_logradouro" name="nome_logradouro" required>
+                            </div>
+                            
+                            <div class="col-md-5">
+                                <label for="editar-bairro" class="form-label small fw-bold text-muted">Bairro</label>
+                                <input type="text" class="form-control" id="editar-bairro" name="bairro" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="editar-cidade" class="form-label small fw-bold text-muted">Cidade</label>
+                                <input type="text" class="form-control" id="editar-cidade" name="cidade" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="editar-estado" class="form-label small fw-bold text-muted">UF</label>
+                                <input type="text" class="form-control" id="editar-estado" name="estado" maxlength="2" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="editar-pais" class="form-label small fw-bold text-muted">País</label>
+                                <input type="text" class="form-control" id="editar-pais" name="pais" value="Brasil" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editar-bairro" class="form-label">Bairro *</label>
-                            <input type="text" class="form-control" id="editar-bairro" name="bairro" required>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger w-100 py-2 fw-bold shadow-sm">SALVAR ENDEREÇO</button>
                         </div>
-                        <div class="mb-3">
-                            <label for="editar-cidade" class="form-label">Cidade *</label>
-                            <input type="text" class="form-control" id="editar-cidade" name="cidade" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editar-estado" class="form-label">Estado *</label>
-                            <input type="text" class="form-control" id="editar-estado" name="estado" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editar-pais" class="form-label">País *</label>
-                            <input type="text" class="form-control" id="editar-pais" name="pais" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalConfirmDeleteCobertura" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3 text-warning animate__animated animate__pulse animate__infinite">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Tem certeza?</h5>
+                    <p class="text-muted small mb-0">Você vai apagar este endereço permanentemente.</p>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius: 4px;">Cancelar</button>
+                    <button type="button" class="btn btn-danger btn-sm px-3" id="btnConfirmarExclusao" style="border-radius: 4px !important; padding: 0.25rem 1rem !important;">Sim, Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% include 'footer.html' %}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -149,14 +225,15 @@
                 // Limpa fields
                 form.reset();
                 document.getElementById('editar-cobertura-id').value = '';
+                document.getElementById('editar-cep').value = ''; 
+                document.getElementById('editar-pais').value = 'Brasil'; // Reset default
 
                 if (coberturaId) {
-                    modalTitle.textContent = 'Editar Endereço de Cobertura';
+                    modalTitle.innerHTML = '<i class="fas fa-pencil-alt me-2"></i>Editar Endereço';
                     try {
                         const response = await fetch(`/admin/get_cobertura/${coberturaId}`);
                         if (!response.ok) throw new Error('Erro na resposta do servidor');
                         const cobertura = await response.json();
-                        console.log('Dados da cobertura:', cobertura);  // Log para depuração
 
                         document.getElementById('editar-cobertura-id').value = cobertura.id || '';
                         document.getElementById('editar-tipo_logradouro').value = cobertura.tipo_logradouro || '';
@@ -164,18 +241,79 @@
                         document.getElementById('editar-bairro').value = cobertura.bairro || '';
                         document.getElementById('editar-cidade').value = cobertura.cidade || '';
                         document.getElementById('editar-estado').value = cobertura.estado || '';
-                        document.getElementById('editar-pais').value = cobertura.pais || '';
+                        document.getElementById('editar-pais').value = cobertura.pais || 'Brasil';
                     } catch (error) {
-                        console.error('Erro ao buscar dados da cobertura:', error);
-                        alert('Erro ao carregar dados da cobertura. Verifique o console para mais detalhes.');
+                        alert('Erro ao carregar dados da cobertura.');
                     }
                 } else {
-                    modalTitle.textContent = 'Novo Endereço de Cobertura';
+                    modalTitle.innerHTML = '<i class="fas fa-plus-circle me-2"></i>Novo Endereço';
                 }
             });
         });
 
-        // Submit form via AJAX (create ou update baseado em id)
+        // --- LÓGICA DO CEP AUTOMÁTICO ---
+        const cepInput = document.getElementById('editar-cep');
+        
+        // Máscara simples para o CEP visual
+        cepInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            if (v.length > 5) v = v.replace(/^(\d{5})(\d)/, '$1-$2');
+            e.target.value = v;
+        });
+
+        cepInput.addEventListener('blur', async function() {
+            const cep = this.value.replace(/\D/g, '');
+            const feedback = document.getElementById('cep-feedback');
+            const icon = document.getElementById('icon-search-cep');
+
+            if (cep.length === 8) {
+                // Animação de loading
+                icon.className = 'fas fa-spinner fa-spin text-danger';
+                feedback.classList.add('d-none');
+                
+                try {
+                    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await res.json();
+                    
+                    if (!data.erro) {
+                        // Tenta separar "Rua" de "Nome"
+                        // ViaCEP retorna logradouro: "Rua das Flores"
+                        let logradouroFull = data.logradouro || '';
+                        let tipo = '';
+                        let nome = logradouroFull;
+                        
+                        // Lista básica de tipos para tentar separar
+                        const tiposComuns = ['Rua', 'Avenida', 'Travessa', 'Alameda', 'Estrada', 'Rodovia', 'Praça', 'Beco'];
+                        const primeiraPalavra = logradouroFull.split(' ')[0];
+                        
+                        if (tiposComuns.includes(primeiraPalavra)) {
+                            tipo = primeiraPalavra;
+                            nome = logradouroFull.substring(primeiraPalavra.length).trim();
+                        }
+
+                        document.getElementById('editar-tipo_logradouro').value = tipo;
+                        document.getElementById('editar-nome_logradouro').value = nome;
+                        document.getElementById('editar-bairro').value = data.bairro || '';
+                        document.getElementById('editar-cidade').value = data.localidade || '';
+                        document.getElementById('editar-estado').value = data.uf || '';
+                        document.getElementById('editar-pais').value = 'Brasil';
+                        
+                        // Foca no campo que pode precisar de ajuste (ex: número não tem aqui, mas talvez ajustar o nome)
+                        document.getElementById('editar-nome_logradouro').focus();
+                    } else {
+                        feedback.classList.remove('d-none');
+                    }
+                } catch (err) {
+                    console.error('Erro CEP', err);
+                    feedback.classList.remove('d-none');
+                } finally {
+                    icon.className = 'fas fa-search text-muted';
+                }
+            }
+        });
+
+        // Submit form via AJAX
         const formEditarCobertura = document.getElementById('formEditarCobertura');
         formEditarCobertura.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -185,46 +323,48 @@
             const url = coberturaId ? `/admin/update_cobertura/${coberturaId}` : '/admin/create_cobertura';
 
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(url, { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.success) {
-                    const modal = bootstrap.Modal.getInstance(formEditarCobertura.closest('.modal'));
-                    modal.hide();
-                    location.reload();  // Recarrega para atualizar a tabela
+                    location.reload();
                 } else {
                     alert('Erro: ' + result.error);
                 }
             } catch (error) {
-                console.error('Erro ao submeter formulário:', error);
-                alert('Erro ao salvar. Verifique o console para mais detalhes.');
+                alert('Erro ao salvar.');
             }
         });
 
-        // Apagar cobertura com confirmação
-        const apagarButtons = document.querySelectorAll('.btn-apagar-cobertura');
-        apagarButtons.forEach(button => {
-            button.addEventListener('click', async () => {
-                const coberturaId = button.getAttribute('data-cobertura-id');
-                if (confirm('Tem certeza que deseja apagar este endereço de cobertura?')) {
-                    try {
-                        const response = await fetch(`/admin/delete_cobertura/${coberturaId}`, { method: 'POST' });
-                        const result = await response.json();
-                        if (result.success) {
-                            location.reload();  // Recarrega para atualizar a tabela
-                        } else {
-                            alert('Erro: ' + result.error);
-                        }
-                    } catch (error) {
-                        console.error('Erro ao apagar cobertura:', error);
-                        alert('Erro ao apagar. Verifique o console para mais detalhes.');
-                    }
-                }
-            });
+        // Apagar cobertura
+    // --- LÓGICA DE EXCLUSÃO COM MODAL BONITO ---
+    let idParaExcluir = null;
+    const modalDelete = new bootstrap.Modal(document.getElementById('modalConfirmDeleteCobertura'));
+
+    // 1. Ao clicar na lixeira (Tabela ou Card)
+    document.querySelectorAll('.btn-apagar-cobertura').forEach(button => {
+        button.addEventListener('click', () => {
+            idParaExcluir = button.getAttribute('data-cobertura-id'); // Guarda o ID
+            modalDelete.show(); // Abre o modal bonito
         });
+    });
+
+    // 2. Ao clicar em "Sim, Excluir" dentro do Modal
+    document.getElementById('btnConfirmarExclusao').addEventListener('click', async () => {
+        if (idParaExcluir) {
+            try {
+                const response = await fetch(`/admin/delete_cobertura/${idParaExcluir}`, { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Erro: ' + result.error);
+                }
+            } catch (error) {
+                alert('Erro ao apagar.');
+            }
+        }
+    });
     </script>
 
 </body>
