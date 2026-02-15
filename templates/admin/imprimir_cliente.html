@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de Instalação - {{ cliente.nome }}</title>
+    <title>{{ cliente.nome }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -26,12 +26,12 @@
         .page-container {
             width: 210mm;
             height: 297mm; /* Força altura exata A4 */
-            padding: 15mm; /* Margem interna (segura para impressão) */
+            padding: 15mm; /* Margem interna */
             margin: 20px auto;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
-            overflow: hidden; /* Corta qualquer excesso que geraria pag extra */
+            overflow: hidden; /* Corta qualquer excesso */
         }
 
         @media print {
@@ -42,7 +42,7 @@
                 width: 210mm; 
                 height: 297mm; 
                 border: none; 
-                page-break-after: avoid; /* Evita quebra de página após o elemento */
+                page-break-after: avoid; 
             }
             .no-print { display: none !important; }
         }
@@ -96,10 +96,10 @@
         .st-nao-realizada { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
         .st-pendente { background-color: #e2e3e5; color: #41464b; border-color: #d3d6d8; }
 
-        /* Footer Fixo no final da A4 */
+        /* Footer Fixo */
         footer {
             position: absolute;
-            bottom: 15mm; /* Margem inferior fixa */
+            bottom: 15mm;
             left: 0;
             width: 100%;
             text-align: center;

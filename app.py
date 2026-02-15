@@ -1298,7 +1298,6 @@ def admin_gerar_relatorio():
         cursor.close()
         conn.close()
 
-
 @app.route('/admin/imprimir_relatorio/<identificador>')
 @login_required
 def admin_imprimir_relatorio(identificador):
@@ -1329,16 +1328,30 @@ def admin_imprimir_relatorio(identificador):
         if cliente:
             clientes.append(cliente)
 
-    # Data criação formatada
-    data = relatorio['created_at']
-    meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
-    dia = data.day
-    mes = meses[data.month - 1]
-    ano = data.year
-    data_criacao = f"Rio de Janeiro, {dia} de {mes} de {ano}"
-
     cursor.close()
     conn.close()
+
+    # CORREÇÃO AQUI: Formatando apenas como DD/MM/AAAA
+    data = relatorio['created_at']
+    # Se por acaso o banco retornar string, converte antes
+    if isinstance(data, str):
+        try:
+            data = datetime.strptime(data, '%Y-%m-%d %H:%M:%S')
+        except:
+            pass # Mantém como está se falhar
+            
+    if hasattr(data, 'strftime'):
+        data_criacao = data.strftime('%d/%m/%Y')
+    else:
+        # Fallback se não for objeto datetime
+        data_criacao = str(data).split()[0] 
+        # Tenta converter YYYY-MM-DD para DD/MM/YYYY manualmente se necessário
+        if '-' in data_criacao:
+            try:
+                ano, mes, dia = data_criacao.split('-')
+                data_criacao = f"{dia}/{mes}/{ano}"
+            except:
+                pass
 
     return render_template('admin/imprimir_relatorio.html', 
                            identificador=identificador, 
