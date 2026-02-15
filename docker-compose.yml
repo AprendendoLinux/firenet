@@ -45,6 +45,8 @@ services:
       APP_BASE_URL: 'https://example.com/'
       # Email de resposta
       REPLY_TO_EMAIL: 'reply@example.com'
+      # Habilita ou desabilia o reCAPTCHA
+      ENABLE_RECAPTCHA: 'True'
       # Chave do site reCAPTCHA para proteção contra spam
       RECAPTCHA_SITE_KEY: 'fake_recaptcha_site_key_jkl012'
       # Chave secreta reCAPTCHA (substitua por valor seguro)

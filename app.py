@@ -39,6 +39,7 @@ mail = Mail(app)
 app.config['REPLY_TO_EMAIL'] = os.environ.get('REPLY_TO_EMAIL')
 app.config['RECAPTCHA_SITE_KEY'] = os.environ.get('RECAPTCHA_SITE_KEY')
 app.config['RECAPTCHA_SECRET_KEY'] = os.environ.get('RECAPTCHA_SECRET_KEY')
+app.config['RECAPTCHA_ENABLED'] = os.environ.get('ENABLE_RECAPTCHA', 'True') == 'True'
 
 # Configurações não-DB
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
@@ -656,22 +657,32 @@ def validar_cobertura():
 def login():
     if 'user_id' in session:
         return redirect(url_for('clientes'))
+    
     if request.method == 'POST':
-        recaptcha_response = request.form.get('g-recaptcha-response')
-        if not recaptcha_response:
-            flash('Por favor, complete o reCAPTCHA.', 'danger')
-            return redirect(url_for('login'))
-        secret_key = app.config['RECAPTCHA_SECRET_KEY']
-        payload = {
-            'secret': secret_key,
-            'response': recaptcha_response,
-            'remoteip': request.remote_addr
-        }
-        response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=payload)
-        result = response.json()
-        if not result['success']:
-            flash('Falha na verificação do reCAPTCHA. Tente novamente.', 'danger')
-            return redirect(url_for('login'))
+        # LÓGICA NOVA: Verifica se o Captcha está habilitado antes de validar
+        if app.config['RECAPTCHA_ENABLED']:
+            recaptcha_response = request.form.get('g-recaptcha-response')
+            if not recaptcha_response:
+                flash('Por favor, complete o reCAPTCHA.', 'danger')
+                return redirect(url_for('login'))
+            
+            secret_key = app.config['RECAPTCHA_SECRET_KEY']
+            payload = {
+                'secret': secret_key,
+                'response': recaptcha_response,
+                'remoteip': request.remote_addr
+            }
+            try:
+                response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=payload)
+                result = response.json()
+                if not result.get('success'):
+                    flash('Falha na verificação do reCAPTCHA. Tente novamente.', 'danger')
+                    return redirect(url_for('login'))
+            except Exception:
+                flash('Erro ao conectar com reCAPTCHA.', 'danger')
+                return redirect(url_for('login'))
+
+        # Lógica de login padrão (continua igual)
         username = request.form['username'].strip().lower()
         password = request.form['password']
         try:
@@ -694,7 +705,11 @@ def login():
         except Exception as e:
             print("Erro no login:", e)
             flash('Erro interno. Tente novamente.', 'danger')
-    return render_template('login.html', recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
+
+    # Passa a variável recaptcha_enabled para o template
+    return render_template('login.html', 
+                           recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'],
+                           recaptcha_enabled=app.config['RECAPTCHA_ENABLED'])
 
 # Nova rota: Logout
 @app.route('/logout')
