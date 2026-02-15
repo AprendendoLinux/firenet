@@ -783,12 +783,14 @@ def clientes():
                            busca_nome=busca_nome,
                            busca_cpf=busca_cpf)
 
-# Nova rota: Imprimir Ficha
+# Em app.py, substitua a rota '/admin/imprimir/<int:cliente_id>' por esta:
+
 @app.route('/admin/imprimir/<int:cliente_id>')
 @login_required
 def imprimir_cliente(cliente_id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    # MUDANÇA IMPORTANTE: DictCursor para acessar por nome (cliente['nome'])
+    cursor = conn.cursor(pymysql.cursors.DictCursor) 
     cursor.execute("SELECT * FROM cadastros WHERE id = %s", (cliente_id,))
     cliente = cursor.fetchone()
     cursor.close()
@@ -798,10 +800,10 @@ def imprimir_cliente(cliente_id):
         flash('Cliente não encontrado.', 'danger')
         return redirect(url_for('clientes'))
 
-    # Formata datas
-    created_at = cliente[19].strftime('%d/%m/%Y') if cliente[19] else 'Não definida'  # Ajuste index conforme schema
+    # Data de emissão atual para o cabeçalho
+    current_date = datetime.now().strftime('%d/%m/%Y')
 
-    return render_template('admin/imprimir_cliente.html', cliente=cliente, created_at=created_at)
+    return render_template('admin/imprimir_cliente.html', cliente=cliente, current_date=current_date)
 
 # Nova rota para get dados cliente (JSON para modals)
 @app.route('/admin/get_cliente/<int:cliente_id>', methods=['GET'])
