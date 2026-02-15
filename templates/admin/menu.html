@@ -1,29 +1,23 @@
 <header class="bg-white shadow-sm py-3 sticky-top">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <a href="/admin/clientes"><img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet"></a>
+            <a href="/admin/clientes">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet">
+            </a>
             
             <nav class="d-none d-md-flex gap-3 align-items-center">
-                
-                <div class="d-flex align-items-center bg-light px-3 py-1 rounded border">
-                    
+                <div class="d-flex align-items-center bg-light px-3 py-1 rounded border shadow-sm">
                     <button class="btn btn-sm btn-outline-secondary me-2 border-0" 
                             data-bs-toggle="modal" data-bs-target="#modalConfigHorario" 
                             title="Configurar Horários e Feriados">
                         <i class="fas fa-cog"></i>
                     </button>
-
                     <div class="vr me-2"></div>
-
                     <div class="form-check me-3" title="Seguir horário configurado">
                         <input class="form-check-input" type="checkbox" id="checkAuto" {% if modo_automatico %}checked{% endif %}>
-                        <label class="form-check-label small fw-bold text-muted" for="checkAuto">
-                            Auto
-                        </label>
+                        <label class="form-check-label small fw-bold text-muted" for="checkAuto">Auto</label>
                     </div>
-
                     <div class="vr me-3"></div>
-
                     <div class="form-check form-switch" title="Controle Manual">
                         <input class="form-check-input" type="checkbox" id="toggleWhatsapp" 
                                {% if whatsapp_ativo %}checked{% endif %}
@@ -34,35 +28,171 @@
                     </div>
                 </div>
 
-                <a href="{{ url_for('clientes') }}" class="nav-link text-dark fw-medium">Clientes</a>
-                <a href="{{ url_for('admin_usuarios') }}" class="nav-link text-dark fw-medium">Usuários</a>
-                <a href="{{ url_for('admin_relatorios') }}" class="nav-link text-dark fw-medium">Relatórios</a>
-                <a href="{{ url_for('admin_cobertura') }}" class="nav-link text-dark fw-medium">Cobertura</a>
-                <a href="{{ url_for('logout') }}" class="nav-link text-danger fw-medium">Logout</a>
+                <div class="vr mx-2"></div>
+
+                <a href="{{ url_for('clientes') }}" class="nav-link text-dark fw-medium hover-effect">Clientes</a>
+                <a href="{{ url_for('admin_usuarios') }}" class="nav-link text-dark fw-medium hover-effect">Usuários</a>
+                <a href="{{ url_for('admin_relatorios') }}" class="nav-link text-dark fw-medium hover-effect">Relatórios</a>
+                <a href="{{ url_for('admin_cobertura') }}" class="nav-link text-dark fw-medium hover-effect">Cobertura</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger ms-2 rounded-pill px-3">Sair</a>
             </nav>
             
-            <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile">
+            <button class="btn btn-light d-md-none text-danger border-0 fs-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuAdminMobile" aria-controls="menuAdminMobile">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
-        
-        <div class="collapse mt-3" id="navMobile">
-            <nav class="d-flex flex-column text-center gap-2">
-                <div class="py-2 d-flex justify-content-center align-items-center gap-2">
-                    <span>WhatsApp Site:</span>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="toggleWhatsappMobile" {% if whatsapp_ativo %}checked{% endif %} {% if modo_automatico %}disabled{% endif %}>
-                    </div>
-                </div>
-                <a href="{{ url_for('clientes') }}" class="py-2 text-dark">Clientes</a>
-                <a href="{{ url_for('admin_usuarios') }}" class="py-2 text-dark">Usuários</a>
-                <a href="{{ url_for('admin_relatorios') }}" class="py-2 text-dark">Relatórios</a>
-                <a href="{{ url_for('admin_cobertura') }}" class="py-2 text-dark">Área de Cobertura</a>
-                <a href="{{ url_for('logout') }}" class="py-2 text-dark">Logout</a>
-            </nav>
-        </div>
     </div>
 </header>
+
+<div class="offcanvas offcanvas-end border-0" tabindex="-1" id="menuAdminMobile" aria-labelledby="menuAdminMobileLabel">
+    <div class="offcanvas-header bg-dark text-white">
+        <h5 class="offcanvas-title fw-bold" id="menuAdminMobileLabel">
+            <i class="fas fa-user-shield me-2"></i>Área Admin
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    
+    <div class="offcanvas-body d-flex flex-column bg-light p-0">
+        <div class="bg-white shadow-sm mb-4 pb-3">
+            <div class="p-3 bg-danger text-white fw-bold mb-2">
+                <i class="fas fa-sliders-h me-2"></i>CONTROLE RÁPIDO
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+                <div>
+                    <span class="fw-bold fs-5 text-dark d-block">Modo Automático</span>
+                    <small class="text-muted">Ligar/Desligar pelo horário</small>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="checkAutoMobile" {% if modo_automatico %}checked{% endif %} style="transform: scale(1.7); margin-left: -10px;">
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+                <div>
+                    <span class="fw-bold fs-5 text-dark d-block"><i class="fab fa-whatsapp text-success me-1"></i> WhatsApp</span>
+                    <small id="statusTextMobile" class="fw-bold">
+                        {% if whatsapp_ativo %}Online{% else %}Offline{% endif %}
+                    </small>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="toggleWhatsappMobile" 
+                           {% if whatsapp_ativo %}checked{% endif %}
+                           {% if modo_automatico %}disabled{% endif %} 
+                           style="transform: scale(1.7); margin-left: -10px;">
+                </div>
+            </div>
+
+            <div class="p-3">
+                <button class="btn btn-outline-dark w-100 py-3 fw-bold border-2" 
+                        data-bs-toggle="modal" data-bs-target="#modalConfigHorario"
+                        onclick="fecharMenuMobile()">
+                    <i class="fas fa-cog me-2"></i>CONFIGURAR HORÁRIOS
+                </button>
+            </div>
+        </div>
+
+        <h6 class="text-secondary fw-bold px-4 mt-2 mb-3">MENU PRINCIPAL</h6>
+        <nav class="nav flex-column px-3 gap-2">
+            <a href="{{ url_for('clientes') }}" class="btn btn-white text-start shadow-sm py-3 fs-5 border" onclick="fecharMenuMobile()">
+                <i class="fas fa-users me-3 text-danger width-icon"></i>Gerenciar Clientes
+            </a>
+            <a href="{{ url_for('admin_usuarios') }}" class="btn btn-white text-start shadow-sm py-3 fs-5 border" onclick="fecharMenuMobile()">
+                <i class="fas fa-user-lock me-3 text-danger width-icon"></i>Usuários do Sistema
+            </a>
+            <a href="{{ url_for('admin_relatorios') }}" class="btn btn-white text-start shadow-sm py-3 fs-5 border" onclick="fecharMenuMobile()">
+                <i class="fas fa-file-alt me-3 text-danger width-icon"></i>Relatórios
+            </a>
+            <a href="{{ url_for('admin_cobertura') }}" class="btn btn-white text-start shadow-sm py-3 fs-5 border" onclick="fecharMenuMobile()">
+                <i class="fas fa-map-marked-alt me-3 text-danger width-icon"></i>Cobertura
+            </a>
+        </nav>
+
+        <div class="mt-auto p-3">
+            <a href="{{ url_for('logout') }}" class="btn btn-danger w-100 py-3 rounded fw-bold shadow">
+                <i class="fas fa-sign-out-alt me-2"></i>SAIR DO SISTEMA
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfigHorario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold"><i class="fas fa-clock me-2 text-primary"></i>Configurar Horários</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4">
+                <form id="formSchedule">
+                    <h6 class="fw-bold border-bottom pb-2 mb-3 text-secondary small text-uppercase">Semana Padrão</h6>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        <div class="bg-light p-3 rounded border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold mb-0 d-flex align-items-center gap-2" for="wd_active">
+                                    <i class="fas fa-briefcase text-muted"></i> Seg à Sex
+                                </label>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input fs-5" type="checkbox" id="wd_active" {% if schedule.weekdays.active %}checked{% endif %}>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6"><small class="text-muted d-block">Abertura</small><input type="time" class="form-control" id="wd_start" value="{{ schedule.weekdays.start }}"></div>
+                                <div class="col-6"><small class="text-muted d-block">Fechamento</small><input type="time" class="form-control" id="wd_end" value="{{ schedule.weekdays.end }}"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-light p-3 rounded border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold mb-0 d-flex align-items-center gap-2" for="sat_active">
+                                    <i class="fas fa-sun text-warning"></i> Sábado
+                                </label>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input fs-5" type="checkbox" id="sat_active" {% if schedule.saturday.active %}checked{% endif %}>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6"><small class="text-muted d-block">Abertura</small><input type="time" class="form-control" id="sat_start" value="{{ schedule.saturday.start }}"></div>
+                                <div class="col-6"><small class="text-muted d-block">Fechamento</small><input type="time" class="form-control" id="sat_end" value="{{ schedule.saturday.end }}"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-light p-3 rounded border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold mb-0 d-flex align-items-center gap-2" for="sun_active">
+                                    <i class="fas fa-umbrella-beach text-success"></i> Domingo
+                                </label>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input fs-5" type="checkbox" id="sun_active" {% if schedule.sunday.active %}checked{% endif %}>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6"><small class="text-muted d-block">Abertura</small><input type="time" class="form-control" id="sun_start" value="{{ schedule.sunday.start }}"></div>
+                                <div class="col-6"><small class="text-muted d-block">Fechamento</small><input type="time" class="form-control" id="sun_end" value="{{ schedule.sunday.end }}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 mt-4">
+                        <h6 class="fw-bold text-secondary mb-0 small text-uppercase">Datas Específicas</h6>
+                        <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="addFeriadoRow()">
+                            <i class="fas fa-plus me-1"></i> Adicionar
+                        </button>
+                    </div>
+                    
+                    <div id="listaFeriadosContainer" class="d-flex flex-column gap-3">
+                        </div>
+
+                </form>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary px-4" onclick="saveSchedule()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -75,8 +205,14 @@
                 <p class="text-muted small mb-0">Você vai remover esta data da configuração.</p>
             </div>
             <div class="modal-footer bg-light border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" onclick="confirmarExclusao()" style="border-radius: 4px; padding: 6px 12px;">Sim, Excluir</button>
+                <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius: 4px;">
+                    Cancelar
+                </button>
+                
+                <button type="button" class="btn btn-danger btn-sm px-3" onclick="confirmarExclusao()" 
+                        style="border-radius: 4px !important; padding: 0.25rem 1rem !important;">
+                    Sim, Excluir
+                </button>
             </div>
         </div>
     </div>
@@ -86,11 +222,9 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-body p-4 text-center">
-                <div class="mb-3 text-success animate__animated animate__bounceIn">
-                    <i class="fas fa-check-circle fa-3x"></i>
-                </div>
+                <div class="mb-3 text-success"><i class="fas fa-check-circle fa-3x"></i></div>
                 <h5 class="fw-bold mb-2">Sucesso!</h5>
-                <p class="text-muted small mb-0">Configurações de horário salvas.</p>
+                <p class="text-muted small mb-0">Salvo com sucesso.</p>
             </div>
             <div class="modal-footer bg-light border-0 justify-content-center">
                 <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal" onclick="checkReload()">OK</button>
@@ -99,409 +233,150 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalConfigHorario" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-light border-bottom-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-clock me-2 text-primary"></i>Configurar Horário Automático</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="formSchedule">
-                    
-                    <h6 class="fw-bold border-bottom pb-2 mb-3 text-secondary small text-uppercase">Semana Padrão</h6>
-                    
-                    <div class="row mb-3">
-                        <div class="col-12 mb-3 border-bottom pb-2">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="wd_active" {% if schedule.weekdays.active %}checked{% endif %}>
-                                    <label class="form-check-label fw-bold" for="wd_active">Segunda a Sexta</label>
-                                </div>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="small text-muted">Abertura</label>
-                                    <input type="time" class="form-control" id="wd_start" value="{{ schedule.weekdays.start }}">
-                                </div>
-                                <div class="col-6">
-                                    <label class="small text-muted">Fechamento</label>
-                                    <input type="time" class="form-control" id="wd_end" value="{{ schedule.weekdays.end }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 mb-3 border-bottom pb-2">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="sat_active" {% if schedule.saturday.active %}checked{% endif %}>
-                                    <label class="form-check-label fw-bold" for="sat_active">Sábado</label>
-                                </div>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="small text-muted">Abertura</label>
-                                    <input type="time" class="form-control" id="sat_start" value="{{ schedule.saturday.start }}">
-                                </div>
-                                <div class="col-6">
-                                    <label class="small text-muted">Fechamento</label>
-                                    <input type="time" class="form-control" id="sat_end" value="{{ schedule.saturday.end }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="sun_active" {% if schedule.sunday.active %}checked{% endif %}>
-                                    <label class="form-check-label fw-bold" for="sun_active">Domingo</label>
-                                </div>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="small text-muted">Abertura</label>
-                                    <input type="time" class="form-control" id="sun_start" value="{{ schedule.sunday.start }}">
-                                </div>
-                                <div class="col-6">
-                                    <label class="small text-muted">Fechamento</label>
-                                    <input type="time" class="form-control" id="sun_end" value="{{ schedule.sunday.end }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 mt-4">
-                        <h6 class="fw-bold text-secondary mb-0 small text-uppercase">Feriados e Datas Específicas</h6>
-                        <button type="button" class="btn btn-sm btn-outline-success" onclick="addFeriadoRow()">
-                            <i class="fas fa-plus me-1"></i> Adicionar
-                        </button>
-                    </div>
-                    
-                    <div class="table-responsive bg-white border rounded">
-                        <table class="table table-sm table-hover mb-0 align-middle">
-                            <thead class="table-light small text-muted text-uppercase">
-                                <tr>
-                                    <th style="width: 25%;" class="ps-3">Data</th> <th style="width: 30%;">Motivo</th>           <th style="width: 15%;">Status</th>
-                                    <th style="width: 15%;">Início</th>
-                                    <th style="width: 15%;">Fim</th>
-                                    <th style="width: 5%;"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="listaFeriados">
-                                </tbody>
-                        </table>
-                    </div>
-                    <small class="text-muted d-block mt-2 fst-italic">
-                        <i class="fas fa-info-circle me-1 text-primary"></i> Datas específicas têm prioridade sobre a configuração semanal.
-                    </small>
-
-                </form>
-            </div>
-            <div class="modal-footer bg-light border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveSchedule()">Salvar Horários</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
-    // Recupera os feriados existentes do backend via Jinja2
     let feriados = {{ schedule.feriados|tojson if schedule.feriados else '[]' }};
-    // Variável para armazenar qual índice será excluído
     let indexParaExcluir = null;
 
+    function fecharMenuMobile() {
+        const menuEl = document.getElementById('menuAdminMobile');
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(menuEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        const toggleManual = document.getElementById('toggleWhatsapp');
-        const toggleMobile = document.getElementById('toggleWhatsappMobile');
-        const checkAuto = document.getElementById('checkAuto');
-        const label = document.getElementById('labelWhatsapp');
-
-        // Renderiza a tabela de feriados ao carregar
         renderFeriados();
+        // Lógica de Sincronia
+        const checkAuto = document.getElementById('checkAuto');
+        const checkAutoMob = document.getElementById('checkAutoMobile');
+        const toggleManual = document.getElementById('toggleWhatsapp');
+        const toggleManualMob = document.getElementById('toggleWhatsappMobile');
+        const labelManual = document.getElementById('labelWhatsapp');
+        const labelMobile = document.getElementById('statusTextMobile');
 
-        // Função para atualizar a interface visualmente
-        function updateInterface(isAuto, isAtivo) {
-            toggleManual.disabled = isAuto;
-            if(toggleMobile) toggleMobile.disabled = isAuto;
+        function updateAllInterfaces(isAuto, isAtivo) {
+            if(checkAuto) checkAuto.checked = isAuto;
+            if(toggleManual) { toggleManual.checked = isAtivo; toggleManual.disabled = isAuto; }
+            if(labelManual) { labelManual.innerHTML = `<i class="fab fa-whatsapp"></i> ${isAtivo ? 'ON' : 'OFF'}`; labelManual.className = `form-check-label fw-bold ${isAtivo ? 'text-danger' : 'text-secondary'}`; }
 
-            toggleManual.checked = isAtivo;
-            if(toggleMobile) toggleMobile.checked = isAtivo;
-            
-            if(label) {
-                label.innerHTML = `<i class="fab fa-whatsapp"></i> ${isAtivo ? 'ON' : 'OFF'}`;
-                label.className = `form-check-label fw-bold ${isAtivo ? 'text-danger' : 'text-secondary'}`;
-            }
-
-            const containerManual = toggleManual.parentElement;
-            if (isAuto) {
-                containerManual.title = "Controlado pelo Horário Comercial (Auto Ligado)";
-                toggleManual.style.cursor = "not-allowed";
-            } else {
-                containerManual.title = "Controle Manual";
-                toggleManual.style.cursor = "pointer";
-            }
+            if(checkAutoMob) checkAutoMob.checked = isAuto;
+            if(toggleManualMob) { toggleManualMob.checked = isAtivo; toggleManualMob.disabled = isAuto; }
+            if(labelMobile) { labelMobile.innerText = isAtivo ? "Online" : "Offline"; labelMobile.className = `fw-bold ${isAtivo ? 'text-success' : 'text-muted'}`; }
         }
 
-        // 1. EVENTO: Mudar checkbox 'Auto'
-        if(checkAuto) {
-            checkAuto.addEventListener('change', function() {
-                const isAuto = this.checked;
-                
-                fetch('/admin/toggle_whatsapp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ modo_automatico: isAuto })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.success) {
-                        window.location.reload();
-                    } else {
-                        alert('Erro ao alterar modo automático.');
-                        this.checked = !isAuto;
-                    }
-                });
-            });
+        function toggleAutoMode(isAuto) {
+            fetch('/admin/toggle_whatsapp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ modo_automatico: isAuto }) })
+            .then(r => r.json()).then(data => { if(data.success) window.location.reload(); else updateAllInterfaces(!isAuto, toggleManual.checked); });
+        }
+        function toggleManualMode(isAtivo) {
+            fetch('/admin/toggle_whatsapp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ativo: isAtivo }) })
+            .then(r => r.json()).then(data => { if(data.success) updateAllInterfaces(false, isAtivo); });
         }
 
-        // 2. EVENTO: Mudar switch 'Manual'
-        [toggleManual, toggleMobile].forEach(t => {
-            if(!t) return;
-            t.addEventListener('change', function() {
-                if(checkAuto && checkAuto.checked) {
-                    this.checked = !this.checked;
-                    alert('Desative o Modo Automático para controlar manualmente.');
-                    return;
-                }
+        if(checkAuto) checkAuto.addEventListener('change', (e) => toggleAutoMode(e.target.checked));
+        if(toggleManual) toggleManual.addEventListener('change', (e) => toggleManualMode(e.target.checked));
+        if(checkAutoMob) checkAutoMob.addEventListener('change', (e) => toggleAutoMode(e.target.checked));
+        if(toggleManualMob) toggleManualMob.addEventListener('change', (e) => toggleManualMode(e.target.checked));
 
-                const isAtivo = this.checked;
-
-                fetch('/admin/toggle_whatsapp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ativo: isAtivo })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.success) {
-                        updateInterface(false, isAtivo);
-                    } else {
-                        alert('Erro ao atualizar status.');
-                        this.checked = !isAtivo;
-                    }
-                });
-            });
-        });
-
-        // Inicialização Visual
-        const inicialAtivo = {{ 'true' if whatsapp_ativo else 'false' }};
-        const inicialAuto = {{ 'true' if modo_automatico else 'false' }};
-        updateInterface(inicialAuto, inicialAtivo);
+        updateAllInterfaces({{ 'true' if modo_automatico else 'false' }}, {{ 'true' if whatsapp_ativo else 'false' }});
     });
 
-    // --- FUNÇÕES DE FERIADOS ---
-
-// --- FUNÇÃO DE RENDERIZAÇÃO CORRIGIDA (VISUAL DA SETINHA) ---
-
+    // --- FUNÇÃO RENDERIZAÇÃO CORRIGIDA ---
     function renderFeriados() {
-        const tbody = document.getElementById('listaFeriados');
-        tbody.innerHTML = '';
+        const container = document.getElementById('listaFeriadosContainer');
+        container.innerHTML = '';
 
         if(feriados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted small py-4 fw-light">Nenhuma data específica configurada.</td></tr>';
+            container.innerHTML = '<div class="text-center text-muted py-3 small bg-light rounded border-dashed">Nenhuma data específica configurada.</div>';
             return;
         }
 
         feriados.forEach((f, index) => {
-            const tr = document.createElement('tr');
             const disabledAttr = !f.ativo ? 'disabled style="background-color: #f8f9fa;"' : '';
-            
-            const motivoVal = f.motivo || ''; 
             const prepVal = f.preposicao || 'de';
-
-            tr.innerHTML = `
-                <td class="ps-3">
-                    <input type="date" class="form-control form-control-sm border-0 bg-transparent fw-bold text-dark" value="${f.data}" 
-                           onchange="updateFeriado(${index}, 'data', this.value)">
-                </td>
-                <td>
-                    <div class="input-group input-group-sm">
-                        <select class="form-select border-0 bg-transparent text-muted" style="max-width: 75px;"
-                                onchange="updateFeriado(${index}, 'preposicao', this.value)">
-                            <option value="de" ${prepVal === 'de' ? 'selected' : ''}>de</option>
-                            <option value="do" ${prepVal === 'do' ? 'selected' : ''}>do</option>
-                            <option value="da" ${prepVal === 'da' ? 'selected' : ''}>da</option>
-                            <option value="dos" ${prepVal === 'dos' ? 'selected' : ''}>dos</option>
-                            <option value="das" ${prepVal === 'das' ? 'selected' : ''}>das</option>
-                        </select>
-                        <input type="text" class="form-control border-0 bg-transparent ps-2" placeholder="Ex: Carnaval" value="${motivoVal}" 
-                               onchange="updateFeriado(${index}, 'motivo', this.value)">
-                    </div>
-                </td>
-                <td>
-                    <select class="form-select form-select-sm border-0 bg-transparent fw-bold ${f.ativo ? 'text-success' : 'text-danger'}" 
-                            onchange="updateFeriado(${index}, 'ativo', this.value === 'true')" style="cursor: pointer;">
-                        <option value="true" ${f.ativo ? 'selected' : ''} class="text-success fw-bold">Aberto</option>
-                        <option value="false" ${!f.ativo ? 'selected' : ''} class="text-danger fw-bold">Fechado</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="time" class="form-control form-control-sm border-0 bg-transparent" value="${f.inicio}" ${disabledAttr} 
-                           onchange="updateFeriado(${index}, 'inicio', this.value)">
-                </td>
-                <td>
-                    <input type="time" class="form-control form-control-sm border-0 bg-transparent" value="${f.fim}" ${disabledAttr} 
-                           onchange="updateFeriado(${index}, 'fim', this.value)">
-                </td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-link text-muted p-0 opacity-50 hover-danger" onclick="prepararExclusao(${index})" title="Remover">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function addFeriadoRow() {
-        const hoje = new Date().toISOString().split('T')[0];
-        feriados.push({
-            data: hoje,
-            motivo: '',
-            preposicao: 'de', // Novo padrão
-            ativo: false,
-            inicio: '09:00',
-            fim: '18:00'
-        });
-        renderFeriados();
-    }
-
-    function addFeriadoRow() {
-        const hoje = new Date().toISOString().split('T')[0];
-        feriados.push({
-            data: hoje,
-            motivo: '', // Novo campo inicia vazio
-            ativo: false,
-            inicio: '09:00',
-            fim: '18:00'
-        });
-        renderFeriados();
-    }
-
-    function addFeriadoRow() {
-        const hoje = new Date().toISOString().split('T')[0];
-        feriados.push({
-            data: hoje,
-            ativo: false,
-            inicio: '09:00',
-            fim: '18:00'
-        });
-        renderFeriados();
-    }
-
-    // Abre o modal de confirmação em vez de excluir direto
-    function prepararExclusao(index) {
-        indexParaExcluir = index;
-        const modalDelete = new bootstrap.Modal(document.getElementById('modalConfirmDelete'));
-        modalDelete.show();
-    }
-
-    // Executa a exclusão após confirmação
-    function confirmarExclusao() {
-        if (indexParaExcluir !== null) {
-            feriados.splice(indexParaExcluir, 1);
-            renderFeriados();
-            indexParaExcluir = null;
             
-            // Fecha o modal de delete
-            const modalEl = document.getElementById('modalConfirmDelete');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
-        }
+            const card = document.createElement('div');
+            card.className = 'card shadow-sm border-0 bg-white';
+            
+            // ADICIONEI type="button" NOS BOTÕES DE EXCLUIR ABAIXO
+            card.innerHTML = `
+                <div class="card-body p-3">
+                    <div class="row g-2 align-items-end">
+                        
+                        <div class="col-10 col-md-2">
+                            <label class="small text-muted fw-bold mb-1">Data</label>
+                            <input type="date" class="form-control" value="${f.data}" onchange="updateFeriado(${index}, 'data', this.value)">
+                        </div>
+                        <div class="col-2 d-md-none text-end pb-1">
+                            <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="prepararExclusao(${index})"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label class="small text-muted fw-bold mb-1">Motivo</label>
+                            <div class="input-group">
+                                <select class="form-select bg-light text-muted" style="max-width: 75px;" onchange="updateFeriado(${index}, 'preposicao', this.value)">
+                                    <option value="de" ${prepVal === 'de' ? 'selected' : ''}>de</option>
+                                    <option value="do" ${prepVal === 'do' ? 'selected' : ''}>do</option>
+                                    <option value="da" ${prepVal === 'da' ? 'selected' : ''}>da</option>
+                                    <option value="dos" ${prepVal === 'dos' ? 'selected' : ''}>dos</option>
+                                    <option value="das" ${prepVal === 'das' ? 'selected' : ''}>das</option>
+                                </select>
+                                <input type="text" class="form-control" placeholder="Ex: Carnaval" value="${f.motivo || ''}" onchange="updateFeriado(${index}, 'motivo', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-2">
+                             <label class="small text-muted fw-bold mb-1">Status</label>
+                             <select class="form-select fw-bold ${f.ativo ? 'text-success border-success' : 'text-danger border-danger'}" onchange="updateFeriado(${index}, 'ativo', this.value === 'true')">
+                                <option value="true" ${f.ativo ? 'selected' : ''}>Aberto</option>
+                                <option value="false" ${!f.ativo ? 'selected' : ''}>Fechado</option>
+                            </select>
+                        </div>
+
+                        <div class="col-6 col-md-2">
+                            <label class="small text-muted fw-bold mb-1">Início</label>
+                            <input type="time" class="form-control" value="${f.inicio}" ${disabledAttr} onchange="updateFeriado(${index}, 'inicio', this.value)">
+                        </div>
+
+                        <div class="col-6 col-md-2">
+                            <label class="small text-muted fw-bold mb-1">Fim</label>
+                            <input type="time" class="form-control" value="${f.fim}" ${disabledAttr} onchange="updateFeriado(${index}, 'fim', this.value)">
+                        </div>
+
+                        <div class="col-md-1 d-none d-md-block text-center pb-1">
+                            <button type="button" class="btn btn-link text-muted hover-danger" onclick="prepararExclusao(${index})" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
     }
 
-    function updateFeriado(index, field, value) {
-        feriados[index][field] = value;
-        if(field === 'ativo') {
-            renderFeriados();
-        }
+    function addFeriadoRow() {
+        feriados.push({ data: new Date().toISOString().split('T')[0], motivo: '', preposicao: 'de', ativo: false, inicio: '09:00', fim: '18:00' });
+        renderFeriados();
     }
 
-    // --- FUNÇÃO DE SALVAR GERAL COM MODAL BONITO ---
+    function prepararExclusao(index) { indexParaExcluir = index; new bootstrap.Modal(document.getElementById('modalConfirmDelete')).show(); }
+    function confirmarExclusao() { if(indexParaExcluir !== null) { feriados.splice(indexParaExcluir, 1); renderFeriados(); bootstrap.Modal.getInstance(document.getElementById('modalConfirmDelete')).hide(); } }
+    function updateFeriado(i, f, v) { feriados[i][f] = v; if(f==='ativo') renderFeriados(); }
+    
     function saveSchedule() {
         const schedule = {
-            weekdays: {
-                active: document.getElementById('wd_active').checked,
-                start: document.getElementById('wd_start').value,
-                end: document.getElementById('wd_end').value
-            },
-            saturday: {
-                active: document.getElementById('sat_active').checked,
-                start: document.getElementById('sat_start').value,
-                end: document.getElementById('sat_end').value
-            },
-            sunday: {
-                active: document.getElementById('sun_active').checked,
-                start: document.getElementById('sun_start').value,
-                end: document.getElementById('sun_end').value
-            },
+            weekdays: { active: document.getElementById('wd_active').checked, start: document.getElementById('wd_start').value, end: document.getElementById('wd_end').value },
+            saturday: { active: document.getElementById('sat_active').checked, start: document.getElementById('sat_start').value, end: document.getElementById('sat_end').value },
+            sunday: { active: document.getElementById('sun_active').checked, start: document.getElementById('sun_start').value, end: document.getElementById('sun_end').value },
             feriados: feriados
         };
-
-        const btnSave = document.querySelector('#modalConfigHorario .btn-primary');
-        const originalText = btnSave.innerHTML;
-        btnSave.disabled = true;
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
-
-        fetch('/admin/save_schedule', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(schedule)
-        })
-        .then(r => r.json())
-        .then(data => {
-            btnSave.disabled = false;
-            btnSave.innerHTML = originalText;
-
-            if(data.success) {
-                // 1. Fecha o modal de configuração
-                const modalConfigEl = document.getElementById('modalConfigHorario');
-                const modalConfig = bootstrap.Modal.getInstance(modalConfigEl);
-                modalConfig.hide();
-                
-                // 2. Abre o modal de sucesso (BONITO)
-                const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucessoConfig'));
-                modalSucesso.show();
-                
-            } else {
-                alert('Erro ao salvar: ' + data.error);
-            }
-        })
-        .catch(err => {
-            btnSave.disabled = false;
-            btnSave.innerHTML = originalText;
-            alert('Erro de conexão ao salvar.');
-        });
+        fetch('/admin/save_schedule', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(schedule) })
+        .then(r=>r.json()).then(d=>{ if(d.success) { bootstrap.Modal.getInstance(document.getElementById('modalConfigHorario')).hide(); new bootstrap.Modal(document.getElementById('modalSucessoConfig')).show(); } else alert('Erro: '+d.error); });
     }
-
-    function checkReload() {
-        if(document.getElementById('checkAuto').checked) {
-            window.location.reload();
-        }
-    }
+    function checkReload() { if(document.getElementById('checkAuto').checked) window.location.reload(); }
 </script>
 
 <style>
-    /* Hover do botão de lixeira */
-    .hover-danger:hover {
-        color: #dc3545 !important;
-        opacity: 1 !important;
-    }
-    /* Limpeza visual dos inputs na tabela */
-    .form-control:focus, .form-select:focus {
-        box-shadow: none;
-        border-color: #dee2e6; 
-        background-color: #f8f9fa;
-    }
+    .hover-danger:hover { color: #dc3545 !important; }
+    .width-icon { width: 30px; text-align: center; }
+    .border-dashed { border: 1px dashed #dee2e6; }
 </style>
