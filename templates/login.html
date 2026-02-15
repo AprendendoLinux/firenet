@@ -12,41 +12,74 @@
 </head>
 <body class="bg-light">
 
-<!-- Header (Branco, logo grande, menu limpo) -->
 <header class="bg-white shadow-sm py-3 sticky-top">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <a href="/">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="logo-firenet">
             </a>
-                <!-- MENU SUPERIOR ATUALIZADO -->
-                <nav class="d-none d-md-flex gap-4">
-                    <a href="/#inicio" class="nav-link text-dark fw-medium">Início</a>
-                    <a href="/#planos" class="nav-link text-dark fw-medium">Planos</a>
-                    <a href="/#vantagens" class="nav-link text-dark fw-medium">Vantagens</a>
-                    <a href="/#cobertura" class="nav-link text-dark fw-medium">Cobertura</a>
-                    <a href="/#central" class="nav-link text-dark fw-medium">Central do Cliente</a>
-                    <a href="/#cadastro" class="nav-link text-dark fw-medium">Cadastro</a>
-                    <a href="/contato" class="nav-link text-dark fw-medium">Contato</a>
-                </nav>
-            <button class="btn btn-outline-danger d-md-none" data-bs-toggle="collapse" data-bs-target="#navMobile">
+
+            <nav class="d-none d-md-flex gap-4">
+                <a href="/#inicio" class="nav-link text-dark fw-medium hover-effect">Início</a>
+                <a href="/#planos" class="nav-link text-dark fw-medium hover-effect">Planos</a>
+                <a href="/#vantagens" class="nav-link text-dark fw-medium hover-effect">Vantagens</a>
+                <a href="/#cobertura" class="nav-link text-dark fw-medium hover-effect">Cobertura</a>
+                <a href="/#central" class="nav-link text-dark fw-medium hover-effect">Central do Cliente</a>
+                <a href="/cadastro" class="nav-link text-dark fw-medium hover-effect">Cadastro</a>
+                <a href="/contato" class="nav-link text-dark fw-medium hover-effect">Contato</a>
+            </nav>
+
+            <button class="btn btn-light d-md-none text-danger border-0 fs-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuMobileFirenet" aria-controls="menuMobileFirenet">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
-        <div class="collapse mt-3" id="navMobile">
-            <!-- MENU MOBILE ATUALIZADO -->
-            <nav class="d-flex flex-column text-center gap-2">
-                <a href="/#inicio" class="py-2 text-dark">Início</a>
-                <a href="/#planos" class="py-2 text-dark">Planos</a>
-                <a href="/#vantagens" class="py-2 text-dark">Vantagens</a>
-                <a href="/#cobertura" class="py-2 text-dark">Cobertura</a>
-                <a href="/#central" class="py-2 text-dark">Central do Cliente</a>
-                <a href="/#cadastro" class="py-2 text-dark">Cadastro</a>
-                <a href="/contato" class="py-2 text-dark">Contato</a>
-            </nav>
-        </div>
     </div>
 </header>
+
+<div class="offcanvas offcanvas-end border-0" tabindex="-1" id="menuMobileFirenet" aria-labelledby="menuMobileFirenetLabel">
+    <div class="offcanvas-header bg-danger text-white">
+        <h5 class="offcanvas-title fw-bold" id="menuMobileFirenetLabel">
+            <i class="fas fa-wifi me-2"></i>FireNet Telecom
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    
+    <div class="offcanvas-body d-flex flex-column bg-light">
+        <nav class="nav flex-column gap-2">
+            <a href="/#inicio" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-home me-3 text-danger width-icon"></i>Início
+            </a>
+            <a href="/#planos" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-rocket me-3 text-danger width-icon"></i>Planos
+            </a>
+            <a href="/#vantagens" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-star me-3 text-danger width-icon"></i>Vantagens
+            </a>
+            <a href="/#cobertura" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-map-marked-alt me-3 text-danger width-icon"></i>Cobertura
+            </a>
+            <a href="/#central" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-user-circle me-3 text-danger width-icon"></i>Central do Cliente
+            </a>
+            <a href="/cadastro" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-file-signature me-3 text-danger width-icon"></i>Cadastro
+            </a>
+            <a href="/contato" class="nav-link text-dark fs-5 py-3 border-bottom mobile-link" onclick="fecharMenuMobile()">
+                <i class="fas fa-envelope me-3 text-danger width-icon"></i>Contato
+            </a>
+        </nav>
+
+        <div class="mt-auto text-center pt-4 pb-2">
+            <p class="mb-2 text-muted small">Precisa de suporte agora?</p>
+            <button class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modalAtendenteVirtual"
+                    onclick="fecharMenuMobile()">
+                <i class="fab fa-whatsapp me-2 fa-lg"></i> Falar com Atendente
+            </button>
+        </div>
+    </div>
+</div>
 
 <main>
     <div class="container py-5">
@@ -85,7 +118,22 @@
         </div>
     </div>
 </main>
+
     {% include 'footer.html' %}
+    
+    {% include 'whatsapp_widget.html' %}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Função para fechar o menu mobile ao clicar
+        function fecharMenuMobile() {
+            const menuEl = document.getElementById('menuMobileFirenet');
+            const bsOffcanvas = bootstrap.Offcanvas.getInstance(menuEl);
+            if (bsOffcanvas) {
+                bsOffcanvas.hide();
+            }
+        }
+    </script>
 </body>
 </html>
