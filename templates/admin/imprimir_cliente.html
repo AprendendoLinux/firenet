@@ -241,8 +241,13 @@
                         {% elif cliente.status_instalacao == 'Programada' %}st-programada
                         {% elif cliente.status_instalacao == 'Não Realizada' %}st-nao-realizada
                         {% else %}st-pendente{% endif %}">
-                        STATUS ATUAL: {{ cliente.status_instalacao|upper }}
-                        {% if cliente.data_instalacao %} - {{ cliente.data_instalacao }} ({{ cliente.turno_instalacao }}){% endif %}
+                        
+                        {% if cliente.status_instalacao and cliente.status_instalacao != 'N/D' %}
+                            STATUS ATUAL: {{ cliente.status_instalacao|upper }}
+                            {% if cliente.data_instalacao %} - {{ cliente.data_instalacao }} ({{ cliente.turno_instalacao }}){% endif %}
+                        {% else %}
+                            <i class="fas fa-clock me-1"></i> INSTALAÇÃO AINDA NÃO AGENDADA
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-12 mt-1">
