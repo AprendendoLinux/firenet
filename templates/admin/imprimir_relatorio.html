@@ -1,179 +1,196 @@
-<!-- admin/imprimir_relatorio.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório de Instalações - FireNet Telecom</title>
-    <!-- Adicione CSS para impressão, similar ao PHP -->
     <style>
         * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-}
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
 
-body {
-    margin: 0;
-    padding: 0;
-}
+        body {
+            margin: 0;
+            padding: 0;
+        }
 
-@page {
-    size: A4;
-    margin: 15mm;
-}
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
 
-.a4-page {
-    width: 210mm;
-    height: 297mm;
-    padding: 15mm 25mm;
-    margin: 0 auto;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            padding: 15mm 25mm;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
 
-@media screen {
-    body {
-        background-color: #f5f5f5;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
+        @media screen {
+            body {
+                background-color: #f5f5f5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
 
-    .a4-page {
-        margin: 20px auto;
-    }
-}
+            .a4-page {
+                margin: 20px auto;
+            }
+        }
 
-@media print {
-    body {
-        background-color: #fff;
-    }
+        @media print {
+            body {
+                background-color: #fff;
+            }
 
-    .a4-page {
-        margin: 0;
-        box-shadow: none;
-        width: 210mm;
-        height: 297mm;
-    }
+            .a4-page {
+                margin: 0;
+                box-shadow: none;
+                width: 210mm;
+                height: 297mm;
+            }
 
-    .no-print {
-        display: none;
-    }
-}
+            .no-print {
+                display: none;
+            }
+        }
 
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-}
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-.header img {
-    width: 150px;
-    margin-bottom: 15px;
-}
+        .header img {
+            width: 150px;
+            margin-bottom: 15px;
+        }
 
-.header h1 {
-    color: #ff0000;
-    font-size: 25px;
-    font-weight: bold;
-}
+        .header h1 {
+            color: #ff0000;
+            font-size: 25px;
+            font-weight: bold;
+        }
 
-.section {
-    margin-bottom: 30px;
-}
+        .section {
+            margin-bottom: 30px;
+        }
 
-.section h2 {
-    color: #ff0000;
-    font-size: 22px;
-    border-bottom: 2px solid #ffcc00;
-    padding-bottom: 6px;
-    margin-bottom: 15px;
-}
+        .section h2 {
+            color: #ff0000;
+            font-size: 22px;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 6px;
+            margin-bottom: 15px;
+        }
 
-.section p {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #333;
-    line-height: 1.6;
-}
+        .section p {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.6;
+        }
 
-.section .report-number {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-    text-align: right;
-}
+        .section .report-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: right;
+        }
 
-.section table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
+        .section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
 
-.section th, .section td {
-    border: 0.5px solid #ddd;
-    padding: 12px;
-    text-align: left;
-    font-size: 14px;
-}
+        .section th, .section td {
+            border: 0.5px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
 
-.section th {
-    background-color: #ff0000;
-    color: #fff;
-}
+        .section th {
+            background-color: #ff0000;
+            color: #fff;
+        }
 
-.section tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+        .section tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-.section .boleto-request {
-    margin-top: 20px;
-}
+        .section .boleto-request {
+            margin-top: 20px;
+        }
 
-.footer {
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-    margin-top: 20px;
-}
+        /* --- RODAPÉ CORRIGIDO --- */
+        footer {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-top: auto;
+            width: 100%;
+            padding-top: 20px;
+            background: transparent !important;
+        }
 
-.no-print {
-    text-align: center;
-    margin-top: 20px;
-}
+        footer a {
+            color: #666;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-.no-print button {
-    background-color: #ff0000;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        /* Pipe manual para o relatório */
+        footer span[title="Versão do Sistema"] {
+            border-left: 1px solid #666;
+            padding-left: 10px;
+            margin-left: 10px;
+            display: inline-block;
+        }
 
-.no-print button:hover {
-    background-color: #ffcc00;
-    color: #000;
-}
+        .no-print {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-.error-message {
-    text-align: center;
-    font-size: 18px;
-    color: #721c24;
-    background-color: #f8d7da;
-    padding: 15px;
-    border-radius: 5px;
-    margin: 20px auto;
-    max-width: 600px;
-}
+        .no-print button {
+            background-color: #ff0000;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .no-print button:hover {
+            background-color: #ffcc00;
+            color: #000;
+        }
+
+        .error-message {
+            text-align: center;
+            font-size: 18px;
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
     </style>
 </head>
 <body>
