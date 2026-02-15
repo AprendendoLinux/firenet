@@ -233,3 +233,73 @@ main {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* --- Melhorias no Menu Mobile (Offcanvas) --- */
+.mobile-link {
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-link:hover {
+    background-color: white;
+    padding-left: 15px; /* Efeito de deslizar para a direita */
+    color: var(--fire-red) !important;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.width-icon {
+    width: 25px; /* Alinha os ícones */
+    text-align: center;
+}
+
+/* Hover no menu desktop */
+.nav-link.hover-effect {
+    position: relative;
+    transition: color 0.3s;
+}
+
+.nav-link.hover-effect::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--fire-red);
+    transition: width 0.3s;
+}
+
+.nav-link.hover-effect:hover::after {
+    width: 100%;
+}
+
+/* --- Estilos do Menu Mobile (Offcanvas) --- */
+.mobile-link {
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-link:hover {
+    background-color: white;
+    padding-left: 15px; /* Efeito deslizar */
+    color: var(--fire-red) !important;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.width-icon {
+    width: 25px; /* Alinha os ícones */
+    text-align: center;
+}
+
+/* Efeito sutil no desktop (opcional, só a linha vermelha embaixo ao passar o mouse) */
+.nav-link.hover-effect {
+    position: relative;
+    transition: color 0.3s;
+}
+.nav-link.hover-effect:hover {
+    color: var(--fire-red) !important;
+}
