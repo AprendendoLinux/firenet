@@ -712,8 +712,6 @@ def login_required(view):
     wrapped_view.__name__ = view.__name__
     return wrapped_view
 
-# Nova rota: Clientes (lista)
-# Atualize a rota para clientes em app.py (assumindo que a rota é def clientes():)
 @app.route('/admin/clientes')
 @login_required
 def clientes():
@@ -721,7 +719,7 @@ def clientes():
     page = request.args.get('page', 1, type=int)
     offset = (page - 1) * per_page
     busca_nome = request.args.get('busca_nome', '').lower()
-    busca_cpf = request.args.get('busca_cpf', '').lower().replace('.', '').replace('-', '')  # Remove máscara para busca
+    busca_cpf = request.args.get('busca_cpf', '').lower().replace('.', '').replace('-', '') 
 
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -739,11 +737,11 @@ def clientes():
     total = cursor.fetchone()['total']
     total_pages = (total // per_page) + (1 if total % per_page > 0 else 0)
 
-    params = []  # Reset params para seleção
+    params = [] 
 
-    # Selecionar filtrado com paginação
+    # --- ALTERAÇÃO AQUI: Adicionado data_instalacao e turno_instalacao ---
     sql_select = """
-        SELECT id, nome, cpf, telefone, plano, status_instalacao 
+        SELECT id, nome, cpf, telefone, plano, status_instalacao, data_instalacao, turno_instalacao
         FROM cadastros 
         WHERE 1=1
     """
@@ -757,8 +755,6 @@ def clientes():
     params.extend([per_page, offset])
     cursor.execute(sql_select, params)
     cadastros = cursor.fetchall()
-
-    # Formatação de CPF e telefone (faça aqui se necessário, ou no template)
 
     cursor.close()
     conn.close()
