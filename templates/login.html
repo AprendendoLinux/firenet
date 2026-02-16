@@ -102,10 +102,15 @@
                                 <label for="username" class="form-label">Usuário ou E-mail</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Senha</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                        <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
                                 {% if recaptcha_enabled %}
                                 <div class="mb-3">
                                     <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
@@ -139,5 +144,27 @@
             }
         }
     </script>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const icon = togglePassword.querySelector('i');
+
+        togglePassword.addEventListener('click', function () {
+            // Alterna o atributo type entre 'password' e 'text'
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // Alterna o ícone
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
+
 </body>
 </html>
