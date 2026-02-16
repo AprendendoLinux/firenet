@@ -6,251 +6,451 @@
     <title>Usuários - FireNet Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    <script>
-        // Inicializa tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    </script>
+    <style>
+        /* Card do Usuário */
+        .user-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .avatar-circle {
+            width: 55px;
+            height: 55px;
+            background-color: var(--fire-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 auto 10px auto;
+        }
+
+        /* Área de ações */
+        .card-actions {
+            background-color: #f8f9fa;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 12px;
+        }
+
+        /* ESTILO DOS ÍCONES */
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; /* Redondo perfeito */
+            border: none;
+            background: #fff; /* Fundo branco para destaque */
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra bem leve */
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Cores específicas */
+        .btn-icon-edit { color: #0d6efd; } /* Azul */
+        .btn-icon-edit:hover { background-color: #e7f1ff; }
+
+        .btn-icon-delete { color: #dc3545; } /* Vermelho */
+        .btn-icon-delete:hover { background-color: #ffeef0; }
+        
+        /* Desabilitado */
+        .btn-icon:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f0f0f0;
+            color: #999;
+        }
+    </style>
 </head>
-<body>
-    <!-- Navbar Admin -->
+<body class="bg-light">
+    
     {% include 'admin/menu.html' %}
 
-    <main><section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center text-danger mb-4">Lista de Usuários</h2>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            <!-- Botão para Novo Usuário -->
-            <div class="mb-3 text-end">
-                <button class="btn btn-success btn-novo-usuario" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario" data-usuario-id=""><i class="fas fa-plus"></i> Novo Usuário</button>
-            </div>
-            <!-- Campos de busca por Username e Email -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <input type="text" id="busca-username" class="form-control" placeholder="Buscar por Username">
+    <main>
+        <section class="py-4 py-md-5">
+            <div class="container">
+                
+                <div class="mb-4">
+                    <h2 class="text-danger mb-0">Gestão de Usuários</h2>
                 </div>
-                <div class="col-md-6">
-                    <input type="text" id="busca-email" class="form-control" placeholder="Buscar por Email">
-                </div>
-            </div>
-            <div class="table-responsive">  <!-- Adicionado para responsividade em mobile -->
-                <table class="table table-striped" id="usuarios-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Telegram ID</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for usuario in usuarios %}
-                        <tr data-usuario-id="{{ usuario.id }}">
-                            <td>{{ usuario.id }}</td>
-                            <td class="username text-nowrap">{{ usuario.username }}</td>
-                            <td class="email text-nowrap">{{ usuario.email }}</td>
-                            <td class="telegram-id text-nowrap">{{ usuario.telegram_id or 'N/A' }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary btn-editar-usuario" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario" data-usuario-id="{{ usuario.id }}" data-bs-tooltip="tooltip" title="Editar"><i class="fas fa-pencil-alt"></i></button>
-                                <button class="btn btn-sm btn-danger btn-apagar-usuario" data-usuario-id="{{ usuario.id }}" {% if usuario.id == session['user_id'] %}disabled data-bs-tooltip="tooltip" title="Não pode apagar o próprio usuário"{% endif %}><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section></main>
 
-    <!-- Modal para Editar/Criar Usuário -->
-    <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalEditarUsuarioLabel">Editar Usuário</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} shadow-sm border-0 mb-4">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card shadow-sm border-0 mb-4 bg-white">
+                    <div class="card-body p-4">
+                        
+                        <div class="row g-3 mb-4 align-items-center">
+                            <div class="col-md-9">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                            <input type="text" id="busca-username" class="form-control border-start-0 bg-light" placeholder="Buscar por Nome">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                                            <input type="text" id="busca-email" class="form-control border-start-0 bg-light" placeholder="Buscar por E-mail">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-md-end">
+                                <button class="btn btn-danger btn-sm px-3 shadow-sm btn-novo-usuario w-100 w-md-auto" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalEditarUsuario" 
+                                        data-usuario-id="">
+                                    <i class="fas fa-plus me-1"></i> Novo Usuário
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row g-4" id="usuarios-grid">
+                            {% for usuario in usuarios %}
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-3 user-item">
+                                <div class="card h-100 user-card border-0 shadow-sm">
+                                    <div class="card-body text-center p-4">
+                                        <div class="avatar-circle shadow-sm mb-3">
+                                            {{ usuario.username[0]|upper }}
+                                        </div>
+                                        
+                                        <h6 class="card-title fw-bold text-dark mb-1 username">{{ usuario.username }}</h6>
+                                        <p class="card-text text-muted small mb-3 email text-truncate" title="{{ usuario.email }}">
+                                            {{ usuario.email }}
+                                        </p>
+
+                                        <div class="mb-2">
+                                            {% if usuario.telegram_id %}
+                                                <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill fw-normal" style="font-size: 0.75rem;">
+                                                    <i class="fab fa-telegram-plane me-1"></i> {{ usuario.telegram_id }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-light text-muted border rounded-pill fw-normal" style="font-size: 0.75rem;">
+                                                    Sem Telegram
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="card-actions d-flex justify-content-center gap-4">
+                                        <button class="btn btn-icon btn-icon-edit btn-editar-usuario" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modalEditarUsuario" 
+                                                data-usuario-id="{{ usuario.id }}" 
+                                                data-bs-tooltip="tooltip"
+                                                title="Editar">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                        
+                                        <button class="btn btn-icon btn-icon-delete btn-apagar-usuario" 
+                                                data-usuario-id="{{ usuario.id }}" 
+                                                {% if usuario.id == session['user_id'] %}disabled{% endif %}
+                                                data-bs-tooltip="tooltip"
+                                                title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="no-results" class="text-center py-5 d-none">
+                            <i class="fas fa-search fa-3x text-muted opacity-25 mb-3"></i>
+                            <h5 class="text-muted">Nenhum usuário encontrado.</h5>
+                        </div>
+
+                    </div>
                 </div>
-                <div class="modal-body">
+
+            </div>
+        </section>
+    </main>
+
+    <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold" id="modalEditarUsuarioLabel">Gerenciar Usuário</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
                     <form id="formEditarUsuario" method="POST">
                         <input type="hidden" id="editar-usuario-id" name="usuario_id">
+                        
                         <div class="mb-3">
-                            <label for="editar-username" class="form-label">Username *</label>
+                            <label for="editar-username" class="form-label small fw-bold text-muted">Nome de Usuário *</label>
                             <input type="text" class="form-control" id="editar-username" name="username" required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="editar-email" class="form-label">Email *</label>
+                            <label for="editar-email" class="form-label small fw-bold text-muted">E-mail *</label>
                             <input type="email" class="form-control" id="editar-email" name="email" required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="editar-telegram_id" class="form-label">Telegram ID</label>
-                            <input type="number" class="form-control" id="editar-telegram_id" name="telegram_id">
+                            <label for="editar-telegram_id" class="form-label small fw-bold text-muted">Telegram ID</label>
+                            <input type="number" class="form-control" id="editar-telegram_id" name="telegram_id" placeholder="Opcional">
                         </div>
-                        <div class="mb-3">
-                            <label for="editar-password" class="form-label">Nova Senha (deixe em branco para manter a atual)</label>
-                            <input type="password" class="form-control" id="editar-password" name="password">
+
+                        <hr class="text-muted opacity-25 my-4">
+                        <h6 class="text-danger fw-bold mb-3 small">SEGURANÇA</h6>
+
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label for="editar-password" class="form-label small fw-bold text-muted">Nova Senha</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control border-end-0" id="editar-password" name="password">
+                                    <span class="input-group-text bg-white border-start-0 cursor-pointer" onclick="togglePassword('editar-password', this)">
+                                        <i class="fas fa-eye text-muted"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editar-confirm_password" class="form-label small fw-bold text-muted">Confirmar Senha</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control border-end-0" id="editar-confirm_password" name="confirm_password">
+                                    <span class="input-group-text bg-white border-start-0 cursor-pointer" onclick="togglePassword('editar-confirm_password', this)">
+                                        <i class="fas fa-eye text-muted"></i>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editar-confirm_password" class="form-label">Confirmar Nova Senha</label>
-                            <input type="password" class="form-control" id="editar-confirm_password" name="confirm_password">
+                        
+                        <div id="senha-aviso" class="form-text text-muted mb-3 d-none">
+                            <i class="fas fa-info-circle me-1"></i> Deixe em branco para manter a senha atual.
                         </div>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
+
+                        <button type="submit" class="btn btn-danger w-100 fw-bold py-2 shadow-sm">SALVAR</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalExcluirUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-exclamation-circle text-danger fa-4x opacity-75"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Excluir Usuário?</h5>
+                    <p class="text-muted small mb-4">Tem certeza que deseja apagar este usuário? Esta ação não poderá ser desfeita.</p>
+                    
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-light fw-bold px-4 rounded-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger fw-bold px-4 rounded-3" id="btnConfirmarExclusao">Sim, Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% include 'footer.html' %}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Função para carregar dados do usuário no modal
-        const editarButtons = document.querySelectorAll('.btn-editar-usuario, .btn-novo-usuario');
-        editarButtons.forEach(button => {
-            button.addEventListener('click', async () => {
-                const usuarioId = button.getAttribute('data-usuario-id');
-                const modalTitle = document.getElementById('modalEditarUsuarioLabel');
-                const form = document.getElementById('formEditarUsuario');
-                const usernameInput = document.getElementById('editar-username');
+        // Inicializa Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-tooltip="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
 
-                // Limpa fields
-                form.reset();
-                document.getElementById('editar-usuario-id').value = '';
-
-                if (usuarioId) {
-                    modalTitle.textContent = 'Editar Usuário';
-                    usernameInput.readOnly = true;
-                    usernameInput.classList.add('bg-light');  // Opcional: estilo para indicar readonly
-                    try {
-                        const response = await fetch(`/admin/get_usuario/${usuarioId}`);
-                        if (!response.ok) throw new Error('Erro na resposta do servidor');
-                        const usuario = await response.json();
-                        console.log('Dados do usuário:', usuario);  // Log para depuração
-
-                        document.getElementById('editar-usuario-id').value = usuario.id || '';
-                        document.getElementById('editar-username').value = usuario.username || '';
-                        document.getElementById('editar-email').value = usuario.email || '';
-                        document.getElementById('editar-telegram_id').value = usuario.telegram_id || '';
-                        // Senha não é preenchida (apenas para alteração)
-                    } catch (error) {
-                        console.error('Erro ao buscar dados do usuário:', error);
-                        alert('Erro ao carregar dados do usuário. Verifique o console para mais detalhes.');
-                    }
-                } else {
-                    modalTitle.textContent = 'Novo Usuário';
-                    usernameInput.readOnly = false;
-                    usernameInput.classList.remove('bg-light');
-                    // Para novo, senha é obrigatória
-                    document.getElementById('editar-password').required = true;
-                    document.getElementById('editar-confirm_password').required = true;
-                }
-            });
-        });
-
-        // Função de busca por Username e Email
-        const table = document.getElementById('usuarios-table');
-        const buscaUsername = document.getElementById('busca-username');
-        const buscaEmail = document.getElementById('busca-email');
-
-        function filtrarTabela() {
-            const filterUsername = buscaUsername.value.toLowerCase();
-            const filterEmail = buscaEmail.value.toLowerCase();
-            const rows = table.querySelectorAll('tbody tr');
-
-            rows.forEach(row => {
-                const username = row.querySelector('.username').textContent.toLowerCase();
-                const email = row.querySelector('.email').textContent.toLowerCase();
-                const matchUsername = username.includes(filterUsername);
-                const matchEmail = email.includes(filterEmail);
-                row.style.display = (matchUsername && matchEmail) ? '' : 'none';  // AND: ambos filtros
-            });
+        // Toggle de Senha
+        function togglePassword(inputId, iconSpan) {
+            const input = document.getElementById(inputId);
+            const icon = iconSpan.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
 
-        buscaUsername.addEventListener('keyup', filtrarTabela);
-        buscaEmail.addEventListener('keyup', filtrarTabela);
+        // Filtro em Tempo Real
+        const buscaUsername = document.getElementById('busca-username');
+        const buscaEmail = document.getElementById('busca-email');
+        const grid = document.getElementById('usuarios-grid');
+        const noResults = document.getElementById('no-results');
 
-        // Submit form via AJAX (create ou update baseado em id)
-        const formEditarUsuario = document.getElementById('formEditarUsuario');
-        formEditarUsuario.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(formEditarUsuario);
-            const usuarioId = document.getElementById('editar-usuario-id').value;
-            const password = formData.get('password');
-            const confirmPassword = formData.get('confirm_password');
+        function filtrar() {
+            const termoNome = buscaUsername.value.toLowerCase();
+            const termoEmail = buscaEmail.value.toLowerCase();
+            const cards = grid.getElementsByClassName('user-item');
+            let visiveis = 0;
 
-            // Validação client-side: senhas iguais se preenchidas
-            if (password || confirmPassword) {
-                if (password !== confirmPassword) {
-                    alert('As senhas não coincidem.');
-                    return;
-                }
-                if (password.length < 6) {
-                    alert('A senha deve ter pelo menos 6 caracteres.');
-                    return;
-                }
-            }
+            Array.from(cards).forEach(card => {
+                const nome = card.querySelector('.username').textContent.toLowerCase();
+                const email = card.querySelector('.email').textContent.toLowerCase();
+                
+                const matchNome = nome.includes(termoNome);
+                const matchEmail = email.includes(termoEmail);
 
-            // Para novo usuário, senha obrigatória
-            if (!usuarioId && !password) {
-                alert('Senha é obrigatória para novo usuário.');
-                return;
-            }
-
-            const url = usuarioId ? `/admin/update_usuario/${usuarioId}` : '/admin/create_usuario';
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    const modal = bootstrap.Modal.getInstance(formEditarUsuario.closest('.modal'));
-                    modal.hide();
-                    location.reload();  // Recarrega para atualizar a tabela
+                if (matchNome && matchEmail) {
+                    card.classList.remove('d-none');
+                    visiveis++;
                 } else {
-                    alert('Erro: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Erro ao submeter formulário:', error);
-                alert('Erro ao salvar. Verifique o console para mais detalhes.');
-            }
-        });
-
-        // Apagar usuário com confirmação
-        const apagarButtons = document.querySelectorAll('.btn-apagar-usuario');
-        apagarButtons.forEach(button => {
-            button.addEventListener('click', async () => {
-                const usuarioId = button.getAttribute('data-usuario-id');
-                if (confirm('Tem certeza que deseja apagar este usuário?')) {
-                    try {
-                        const response = await fetch(`/admin/delete_usuario/${usuarioId}`, { method: 'POST' });
-                        const result = await response.json();
-                        if (result.success) {
-                            location.reload();  // Recarrega para atualizar a tabela
-                        } else {
-                            alert('Erro: ' + result.error);
-                        }
-                    } catch (error) {
-                        console.error('Erro ao apagar usuário:', error);
-                        alert('Erro ao apagar. Verifique o console para mais detalhes.');
-                    }
+                    card.classList.add('d-none');
                 }
             });
+
+            if (visiveis === 0) noResults.classList.remove('d-none');
+            else noResults.classList.add('d-none');
+        }
+
+        buscaUsername.addEventListener('keyup', filtrar);
+        buscaEmail.addEventListener('keyup', filtrar);
+
+        // Lógica do Modal (Create/Edit)
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-editar-usuario, .btn-novo-usuario');
+            if (!btn) return;
+
+            const id = btn.dataset.usuarioId;
+            const titulo = document.getElementById('modalEditarUsuarioLabel');
+            const aviso = document.getElementById('senha-aviso');
+            const form = document.getElementById('formEditarUsuario');
+            
+            form.reset();
+            document.getElementById('editar-usuario-id').value = '';
+            document.getElementById('editar-username').readOnly = false;
+
+            if (id) {
+                // Edição
+                titulo.innerText = 'Editar Usuário';
+                aviso.classList.remove('d-none');
+                document.getElementById('editar-password').required = false;
+                document.getElementById('editar-confirm_password').required = false;
+                document.getElementById('editar-username').readOnly = true;
+
+                try {
+                    const res = await fetch(`/admin/get_usuario/${id}`);
+                    const data = await res.json();
+                    
+                    document.getElementById('editar-usuario-id').value = data.id;
+                    document.getElementById('editar-username').value = data.username;
+                    document.getElementById('editar-email').value = data.email;
+                    document.getElementById('editar-telegram_id').value = data.telegram_id || '';
+                } catch(err) {
+                    console.error(err);
+                    alert('Erro ao carregar usuário.');
+                }
+            } else {
+                // Novo
+                titulo.innerText = 'Novo Usuário';
+                aviso.classList.add('d-none');
+                document.getElementById('editar-password').required = true;
+                document.getElementById('editar-confirm_password').required = true;
+            }
+        });
+
+        // Submit via AJAX
+        document.getElementById('formEditarUsuario').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Salvando...';
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+            const id = document.getElementById('editar-usuario-id').value;
+            const pass = formData.get('password');
+            const conf = formData.get('confirm_password');
+
+            if ((pass || conf) && pass !== conf) {
+                alert('As senhas não conferem.');
+                btn.innerHTML = originalText; btn.disabled = false; return;
+            }
+
+            const url = id ? `/admin/update_usuario/${id}` : '/admin/create_usuario';
+            
+            try {
+                const res = await fetch(url, { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) location.reload();
+                else alert('Erro: ' + json.error);
+            } catch (err) {
+                alert('Erro ao processar.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // --- LÓGICA DE EXCLUSÃO COM MODAL (Atualizado) ---
+        let usuarioIdParaExcluir = null;
+        const modalExcluir = new bootstrap.Modal(document.getElementById('modalExcluirUsuario'));
+        const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
+
+        // 1. Abre o modal ao clicar na lixeira
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-apagar-usuario');
+            if (btn && !btn.disabled) {
+                usuarioIdParaExcluir = btn.dataset.usuarioId;
+                modalExcluir.show();
+            }
+        });
+
+        // 2. Executa a exclusão ao confirmar
+        btnConfirmarExclusao.addEventListener('click', async () => {
+            if (!usuarioIdParaExcluir) return;
+
+            const originalText = btnConfirmarExclusao.innerHTML;
+            btnConfirmarExclusao.innerHTML = 'Excluindo...';
+            btnConfirmarExclusao.disabled = true;
+
+            try {
+                const res = await fetch(`/admin/delete_usuario/${usuarioIdParaExcluir}`, { method: 'POST' });
+                const json = await res.json();
+                
+                if (json.success) {
+                    location.reload();
+                } else {
+                    alert('Erro: ' + json.error);
+                    modalExcluir.hide();
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao apagar usuário.');
+                modalExcluir.hide();
+            } finally {
+                btnConfirmarExclusao.innerHTML = originalText;
+                btnConfirmarExclusao.disabled = false;
+            }
         });
     </script>
-
 </body>
 </html>
