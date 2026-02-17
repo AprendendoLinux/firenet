@@ -7,3 +7,4 @@ docker-compose-firenet.yml
 Dockerfile
 README.md
 LICENSE
+deploy.sh
