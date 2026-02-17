@@ -51,9 +51,21 @@
                     </thead>
                     <tbody>
                         {% for aviso in avisos %}
-                        <tr>
+                        
+                        {# Lógica de Expiração Visual #}
+                        {% set expirado = False %}
+                        {% if aviso.data_fim and aviso.data_fim < now %}
+                            {% set expirado = True %}
+                        {% endif %}
+
+                        <tr class="{% if expirado %}opacity-50{% endif %}">
                             <td class="ps-4" style="max-width: 350px;">
-                                <div class="fw-bold text-dark">{{ aviso.titulo }}</div>
+                                <div class="fw-bold text-dark">
+                                    {{ aviso.titulo }}
+                                    {% if expirado %}
+                                        <span class="badge bg-secondary ms-2" style="font-size: 0.6em;">EXPIRADO</span>
+                                    {% endif %}
+                                </div>
                                 <div class="small text-muted text-truncate" title="{{ aviso.mensagem }}">{{ aviso.mensagem }}</div>
                             </td>
                             <td>
@@ -78,10 +90,19 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-check form-switch">
+                                <div class="form-check form-switch" title="{% if expirado %}Este aviso já venceu{% endif %}">
                                     <input class="form-check-input" type="checkbox" style="cursor: pointer;"
-                                           onchange="toggleAviso({{ aviso.id }})" {% if aviso.ativo %}checked{% endif %}>
-                                    <label class="form-check-label small text-muted">{{ 'Ativo' if aviso.ativo else 'Inativo' }}</label>
+                                           onchange="toggleAviso({{ aviso.id }})" 
+                                           {% if aviso.ativo and not expirado %}checked{% endif %}
+                                           {% if expirado %}disabled{% endif %}>
+                                    
+                                    <label class="form-check-label small text-muted">
+                                        {% if expirado %}
+                                            Expirado
+                                        {% else %}
+                                            {{ 'Ativo' if aviso.ativo else 'Inativo' }}
+                                        {% endif %}
+                                    </label>
                                 </div>
                             </td>
                             <td class="text-end pe-4">
@@ -109,7 +130,13 @@
 
     <div class="d-lg-none d-flex flex-column gap-3">
         {% for aviso in avisos %}
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        
+        {% set expirado = False %}
+        {% if aviso.data_fim and aviso.data_fim < now %}
+            {% set expirado = True %}
+        {% endif %}
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden {% if expirado %}opacity-75 bg-light{% endif %}">
             <div class="h-1 w-100 
                 {% if aviso.tipo == 'urgente' %}bg-danger
                 {% elif aviso.tipo == 'alerta' %}bg-warning
@@ -118,7 +145,12 @@
 
             <div class="card-body p-3">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="fw-bold text-dark mb-0 pe-2">{{ aviso.titulo }}</h6>
+                    <h6 class="fw-bold text-dark mb-0 pe-2">
+                        {{ aviso.titulo }}
+                        {% if expirado %}
+                            <span class="badge bg-secondary ms-2">EXPIRADO</span>
+                        {% endif %}
+                    </h6>
                     {% if aviso.tipo == 'urgente' %}
                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2">Urgente</span>
                     {% elif aviso.tipo == 'alerta' %}
@@ -146,8 +178,12 @@
                 <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                     <div class="form-check form-switch mb-0">
                         <input class="form-check-input" type="checkbox" style="width: 2.5em; height: 1.25em;" 
-                               onchange="toggleAviso({{ aviso.id }})" {% if aviso.ativo %}checked{% endif %}>
-                        <label class="form-check-label small ms-1 pt-1">{{ 'Ativo' if aviso.ativo else 'Inativo' }}</label>
+                               onchange="toggleAviso({{ aviso.id }})" 
+                               {% if aviso.ativo and not expirado %}checked{% endif %}
+                               {% if expirado %}disabled{% endif %}>
+                        <label class="form-check-label small ms-1 pt-1">
+                            {% if expirado %}Expirado{% else %}{{ 'Ativo' if aviso.ativo else 'Inativo' }}{% endif %}
+                        </label>
                     </div>
 
                     <div>
