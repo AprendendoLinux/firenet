@@ -378,6 +378,83 @@
 
 {% include 'whatsapp_widget.html' %}
 
+{% if aviso_global %}
+<div class="modal fade" id="modalAvisoGlobal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" style="z-index: 10000;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0 text-white 
+                {% if aviso_global.tipo == 'urgente' %}bg-danger
+                {% elif aviso_global.tipo == 'alerta' %}bg-warning text-dark
+                {% else %}bg-primary{% endif %}">
+                
+                <h5 class="modal-title fw-bold">
+                    {% if aviso_global.tipo == 'urgente' %}<i class="fas fa-exclamation-triangle me-2"></i>
+                    {% elif aviso_global.tipo == 'alerta' %}<i class="fas fa-info-circle me-2"></i>
+                    {% else %}<i class="fas fa-bullhorn me-2"></i>{% endif %}
+                    {{ aviso_global.titulo }}
+                </h5>
+            </div>
+            
+            <div class="modal-body p-4">
+                <p class="fs-5 text-dark mb-0" style="white-space: pre-wrap;">{{ aviso_global.mensagem }}</p>
+            </div>
+            
+            <div class="modal-footer border-0 bg-light justify-content-center">
+                <button type="button" class="btn btn-dark px-5 rounded-pill" onclick="fecharAvisoGlobal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avisoId = "{{ aviso_global.id }}";
+        // Verifica se já foi visto nesta sessão
+        const jaVisto = sessionStorage.getItem('aviso_visto_' + avisoId);
+
+        if (!jaVisto) {
+            const modalElement = document.getElementById('modalAvisoGlobal');
+            const myModal = new bootstrap.Modal(modalElement);
+            
+            myModal.show();
+            
+            // 1. TRAVAR ROLAGEM FORÇADA (CSS inline no body e html)
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.height = '100vh'; // Garante que não role mesmo
+            
+            // 2. ESCURECER O FUNDO (Backdrop)
+            // Pequeno delay para garantir que o elemento backdrop foi criado
+            setTimeout(() => {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(bd => {
+                    bd.style.opacity = '0.96'; // Quase preto
+                    bd.style.backgroundColor = '#000';
+                    bd.style.zIndex = '9999'; // Garante que fique acima de tudo, menos do modal
+                });
+            }, 50);
+
+            // Marca como visto
+            sessionStorage.setItem('aviso_visto_' + avisoId, 'true');
+        }
+    });
+
+    function fecharAvisoGlobal() {
+        // Libera a rolagem novamente
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.body.style.height = '';
+        
+        // Fecha o modal via Bootstrap
+        const modalElement = document.getElementById('modalAvisoGlobal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
+</script>
+{% endif %}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

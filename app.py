@@ -209,94 +209,93 @@ def obter_mensagem_indisponibilidade():
         print(f"Erro msg indisponibilidade: {e}")
         return "No momento, estamos fora do horário de atendimento."
 
+# --- FUNÇÃO AUXILIAR PARA AVISOS ---
+def get_aviso_ativo():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        
+        agora = datetime.now()
+        
+        # Seleciona aviso que está ATIVO, DENTRO DO PRAZO (ou sem prazo)
+        query = """
+            SELECT * FROM avisos 
+            WHERE ativo = 1 
+            AND (data_inicio IS NULL OR data_inicio <= %s) 
+            AND (data_fim IS NULL OR data_fim >= %s)
+            ORDER BY id DESC LIMIT 1
+        """
+        cursor.execute(query, (agora, agora))
+        aviso = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return aviso
+    except Exception as e:
+        print(f"Erro ao buscar aviso: {e}")
+        return None
+
 @app.context_processor
-def inject_globals():
+def inject_global_vars():
     """
-    Injeta variáveis globais em todos os templates.
+    Injeta variáveis globais em todos os templates (WhatsApp, Horários e Avisos).
     """
     whatsapp_ativo = False
     modo_automatico = False
-    whatsapp_sales = "5521999999999" # Valor default
-    whatsapp_support = "5521999999999" # Valor default
+    schedule_settings = {}
+    aviso_global = None # Inicializa como None por segurança
+    
+    # Valores padrão de telefone
+    whatsapp_sales = os.environ.get('WHATSAPP_SALES', '5521981176211')
+    whatsapp_support = os.environ.get('WHATSAPP_SUPPORT', '5521981176211')
     mensagem_indisponibilidade = "Fora do horário de atendimento."
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Carrega Configurações Gerais
+        # 1. Carrega Configurações Gerais
         cursor.execute("SELECT chave, valor FROM configuracoes")
         configs = {row[0]: row[1] for row in cursor.fetchall()}
         
-        # Lógica de Ativo/Inativo
-        is_comercial = is_horario_comercial()
-        modo_auto = configs.get('modo_automatico', '0') == '1'
-        
-        if modo_auto:
-            whatsapp_ativo = is_comercial
+        # 2. Lógica de Horário / WhatsApp
+        modo_automatico = (configs.get('modo_automatico', '0') == '1')
+        status_manual = (configs.get('whatsapp_ativo', '0') == '1')
+
+        # Tenta decodificar o JSON do horário
+        try:
+            schedule_settings = json.loads(configs.get('horario_atendimento', '{}'))
+        except:
+            schedule_settings = {}
+
+        if modo_automatico:
+            whatsapp_ativo = is_horario_comercial()
         else:
-            whatsapp_ativo = configs.get('whatsapp_ativo', '0') == '1'
+            whatsapp_ativo = status_manual
             
-        whatsapp_sales = os.environ.get('WHATSAPP_SALES', '552100000000')
-        whatsapp_support = os.environ.get('WHATSAPP_SUPPORT', '552100000000')
-        
-        # Gera a mensagem dinâmica SOMENTE se estiver fechado
+        # Gera mensagem de indisponibilidade se estiver fechado
         if not whatsapp_ativo:
             mensagem_indisponibilidade = obter_mensagem_indisponibilidade()
 
         cursor.close()
         conn.close()
         
+        # 3. Busca Aviso Global (usando a função que criamos acima)
+        aviso_global = get_aviso_ativo()
+        
     except Exception as e:
-        print(f"Erro context processor: {e}")
+        print(f"Erro no context processor: {e}")
+        # Mantém valores seguros em caso de erro no banco
+        whatsapp_ativo = True 
 
     return dict(
         whatsapp_ativo=whatsapp_ativo,
-        modo_automatico=modo_auto,
+        modo_automatico=modo_automatico,
+        schedule=schedule_settings,
         whatsapp_sales=whatsapp_sales,
         whatsapp_support=whatsapp_support,
-        mensagem_indisponibilidade=mensagem_indisponibilidade 
+        mensagem_indisponibilidade=mensagem_indisponibilidade,
+        aviso_global=aviso_global  # <--- Aqui está a variável mágica para o modal!
     )
-
-@app.context_processor
-def inject_global_vars():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT chave, valor FROM configuracoes WHERE chave IN ('whatsapp_ativo', 'modo_automatico', 'horario_atendimento')")
-        resultados = dict(cursor.fetchall())
-        cursor.close()
-        conn.close()
-
-        status_manual = (resultados.get('whatsapp_ativo') == '1')
-        modo_auto = (resultados.get('modo_automatico') == '1')
-        
-        # Tenta decodificar o JSON do horário, ou usa um vazio se der erro
-        try:
-            schedule_settings = json.loads(resultados.get('horario_atendimento', '{}'))
-        except:
-            schedule_settings = {}
-
-        if modo_auto:
-            whatsapp_ativo = is_horario_comercial()
-        else:
-            whatsapp_ativo = status_manual
-            
-    except Exception as e:
-        print(f"Erro context processor: {e}")
-        whatsapp_ativo = True
-        modo_auto = False
-        schedule_settings = {}
-    
-    # --- CORREÇÃO AQUI: Passando os números do Docker para o Template ---
-    return dict(
-        whatsapp_ativo=whatsapp_ativo, 
-        modo_automatico=modo_auto, 
-        schedule=schedule_settings,
-        whatsapp_sales=os.environ.get('WHATSAPP_SALES', '5521981176211'),   # Valor do Docker ou Default
-        whatsapp_support=os.environ.get('WHATSAPP_SUPPORT', '5521981176211') # Valor do Docker ou Default
-    )
-
 
 # Função para sanitizar inputs (similar a PHP)
 def sanitize(data):
@@ -1238,6 +1237,131 @@ def admin_relatorios():
                            data_inicio=data_inicio,
                            data_fim=data_fim,
                            status_filtro=status_filtro)
+
+
+# --- ROTAS DE GERENCIAMENTO DE AVISOS ---
+
+# ... (No final do arquivo app.py) ...
+@app.route('/admin/avisos')
+@login_required
+def admin_avisos():
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    # Lista todos, ordenados por data de criação
+    cursor.execute("SELECT * FROM avisos ORDER BY created_at DESC")
+    avisos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    current_year = datetime.now().year
+    return render_template('admin/avisos.html', avisos=avisos, current_year=current_year)
+
+# Rota para obter dados de um aviso específico (para edição)
+@app.route('/admin/avisos/get/<int:aviso_id>', methods=['GET'])
+@login_required
+def get_aviso_dados(aviso_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("SELECT * FROM avisos WHERE id = %s", (aviso_id,))
+    aviso = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    
+    if aviso:
+        # Converter datas para string compatível com input datetime-local (YYYY-MM-DDTHH:MM)
+        if aviso['data_inicio']:
+            aviso['data_inicio'] = aviso['data_inicio'].strftime('%Y-%m-%dT%H:%M')
+        if aviso['data_fim']:
+            aviso['data_fim'] = aviso['data_fim'].strftime('%Y-%m-%dT%H:%M')
+        return jsonify(aviso)
+    return jsonify({'error': 'Aviso não encontrado'}), 404
+
+@app.route('/admin/avisos/salvar', methods=['POST'])
+@login_required
+def salvar_aviso():
+    try:
+        aviso_id = request.form.get('id') # Campo oculto ID
+        titulo = request.form.get('titulo')
+        mensagem = request.form.get('mensagem')
+        tipo = request.form.get('tipo', 'info')
+        inicio = request.form.get('data_inicio')
+        fim = request.form.get('data_fim')
+        
+        if not inicio: inicio = None
+        if not fim: fim = None
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        if aviso_id:
+            # É uma EDIÇÃO (UPDATE)
+            cursor.execute("""
+                UPDATE avisos 
+                SET titulo=%s, mensagem=%s, tipo=%s, data_inicio=%s, data_fim=%s 
+                WHERE id=%s
+            """, (titulo, mensagem, tipo, inicio, fim, aviso_id))
+            flash('Aviso atualizado com sucesso!', 'success')
+        else:
+            # É um NOVO (INSERT) - Cria já inativo para segurança
+            cursor.execute("""
+                INSERT INTO avisos (titulo, mensagem, tipo, data_inicio, data_fim, ativo)
+                VALUES (%s, %s, %s, %s, %s, 0)
+            """, (titulo, mensagem, tipo, inicio, fim))
+            flash('Aviso criado com sucesso!', 'success')
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"Erro ao salvar aviso: {e}")
+        flash('Erro ao salvar aviso.', 'danger')
+        
+    return redirect(url_for('admin_avisos'))
+
+@app.route('/admin/avisos/toggle/<int:aviso_id>', methods=['POST'])
+@login_required
+def toggle_aviso(aviso_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Verifica o estado atual desse aviso
+        cursor.execute("SELECT ativo FROM avisos WHERE id = %s", (aviso_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            return jsonify({'success': False, 'error': 'Aviso não encontrado'})
+            
+        estado_atual = row[0] # 1 ou 0
+        novo_estado = 0 if estado_atual else 1
+        
+        # Lógica de EXCLUSIVIDADE: Se for ativar (1), desativa todos os outros antes
+        if novo_estado == 1:
+            cursor.execute("UPDATE avisos SET ativo = 0")
+            
+        # Aplica o novo estado no aviso selecionado
+        cursor.execute("UPDATE avisos SET ativo = %s WHERE id = %s", (novo_estado, aviso_id))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/avisos/delete/<int:aviso_id>', methods=['POST'])
+@login_required
+def delete_aviso(aviso_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM avisos WHERE id = %s", (aviso_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/gerar_relatorio', methods=['POST'])
 @login_required

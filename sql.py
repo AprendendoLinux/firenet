@@ -185,6 +185,21 @@ def init_db():
                 VARCHAR(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
             """)
 
+    if 'avisos' not in existing_tables:
+        cursor.execute("""
+            CREATE TABLE avisos (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                titulo VARCHAR(100) NOT NULL,
+                mensagem TEXT NOT NULL,
+                tipo ENUM('info', 'alerta', 'urgente') DEFAULT 'info',
+                data_inicio DATETIME DEFAULT NULL,
+                data_fim DATETIME DEFAULT NULL,
+                ativo TINYINT(1) DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        print("Tabela de avisos criada.")
+    
     if 'cobertura' not in existing_tables:
         cursor.execute("""
             CREATE TABLE cobertura (

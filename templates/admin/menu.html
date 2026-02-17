@@ -34,6 +34,7 @@
                 <a href="{{ url_for('admin_usuarios') }}" class="nav-link text-dark fw-medium hover-effect">Usuários</a>
                 <a href="{{ url_for('admin_relatorios') }}" class="nav-link text-dark fw-medium hover-effect">Relatórios</a>
                 <a href="{{ url_for('admin_cobertura') }}" class="nav-link text-dark fw-medium hover-effect">Cobertura</a>
+                <a href="{{ url_for('admin_avisos') }}" class="nav-link text-dark fw-medium hover-effect">Avisos</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger ms-2 rounded-pill px-3">Sair</a>
             </nav>
             
@@ -105,6 +106,9 @@
             </a>
             <a href="{{ url_for('admin_cobertura') }}" class="btn btn-white text-start shadow-sm py-3 fs-5 border" onclick="fecharMenuMobile()">
                 <i class="fas fa-map-marked-alt me-3 text-danger width-icon"></i>Cobertura
+            </a>
+            <a href="{{ url_for('admin_avisos') }}" class="btn btn-white text-start shadow-sm py-3 fs-5 border" onclick="fecharMenuMobile()">
+                <i class="fas fa-bullhorn me-3 text-danger width-icon"></i>Avisos do Site
             </a>
         </nav>
 
