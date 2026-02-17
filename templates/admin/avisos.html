@@ -21,7 +21,7 @@
             <h2 class="text-center text-md-start text-danger mb-0">Gerenciar Avisos</h2>
         </div>
         <div class="col-12 col-md-auto d-flex gap-2 flex-wrap justify-content-center">
-            <button class="btn btn-warning text-dark fw-bold px-4 shadow-sm" onclick="abrirModalInteligente()">
+            <button class="btn btn-danger px-4 fw-bold shadow-sm" onclick="abrirModalInteligente()">
                 <i class="fas fa-magic me-2"></i>Aviso Inteligente
             </button>
             <button class="btn btn-danger px-4 fw-bold shadow-sm" onclick="abrirModalNovo()">
@@ -207,9 +207,9 @@
 <div class="modal fade" id="modalInteligente" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-warning text-dark">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title fw-bold"><i class="fas fa-magic me-2"></i>Aviso Inteligente</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <p class="text-muted small mb-3">Selecione as datas abaixo para gerar um aviso automático. O sistema agrupará datas consecutivas.</p>
@@ -224,7 +224,7 @@
             </div>
             <div class="modal-footer bg-light">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-warning fw-bold px-4" id="btnGerarInteligente" onclick="gerarAvisoInteligente()" disabled>
+                <button type="button" class="btn btn-danger" style="border-radius: 6px; padding: 0.385rem 2rem;" id="btnGerarInteligente" onclick="gerarAvisoInteligente()" disabled>
                     Gerar Aviso
                 </button>
             </div>
