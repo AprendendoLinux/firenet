@@ -2166,6 +2166,47 @@ def api_check_status():
         print(f"Erro ao verificar status: {e}")
         return jsonify({'found': False, 'error': str(e)})
 
+# ... (Cole isso junto com as outras rotas de avisos, antes do if __name__ == '__main__':)
+
+@app.route('/admin/get_feriados_futuros', methods=['GET'])
+@login_required
+def get_feriados_futuros():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT valor FROM configuracoes WHERE chave = 'horario_atendimento'")
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not row:
+            return jsonify([])
+
+        schedule = json.loads(row[0])
+        feriados = schedule.get('feriados', [])
+        
+        futuros = []
+        hoje = datetime.now().date()
+        
+        for f in feriados:
+            # Converte string YYYY-MM-DD para objeto date
+            try:
+                data_feriado = datetime.strptime(f['data'], '%Y-%m-%d').date()
+                if data_feriado >= hoje:
+                    # Adiciona dados formatados para o front
+                    f['data_fmt'] = data_feriado.strftime('%d/%m/%Y')
+                    f['data_iso'] = f['data'] # Mantém ISO para ordenação JS
+                    futuros.append(f)
+            except ValueError:
+                continue
+        
+        # Ordena por data (o mais próximo primeiro)
+        futuros.sort(key=lambda x: x['data_iso'])
+        
+        return jsonify(futuros)
+    except Exception as e:
+        print(f"Erro ao buscar feriados: {e}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     if wait_for_db():
