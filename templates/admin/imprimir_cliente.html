@@ -172,8 +172,20 @@
                     <span class="value">{{ cliente.data_nascimento }}</span>
                 </div>
                 <div class="col-4 field-group">
-                    <span class="label">Telefone / WhatsApp</span>
-                    <span class="value">{{ cliente.telefone }}</span>
+                    <span class="label">Telefone de Contato</span>
+                    <span class="value" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>{{ cliente.telefone }}</span>
+                        
+                        {% if cliente.whatsapp == 'Sim' %}
+                            <span style="color: #198754; font-weight: 800; font-size: 0.85em; display: flex; align-items: center;">
+                                <i class="fab fa-whatsapp" style="margin-right: 4px; font-size: 1.1em;"></i> WhatsApp
+                            </span>
+                        {% else %}
+                            <span style="color: #6c757d; font-size: 0.75em; font-weight: normal; font-style: italic;">
+                                (Apenas Voz)
+                            </span>
+                        {% endif %}
+                    </span>
                 </div>
                 
                 <div class="col-12 field-group">
