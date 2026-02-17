@@ -6,5 +6,4 @@ docker-compose.yml
 docker-compose-firenet.yml
 Dockerfile
 README.md
-requirements.txt
-LICENSES
+LICENSE
