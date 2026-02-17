@@ -16,7 +16,20 @@
     <main>
         <section class="py-4 py-md-5">
             <div class="container">
-                <h2 class="text-center text-danger mb-4">Área de Cobertura</h2>
+                <div class="row align-items-center mb-4 g-3">
+                    <div class="col-12 col-md">
+                        <!-- <h2 class="fw-bold text-dark mb-0 text-center text-md-start">Área de Cobertura</h2> -->
+                        <h2 class="text-center text-danger mb-4">Área de Cobertura</h2>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm w-100 w-md-auto btn-novo-endereco" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#modalEditarCobertura" 
+                                data-cobertura-id="">
+                            <i class="fas fa-plus me-2"></i>Novo Endereço
+                        </button>
+                    </div>
+                </div>
 
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -25,12 +38,6 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-
-                <div class="d-flex justify-content-end mb-4">
-                    <button class="btn btn-success fw-bold shadow-sm btn-novo-endereco" data-bs-toggle="modal" data-bs-target="#modalEditarCobertura" data-cobertura-id="">
-                        <i class="fas fa-plus me-2"></i> Novo Endereço
-                    </button>
-                </div>
 
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body bg-white rounded">
