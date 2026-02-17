@@ -382,29 +382,38 @@
 <div class="modal fade" id="modalAvisoGlobal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" style="z-index: 10000;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 text-white 
-                {% if aviso_global.tipo == 'urgente' %}bg-danger
-                {% elif aviso_global.tipo == 'alerta' %}bg-warning text-dark
-                {% else %}bg-primary{% endif %}">
+            
+            <div class="modal-header border-0 bg-danger text-white d-flex flex-column align-items-center py-4">
                 
-                <h5 class="modal-title fw-bold">
-                    {% if aviso_global.tipo == 'urgente' %}<i class="fas fa-exclamation-triangle me-2"></i>
-                    {% elif aviso_global.tipo == 'alerta' %}<i class="fas fa-info-circle me-2"></i>
-                    {% else %}<i class="fas fa-bullhorn me-2"></i>{% endif %}
+                <img src="{{ url_for('static', filename='logo.png') }}" 
+                     alt="FireNet" 
+                     class="mb-3" 
+                     style="height: 50px; filter: brightness(0) invert(1); object-fit: contain;">
+                
+                <h5 class="modal-title fw-bold text-uppercase text-center px-3">
+                    {% if aviso_global.tipo == 'urgente' %}
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i> {% elif aviso_global.tipo == 'alerta' %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                    {% else %}
+                        <i class="fas fa-bullhorn me-2"></i>
+                    {% endif %}
                     {{ aviso_global.titulo }}
                 </h5>
             </div>
             
-            <div class="modal-body p-4">
-                <p class="fs-5 text-dark mb-0" style="white-space: pre-wrap;">{{ aviso_global.mensagem }}</p>
+            <div class="modal-body p-4 text-center">
+                <p class="fs-5 text-secondary mb-0" style="white-space: pre-wrap; line-height: 1.6;">{{ aviso_global.mensagem }}</p>
             </div>
             
-            <div class="modal-footer border-0 bg-light justify-content-center">
-                <button type="button" class="btn btn-dark px-5 rounded-pill" onclick="fecharAvisoGlobal()">Entendido</button>
+            <div class="modal-footer border-0 bg-light justify-content-center pb-4">
+                <button type="button" class="btn btn-danger px-5 rounded-pill fw-bold shadow-sm" onclick="fecharAvisoGlobal()">
+                    CIENTE
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
