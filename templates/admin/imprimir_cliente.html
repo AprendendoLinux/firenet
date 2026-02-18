@@ -20,16 +20,21 @@
             print-color-adjust: exact; 
         }
 
-        @page { size: A4; margin: 0; }
+        /* Configuração precisa para A4 */
+        @page { 
+            size: A4; 
+            margin: 0; 
+        }
 
         .page-container {
             width: 210mm;
-            min-height: 297mm;
-            padding: 15mm 15mm;
+            min-height: 297mm; /* Garante o tamanho da folha */
+            padding: 15mm; /* 15mm é seguro e elegante */
             margin: 20px auto;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         @media print {
@@ -37,45 +42,46 @@
             .page-container { 
                 margin: 0; 
                 box-shadow: none; 
-                width: 210mm; 
-                min-height: 297mm; 
                 border: none; 
-                page-break-after: always; 
+                page-break-after: avoid; 
+                width: 210mm;
+                height: 296mm; /* Força 1mm a menos para evitar página em branco extra */
+                overflow: hidden; /* Segurança extra */
             }
             .no-print { display: none !important; }
         }
 
-        /* Header */
+        /* Header Compacto mas Robusto */
         header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-bottom: 2px solid var(--fire-red); 
+            border-bottom: 3px solid var(--fire-red); 
             padding-bottom: 10px; 
             margin-bottom: 20px; 
         }
-        .logo img { height: 50px; max-width: 180px; object-fit: contain; }
+        .logo img { height: 55px; max-width: 200px; object-fit: contain; }
         .header-info { text-align: right; }
-        .header-info h1 { font-size: 18px; color: var(--fire-dark); text-transform: uppercase; margin-bottom: 2px; }
-        .header-info p { font-size: 10px; color: var(--fire-gray); font-weight: 600; }
+        .header-info h1 { font-size: 18px; color: var(--fire-dark); text-transform: uppercase; margin-bottom: 3px; }
+        .header-info p { font-size: 11px; color: var(--fire-gray); font-weight: 600; }
 
         /* Sections */
-        .section { margin-bottom: 18px; }
+        .section { margin-bottom: 15px; } /* Reduzido de 22px para 15px */
         .section-title { 
             font-size: 11px; 
             font-weight: 700; 
             color: var(--fire-red); 
             text-transform: uppercase; 
             border-bottom: 1px solid #ddd; 
-            padding-bottom: 2px; 
+            padding-bottom: 3px; 
             margin-bottom: 8px; 
         }
 
-        /* Grid */
+        /* Grid - Otimizado para economizar altura */
         .data-grid { 
             display: grid; 
             grid-template-columns: repeat(12, 1fr); 
-            gap: 10px;
+            gap: 10px; /* Reduzido de 15px para 10px */
         }
         .col-12 { grid-column: span 12; }
         .col-8 { grid-column: span 8; }
@@ -84,8 +90,6 @@
         .col-3 { grid-column: span 3; }
         .col-2 { grid-column: span 2; }
         .col-7 { grid-column: span 7; }
-
-        .field-group { margin-bottom: 2px; }
         
         .label { 
             display: block; 
@@ -96,20 +100,21 @@
             font-weight: 700; 
         }
         
+        /* Campos - Altura Controlada */
         .value { 
             display: block; 
             font-size: 12px; 
             color: var(--fire-dark); 
             font-weight: 600; 
             border: 1px solid #ccc; 
-            padding: 8px 10px; 
+            padding: 7px 10px; /* Padding levemente menor */
             border-radius: 4px; 
             background: #fff; 
-            min-height: 38px; 
+            min-height: 36px; /* Reduzido de 42px para 36px (ganho crítico de espaço) */
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
-            box-shadow: 0 1px 1px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
         }
         
         .value.highlight { 
@@ -121,8 +126,8 @@
         .value.obs { 
             white-space: normal; 
             height: auto; 
-            min-height: 120px; 
-            line-height: 1.5;
+            min-height: 100px; /* 100px ainda é bastante espaço e ajuda na página única */
+            line-height: 1.4;
         }
 
         /* Status Box */
@@ -134,17 +139,16 @@
             font-size: 13px;
             border: 1px solid #ccc;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         .st-concluida { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
         .st-programada { background-color: #fff3cd; color: #664d03; border-color: #ffecb5; }
         .st-nao-realizada { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
         .st-pendente { background-color: #e2e3e5; color: #41464b; border-color: #d3d6d8; }
 
-        /* Área de Assinatura (Espaço para Gov.br) */
+        /* Área de Assinatura Otimizada */
         .signature-area {
-            margin-top: 100px; /* Espaço amplo para o carimbo digital */
-            margin-bottom: 20px;
+            margin-top: 50px; /* 50px é perfeito para Gov.br sem estourar a página */
+            margin-bottom: 20px; 
             display: flex;
             justify-content: center;
             page-break-inside: avoid;
@@ -156,28 +160,32 @@
         .signature-line div { border-bottom: 1px solid #000; margin-bottom: 5px; }
         .signature-line p { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #333; }
 
-        /* Footer */
+        /* Rodapé no Fluxo (Seguro) */
         footer {
-            margin-top: 20px;
+            margin-top: auto; /* Empurra pro final apenas se sobrar espaço */
             text-align: center;
-            font-size: 9px;
-            color: #999;
-            padding-top: 8px;
-            border-top: 1px solid #eee;
+            font-size: 10px;
+            color: #fff;
+            background-color: var(--fire-red);
+            padding: 10px 0;
+            border-radius: 6px; 
+            font-weight: 600;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
-        footer span.version { border-left: 1px solid #ccc; padding-left: 8px; margin-left: 8px; }
+        footer .sep {
+            color: rgba(255,255,255, 0.5);
+            font-weight: 400;
+            margin: 0 8px;
+        }
 
-        /* Botão Imprimir (Mantido idêntico ao original) */
+        /* Botão Imprimir */
         .fab-print {
             position: fixed; 
             top: 20px;
             right: 20px;
             background: var(--fire-red); color: white;
-            
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            
+            width: 60px; height: 60px; font-size: 24px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -185,7 +193,6 @@
             transition: transform 0.2s, background-color 0.2s;
         }
         .fab-print:hover { transform: scale(1.1); background-color: #b02a37; }
-        .fab-print:active { transform: scale(0.95); }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -210,24 +217,24 @@
         <div class="section">
             <h2 class="section-title"><i class="fas fa-user-circle me-2"></i> Dados do Cliente</h2>
             <div class="data-grid">
-                <div class="col-8 field-group">
+                <div class="col-8">
                     <span class="label">Nome Completo</span>
                     <span class="value">{{ cliente.nome }}</span>
                 </div>
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">CPF</span>
                     <span class="value format-cpf">{{ cliente.cpf }}</span>
                 </div>
 
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">RG</span>
                     <span class="value format-rg">{{ cliente.rg }}</span>
                 </div>
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">Data Nasc.</span>
                     <span class="value">{{ cliente.data_nascimento }}</span>
                 </div>
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">Telefone / WhatsApp</span>
                     <span class="value" style="display: flex; align-items: center; justify-content: space-between;">
                         <span>{{ cliente.telefone }}</span>
@@ -241,7 +248,7 @@
                     </span>
                 </div>
                 
-                <div class="col-12 field-group">
+                <div class="col-12">
                     <span class="label">E-mail</span>
                     <span class="value">{{ cliente.email }}</span>
                 </div>
@@ -251,29 +258,29 @@
         <div class="section">
             <h2 class="section-title"><i class="fas fa-map-marker-alt me-2"></i> Endereço de Instalação</h2>
             <div class="data-grid">
-                <div class="col-3 field-group">
+                <div class="col-3">
                     <span class="label">CEP</span>
                     <span class="value">{{ cliente.cep }}</span>
                 </div>
-                <div class="col-7 field-group">
+                <div class="col-7">
                     <span class="label">Logradouro</span>
                     <span class="value">{{ cliente.rua }}</span>
                 </div>
-                <div class="col-2 field-group">
+                <div class="col-2">
                     <span class="label">Número</span>
                     <span class="value">{{ cliente.numero }}</span>
                 </div>
 
-                <div class="col-6 field-group">
+                <div class="col-6">
                     <span class="label">Bairro</span>
                     <span class="value">{{ cliente.bairro }}</span>
                 </div>
-                <div class="col-6 field-group">
+                <div class="col-6">
                     <span class="label">Complemento</span>
                     <span class="value">{{ cliente.complemento or '-' }}</span>
                 </div>
 
-                <div class="col-12 field-group">
+                <div class="col-12">
                     <span class="label">Ponto de Referência</span>
                     <span class="value">{{ cliente.ponto_referencia }}</span>
                 </div>
@@ -283,24 +290,24 @@
         <div class="section">
             <h2 class="section-title"><i class="fas fa-network-wired me-2"></i> Dados Técnicos e Plano</h2>
             <div class="data-grid">
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">Plano Contratado</span>
                     <span class="value highlight">{{ cliente.plano }}</span>
                 </div>
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">Vencimento</span>
                     <span class="value">Dia {{ cliente.vencimento }}</span>
                 </div>
-                <div class="col-4 field-group">
+                <div class="col-4">
                     <span class="label">Aceite LGPD</span>
                     <span class="value">{{ cliente.lgpd }}</span>
                 </div>
 
-                <div class="col-6 field-group">
+                <div class="col-6">
                     <span class="label">Nome da Rede (SSID Sugerido)</span>
                     <span class="value">{{ cliente.nome_rede }}</span>
                 </div>
-                <div class="col-6 field-group">
+                <div class="col-6">
                     <span class="label">Senha da Rede (Sugerida)</span>
                     <span class="value">{{ cliente.senha_rede }}</span>
                 </div>
@@ -340,7 +347,7 @@
         </div>
 
         <footer>
-            Desenvolvido por Henrique Fagundes <span class="version">{{ app_version }}</span>
+            FireNet Telecomunicações <span class="sep">|</span> Desenvolvido por Henrique Fagundes <span class="sep">|</span> {{ app_version }}
         </footer>
 
     </div>
