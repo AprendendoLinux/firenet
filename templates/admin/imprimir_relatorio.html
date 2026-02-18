@@ -80,23 +80,30 @@
             border-radius: 5px;
         }
 
-        /* Rodapé Fixo */
+        /* NOVO RODAPÉ (Igual ao Imprimir Cliente) */
         footer {
-            position: absolute;
-            bottom: 15mm;
-            left: 0;
-            width: 100%;
+            margin-top: auto; /* Empurra para o final da página */
             text-align: center;
-            font-size: 11px;
-            color: #666;
-            padding-top: 20px;
+            font-size: 10px;
+            color: #fff;
+            background-color: var(--fire-red);
+            padding: 10px 0;
+            border-radius: 6px; 
+            font-weight: 600;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            width: 100%;
         }
-        footer span.version { border-left: 1px solid #666; padding-left: 8px; margin-left: 8px; }
+        footer .sep {
+            color: rgba(255,255,255, 0.5);
+            font-weight: 400;
+            margin: 0 8px;
+        }
 
         /* Botão Imprimir - TOPO DIREITO */
         .fab-print {
             position: fixed; 
-            top: 20px;  /* Alterado para Top */
+            top: 20px;
             right: 20px;
             background: var(--fire-red); color: white;
             width: 60px; height: 60px; border-radius: 50%;
@@ -182,7 +189,7 @@
         </div>
 
         <footer>
-            Desenvolvido por Henrique Fagundes <span class="version" title="Versão do Sistema">Versão {{ app_version }}</span>
+            FireNet Telecomunicações <span class="sep">|</span> Desenvolvido por Henrique Fagundes <span class="sep">|</span> {{ app_version }}
         </footer>
 
     </div>
