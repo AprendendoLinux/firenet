@@ -24,13 +24,12 @@
 
         .page-container {
             width: 210mm;
-            height: 297mm;
-            padding: 15mm;
+            min-height: 297mm;
+            padding: 15mm 15mm;
             margin: 20px auto;
             background: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
-            overflow: hidden;
         }
 
         @media print {
@@ -39,22 +38,29 @@
                 margin: 0; 
                 box-shadow: none; 
                 width: 210mm; 
-                height: 297mm; 
+                min-height: 297mm; 
                 border: none; 
-                page-break-after: avoid; 
+                page-break-after: always; 
             }
             .no-print { display: none !important; }
         }
 
-        /* Header Compacto */
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--fire-red); padding-bottom: 10px; margin-bottom: 15px; }
+        /* Header */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--fire-red); 
+            padding-bottom: 10px; 
+            margin-bottom: 20px; 
+        }
         .logo img { height: 50px; max-width: 180px; object-fit: contain; }
         .header-info { text-align: right; }
         .header-info h1 { font-size: 18px; color: var(--fire-dark); text-transform: uppercase; margin-bottom: 2px; }
-        .header-info p { font-size: 10px; color: var(--fire-gray); }
+        .header-info p { font-size: 10px; color: var(--fire-gray); font-weight: 600; }
 
-        /* Sections Compactas */
-        .section { margin-bottom: 12px; }
+        /* Sections */
+        .section { margin-bottom: 18px; }
         .section-title { 
             font-size: 11px; 
             font-weight: 700; 
@@ -62,11 +68,15 @@
             text-transform: uppercase; 
             border-bottom: 1px solid #ddd; 
             padding-bottom: 2px; 
-            margin-bottom: 6px; 
+            margin-bottom: 8px; 
         }
 
-        /* Grid System Otimizado */
-        .data-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
+        /* Grid */
+        .data-grid { 
+            display: grid; 
+            grid-template-columns: repeat(12, 1fr); 
+            gap: 10px;
+        }
         .col-12 { grid-column: span 12; }
         .col-8 { grid-column: span 8; }
         .col-6 { grid-column: span 6; }
@@ -76,50 +86,97 @@
         .col-7 { grid-column: span 7; }
 
         .field-group { margin-bottom: 2px; }
-        .label { display: block; font-size: 8px; color: var(--fire-gray); text-transform: uppercase; margin-bottom: 1px; font-weight: 600; }
-        .value { display: block; font-size: 11px; color: var(--fire-dark); font-weight: 600; border: 1px solid #ccc; padding: 3px 5px; border-radius: 3px; background: #fff; min-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .value.highlight { background-color: #fff3cd; border-color: #ffecb5; color: #856404; }
-        .value.obs { white-space: normal; height: auto; min-height: 40px; }
+        
+        .label { 
+            display: block; 
+            font-size: 9px; 
+            color: var(--fire-gray); 
+            text-transform: uppercase; 
+            margin-bottom: 2px; 
+            font-weight: 700; 
+        }
+        
+        .value { 
+            display: block; 
+            font-size: 12px; 
+            color: var(--fire-dark); 
+            font-weight: 600; 
+            border: 1px solid #ccc; 
+            padding: 8px 10px; 
+            border-radius: 4px; 
+            background: #fff; 
+            min-height: 38px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            box-shadow: 0 1px 1px rgba(0,0,0,0.03);
+        }
+        
+        .value.highlight { 
+            background-color: #fff3cd; 
+            border-color: #ffecb5; 
+            color: #856404; 
+        }
+        
+        .value.obs { 
+            white-space: normal; 
+            height: auto; 
+            min-height: 120px; 
+            line-height: 1.5;
+        }
 
-        /* Status Box Pequeno */
+        /* Status Box */
         .status-box {
-            padding: 4px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             text-align: center;
-            font-weight: bold;
-            font-size: 10px;
+            font-weight: 800;
+            font-size: 13px;
             border: 1px solid #ccc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .st-concluida { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
         .st-programada { background-color: #fff3cd; color: #664d03; border-color: #ffecb5; }
         .st-nao-realizada { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
         .st-pendente { background-color: #e2e3e5; color: #41464b; border-color: #d3d6d8; }
 
-        /* Footer Fixo */
+        /* Área de Assinatura (Espaço para Gov.br) */
+        .signature-area {
+            margin-top: 100px; /* Espaço amplo para o carimbo digital */
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            page-break-inside: avoid;
+        }
+        .signature-line {
+            text-align: center;
+            width: 50%;
+        }
+        .signature-line div { border-bottom: 1px solid #000; margin-bottom: 5px; }
+        .signature-line p { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #333; }
+
+        /* Footer */
         footer {
-            position: absolute;
-            bottom: 15mm;
-            left: 0;
-            width: 100%;
+            margin-top: 20px;
             text-align: center;
             font-size: 9px;
-            color: #666;
-            padding-top: 5px;
+            color: #999;
+            padding-top: 8px;
             border-top: 1px solid #eee;
         }
-        footer span.version { border-left: 1px solid #666; padding-left: 5px; margin-left: 5px; }
+        footer span.version { border-left: 1px solid #ccc; padding-left: 8px; margin-left: 8px; }
 
-        /* Botão Imprimir - TOPO DIREITO */
+        /* Botão Imprimir (Mantido idêntico ao original) */
         .fab-print {
             position: fixed; 
             top: 20px;
             right: 20px;
             background: var(--fire-red); color: white;
             
-            /* ALTERAR ESTAS 3 LINHAS ABAIXO: */
-            width: 60px;      /* De 50px para 60px */
-            height: 60px;     /* De 50px para 60px */
-            font-size: 24px;  /* De 20px para 24px */
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
             
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -146,13 +203,12 @@
             </div>
             <div class="header-info">
                 <h1>Ficha de Instalação</h1>
-                <p>Ordem de Serviço #{{ cliente.id }}</p>
-                <p>Emissão: <span id="data-emissao">{{ current_date }}</span></p>
+                <p>O.S. #{{ cliente.id }} • EMISSÃO: <span id="data-emissao">{{ current_date }}</span></p>
             </div>
         </header>
 
         <div class="section">
-            <h2 class="section-title">Dados do Cliente</h2>
+            <h2 class="section-title"><i class="fas fa-user-circle me-2"></i> Dados do Cliente</h2>
             <div class="data-grid">
                 <div class="col-8 field-group">
                     <span class="label">Nome Completo</span>
@@ -172,18 +228,15 @@
                     <span class="value">{{ cliente.data_nascimento }}</span>
                 </div>
                 <div class="col-4 field-group">
-                    <span class="label">Telefone de Contato</span>
+                    <span class="label">Telefone / WhatsApp</span>
                     <span class="value" style="display: flex; align-items: center; justify-content: space-between;">
                         <span>{{ cliente.telefone }}</span>
-                        
                         {% if cliente.whatsapp == 'Sim' %}
                             <span style="color: #198754; font-weight: 800; font-size: 0.85em; display: flex; align-items: center;">
-                                <i class="fab fa-whatsapp" style="margin-right: 4px; font-size: 1.1em;"></i> WhatsApp
+                                <i class="fab fa-whatsapp me-1" style="font-size: 1.1em;"></i> WhatsApp
                             </span>
                         {% else %}
-                            <span style="color: #6c757d; font-size: 0.75em; font-weight: normal; font-style: italic;">
-                                (Apenas Voz)
-                            </span>
+                            <span style="color: #6c757d; font-size: 0.75em; font-weight: normal; font-style: italic;">(Apenas Voz)</span>
                         {% endif %}
                     </span>
                 </div>
@@ -196,7 +249,7 @@
         </div>
 
         <div class="section">
-            <h2 class="section-title">Endereço de Instalação</h2>
+            <h2 class="section-title"><i class="fas fa-map-marker-alt me-2"></i> Endereço de Instalação</h2>
             <div class="data-grid">
                 <div class="col-3 field-group">
                     <span class="label">CEP</span>
@@ -217,7 +270,7 @@
                 </div>
                 <div class="col-6 field-group">
                     <span class="label">Complemento</span>
-                    <span class="value">{{ cliente.complemento or '' }}</span>
+                    <span class="value">{{ cliente.complemento or '-' }}</span>
                 </div>
 
                 <div class="col-12 field-group">
@@ -228,7 +281,7 @@
         </div>
 
         <div class="section">
-            <h2 class="section-title">Dados Técnicos e Plano</h2>
+            <h2 class="section-title"><i class="fas fa-network-wired me-2"></i> Dados Técnicos e Plano</h2>
             <div class="data-grid">
                 <div class="col-4 field-group">
                     <span class="label">Plano Contratado</span>
@@ -236,7 +289,7 @@
                 </div>
                 <div class="col-4 field-group">
                     <span class="label">Vencimento</span>
-                    <span class="value">Todo dia {{ cliente.vencimento }}</span>
+                    <span class="value">Dia {{ cliente.vencimento }}</span>
                 </div>
                 <div class="col-4 field-group">
                     <span class="label">Aceite LGPD</span>
@@ -244,18 +297,18 @@
                 </div>
 
                 <div class="col-6 field-group">
-                    <span class="label">Nome da Rede (SSID)</span>
+                    <span class="label">Nome da Rede (SSID Sugerido)</span>
                     <span class="value">{{ cliente.nome_rede }}</span>
                 </div>
                 <div class="col-6 field-group">
-                    <span class="label">Senha da Rede</span>
+                    <span class="label">Senha da Rede (Sugerida)</span>
                     <span class="value">{{ cliente.senha_rede }}</span>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">Status e Agendamento</h2>
+            <h2 class="section-title"><i class="fas fa-clipboard-check me-2"></i> Status e Agendamento</h2>
             <div class="data-grid">
                 <div class="col-12">
                     <div class="status-box 
@@ -265,29 +318,29 @@
                         {% else %}st-pendente{% endif %}">
                         
                         {% if cliente.status_instalacao and cliente.status_instalacao != 'N/D' %}
-                            STATUS ATUAL: {{ cliente.status_instalacao|upper }}
-                            {% if cliente.data_instalacao %} - {{ cliente.data_instalacao }} ({{ cliente.turno_instalacao }}){% endif %}
+                            STATUS: {{ cliente.status_instalacao|upper }}
+                            {% if cliente.data_instalacao %} - PREVISÃO: {{ cliente.data_instalacao }} ({{ cliente.turno_instalacao }}){% endif %}
                         {% else %}
-                            <i class="fas fa-clock me-1"></i> INSTALAÇÃO AINDA NÃO AGENDADA
+                            AGUARDANDO AGENDAMENTO
                         {% endif %}
                     </div>
                 </div>
                 <div class="col-12 mt-1">
-                    <span class="label">Observações Técnicas</span>
+                    <span class="label">Observações / Restrições</span>
                     <div class="value obs">{{ cliente.observacoes or 'Nenhuma observação registrada.' }}</div>
                 </div>
             </div>
         </div>
 
-        <div style="margin-top: 80px; display: flex; justify-content: center;">
-            <div style="text-align: center; width: 50%;">
-                <div style="border-bottom: 1px solid #000; margin-bottom: 5px;"></div>
-                <p style="font-size: 10px; font-weight: bold;">Vendedor Responsável</p>
+        <div class="signature-area">
+            <div class="signature-line">
+                <div></div>
+                <p>Vendedor Responsável</p>
             </div>
         </div>
 
         <footer>
-            Desenvolvido por Henrique Fagundes <span class="version" title="Versão do Sistema">Versão {{ app_version }}</span>
+            Desenvolvido por Henrique Fagundes <span class="version">{{ app_version }}</span>
         </footer>
 
     </div>
