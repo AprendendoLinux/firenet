@@ -371,6 +371,126 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalCpfExistente" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-circle me-2"></i>Cadastro Localizado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <p class="text-muted">Identificamos que o CPF informado já possui um histórico com a gente.</p>
+                    
+                    <div class="card border-danger bg-light shadow-sm mb-3">
+                        <div class="card-body py-3">
+                            <span class="text-uppercase fw-bold text-muted small d-block mb-1">Status da Instalação</span>
+                            <h4 class="text-danger fw-bold mb-0" id="statusInstalacaoTxt">Buscando...</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="blocoPerguntaContato">
+                    <h6 class="fw-bold text-dark text-center mb-3">Deseja que um de nossos consultores entre em contato com você?</h6>
+                    <div class="d-flex gap-2 justify-content-center mb-3">
+                        <button class="btn btn-outline-danger px-4 rounded-pill fw-bold" onclick="mostrarCampoTelefone()">Sim, por favor</button>
+                        <button class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Não, obrigado</button>
+                    </div>
+                </div>
+
+                <div id="blocoTelefoneContato" class="d-none animate__animated animate__fadeIn">
+                    <hr class="text-muted">
+                    <label class="fw-bold small mb-2 text-dark">Confirme seu WhatsApp / Celular atualizado:</label>
+                    <div class="input-group input-group-lg mb-3">
+                        <span class="input-group-text bg-white"><i class="fab fa-whatsapp text-success"></i></span>
+                        <input type="text" id="inputTelefoneRetorno" class="form-control" placeholder="(00) 00000-0000" oninput="mascaraTelefoneModal(this)">
+                    </div>
+                    <button class="btn btn-danger w-100 rounded-pill fw-bold" id="btnSolicitarContato" onclick="enviarSolicitacaoContato()">
+                        Solicitar Contato <i class="fas fa-paper-plane ms-2"></i>
+                    </button>
+                </div>
+                
+                <div id="blocoSucessoContato" class="d-none animate__animated animate__zoomIn text-center py-3">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <h5 class="fw-bold text-dark">Solicitação Enviada!</h5>
+                    <p class="text-muted mb-0">Aguarde, em breve nossa equipe entrará em contato com você.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let clienteRetencao = { cpf: '', nome: '' };
+
+    function abrirModalCpfExistente(cpf, nome, status) {
+        clienteRetencao.cpf = cpf;
+        clienteRetencao.nome = nome;
+        
+        document.getElementById('statusInstalacaoTxt').innerText = status;
+        
+        document.getElementById('blocoPerguntaContato').classList.remove('d-none');
+        document.getElementById('blocoTelefoneContato').classList.add('d-none');
+        document.getElementById('blocoSucessoContato').classList.add('d-none');
+        document.getElementById('inputTelefoneRetorno').value = '';
+        
+        const modal = new bootstrap.Modal(document.getElementById('modalCpfExistente'));
+        modal.show();
+    }
+
+    function mostrarCampoTelefone() {
+        document.getElementById('blocoPerguntaContato').classList.add('d-none');
+        document.getElementById('blocoTelefoneContato').classList.remove('d-none');
+    }
+
+    function mascaraTelefoneModal(i) {
+        let v = i.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.slice(0, 11);
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+        v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+        i.value = v;
+    }
+
+    function enviarSolicitacaoContato() {
+        const telefone = document.getElementById('inputTelefoneRetorno').value;
+        const btn = document.getElementById('btnSolicitarContato');
+        
+        if (telefone.length < 14) {
+            alert('Por favor, insira um telefone válido com DDD.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+        fetch('/api/solicitar_retorno', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                cpf: clienteRetencao.cpf,
+                nome: clienteRetencao.nome,
+                telefone: telefone
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                document.getElementById('blocoTelefoneContato').classList.add('d-none');
+                document.getElementById('blocoSucessoContato').classList.remove('d-none');
+                setTimeout(() => {
+                    const modalEl = document.getElementById('modalCpfExistente');
+                    bootstrap.Modal.getInstance(modalEl).hide();
+                }, 4000);
+            } else {
+                alert('Erro ao enviar. Tente novamente.');
+                btn.disabled = false;
+                btn.innerHTML = 'Solicitar Contato <i class="fas fa-paper-plane ms-2"></i>';
+            }
+        });
+    }
+</script>
+
 </main>
 {% include 'whatsapp_widget.html' %}
 
@@ -504,22 +624,27 @@ nomeInput.addEventListener('input', function (e) {
     return true;
   }
 
-  async function checkCpfExists(cpfValue) {
+async function checkCpfExists(cpfValue) {
     try {
       const response = await fetch('/check_cpf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cpf: cpfValue.replace(/\D/g, '') })
       });
-      const data = await response.json();
-      return data.exists;
-    } catch { return false; }
+      return await response.json(); // Agora retorna o objeto completo
+    } catch { return { exists: false }; }
   }
 
   const debouncedCheckCpfExists = debounce(async (v) => {
-    const exists = await checkCpfExists(v);
-    cpfExists = !!exists;
-    cpfExistsError.style.display = cpfExists ? 'block' : 'none';
+    const data = await checkCpfExists(v);
+    cpfExists = !!data.exists;
+    if (cpfExists) {
+        cpfExistsError.style.display = 'block';
+        // Dispara o modal automaticamente ao terminar de digitar um CPF existente
+        abrirModalCpfExistente(v, data.nome || 'Cliente', data.status || 'N/D');
+    } else {
+        cpfExistsError.style.display = 'none';
+    }
     updateNavButtons();
   }, 400);
 
@@ -700,12 +825,16 @@ nomeInput.addEventListener('input', function (e) {
   });
 
   document.getElementById('back-2').addEventListener('click', () => setStep(0));
-  document.getElementById('next-2').addEventListener('click', async () => {
-    // segurança extra: rechecagem de CPF duplicado
+document.getElementById('next-2').addEventListener('click', async () => {
+    // Segurança extra: rechecagem de CPF duplicado ao tentar avançar
     if (cpfInput.value.length === 14 && validarCPF(cpfInput.value)) {
-      const exists = await checkCpfExists(cpfInput.value);
-      cpfExists = !!exists;
-      if (cpfExists) cpfExistsError.style.display = 'block';
+      const data = await checkCpfExists(cpfInput.value);
+      cpfExists = !!data.exists;
+      if (cpfExists) {
+          cpfExistsError.style.display = 'block';
+          abrirModalCpfExistente(cpfInput.value, data.nome || 'Cliente', data.status || 'N/D');
+          return; // Trava o envio e não vai para a próxima etapa
+      }
     }
     if (validateStep(1)) setStep(2);
   });

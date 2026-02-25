@@ -431,31 +431,36 @@ def check_cpf():
     """
     Endpoint chamado pelo JavaScript do cadastro.html para
     verificar se o CPF já existe (validação em tempo real).
+    Retorna também o nome e o status para o modal de retenção.
     """
     data = request.get_json(silent=True) or {}
     cpf_raw = data.get('cpf', '') or ''
     cpf_num = re.sub(r'\D', '', cpf_raw)
 
-    exists = False
     if cpf_num:
         try:
             conn = get_db_connection()
-            cursor = conn.cursor()
-            # Compara removendo pontuação do que está salvo
+            # Usando DictCursor para puxar os dados por nome da coluna
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
             cursor.execute(
-                "SELECT COUNT(*) FROM cadastros "
+                "SELECT nome, status_instalacao FROM cadastros "
                 "WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = %s",
                 (cpf_num,)
             )
-            exists = cursor.fetchone()[0] > 0
+            cliente = cursor.fetchone()
             cursor.close()
             conn.close()
+            
+            if cliente:
+                return jsonify({
+                    'exists': True, 
+                    'nome': cliente['nome'], 
+                    'status': cliente['status_instalacao']
+                })
         except Exception as e:
-            # Em caso de falha, não travar o front; responder exists=False
             print("Erro ao verificar CPF:", e)
-            exists = False
 
-    return jsonify({'exists': exists})
+    return jsonify({'exists': False})
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
@@ -2166,7 +2171,78 @@ def api_check_status():
         print(f"Erro ao verificar status: {e}")
         return jsonify({'found': False, 'error': str(e)})
 
-# ... (Cole isso junto com as outras rotas de avisos, antes do if __name__ == '__main__':)
+
+# --- NOVAS FUNÇÕES: RETENÇÃO DE CLIENTE (CPF DUPLICADO) ---
+async def send_telegram_retorno(dados):
+    token = os.environ.get('TELEGRAM_BOT_TOKEN')
+    if not token: return
+    bot = Bot(token=token)
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT telegram_id FROM usuarios WHERE telegram_id IS NOT NULL")
+    telegram_ids = [r[0] for r in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+
+    msg = (
+        "🚨 *Novo Pedido de Contato (Cadastro Retido)*\n\n"
+        f"*Nome:* {dados['nome']}\n"
+        f"*CPF:* {dados['cpf']}\n"
+        f"*Celular/WhatsApp:* {dados['telefone']}\n\n"
+        "_O cliente tentou se cadastrar novamente, foi bloqueado pelo sistema e solicitou contato de um consultor._"
+    )
+    for cid in telegram_ids:
+        try:
+            await bot.send_message(chat_id=cid, text=msg, parse_mode='Markdown')
+        except Exception as e:
+            print(f"Erro ao enviar Telegram de retorno para {cid}: {e}")
+
+def enviar_email_retorno(dados, base_url):
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT email FROM usuarios")
+        admins = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        conn.close()
+
+        msg = Message('Novo Pedido de Contato - Cliente Retido', recipients=admins)
+        msg.reply_to = app.config.get('REPLY_TO_EMAIL')
+        msg.html = f"""
+        <div style="font-family: Arial, sans-serif; color: #333;">
+            <h2 style="color: #dc3545;">🚨 Pedido de Contato (Cadastro Duplicado)</h2>
+            <p>O cliente abaixo tentou realizar um novo cadastro com um CPF já existente e solicitou que um consultor entre em contato:</p>
+            <ul>
+                <li><b>Nome:</b> {dados['nome']}</li>
+                <li><b>CPF:</b> {dados['cpf']}</li>
+                <li><b>WhatsApp/Celular:</b> {dados['telefone']}</li>
+            </ul>
+            <p>Por favor, entre em contato o mais breve possível.</p>
+        </div>
+        """
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print(f"Erro ao enviar e-mail de retorno: {e}")
+
+@app.route('/api/solicitar_retorno', methods=['POST'])
+def solicitar_retorno():
+    dados = request.get_json()
+    if not dados.get('cpf') or not dados.get('telefone'):
+        return jsonify({'sucesso': False, 'erro': 'Dados incompletos'}), 400
+
+    base_url = request.url_root or APP_BASE_URL
+    
+    # Dispara e-mail em background
+    threading.Thread(target=enviar_email_retorno, args=(dados, base_url)).start()
+    
+    # Dispara Telegram em background
+    def run_tg():
+        asyncio.run(send_telegram_retorno(dados))
+    threading.Thread(target=run_tg).start()
+
+    return jsonify({'sucesso': True})
 
 @app.route('/admin/get_feriados_futuros', methods=['GET'])
 @login_required
