@@ -401,11 +401,21 @@
 
                 <div id="blocoTelefoneContato" class="d-none animate__animated animate__fadeIn">
                     <hr class="text-muted">
-                    <label class="fw-bold small mb-2 text-dark">Confirme seu WhatsApp / Celular atualizado:</label>
-                    <div class="input-group input-group-lg mb-3">
+                    <label class="fw-bold small mb-2 text-dark">Informe seu WhatsApp / Celular atualizado:</label>
+                    <div class="input-group mb-3">
                         <span class="input-group-text bg-white"><i class="fab fa-whatsapp text-success"></i></span>
-                        <input type="text" id="inputTelefoneRetorno" class="form-control" placeholder="(00) 00000-0000" oninput="mascaraTelefoneModal(this)">
+                        <input type="text" id="inputTelefoneRetorno" class="form-control form-control-lg" placeholder="(00) 00000-0000" oninput="mascaraTelefoneModal(this)">
                     </div>
+                    
+                    <label class="fw-bold small mb-2 text-dark">Confirme seu WhatsApp / Celular:</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-white"><i class="fab fa-whatsapp text-success"></i></span>
+                        <input type="text" id="inputTelefoneConfirma" class="form-control form-control-lg" placeholder="(00) 00000-0000" oninput="mascaraTelefoneModal(this)" onpaste="return false;" autocomplete="off">
+                    </div>
+                    <div id="msgErroTelefones" class="text-danger small mb-3 d-none">
+                        <i class="fas fa-times-circle me-1"></i> Os números não coincidem. Verifique a digitação.
+                    </div>
+
                     <button class="btn btn-danger w-100 rounded-pill fw-bold" id="btnSolicitarContato" onclick="enviarSolicitacaoContato()">
                         Solicitar Contato <i class="fas fa-paper-plane ms-2"></i>
                     </button>
@@ -452,14 +462,27 @@
         i.value = v;
     }
 
-    function enviarSolicitacaoContato() {
-        const telefone = document.getElementById('inputTelefoneRetorno').value;
+  function enviarSolicitacaoContato() {
+        const tel1 = document.getElementById('inputTelefoneRetorno').value;
+        const tel2 = document.getElementById('inputTelefoneConfirma').value;
         const btn = document.getElementById('btnSolicitarContato');
+        const msgErro = document.getElementById('msgErroTelefones');
         
-        if (telefone.length < 14) {
+        // Verifica tamanho
+        if (tel1.length < 14) {
             alert('Por favor, insira um telefone válido com DDD.');
             return;
         }
+
+        // Verifica se são iguais
+        if (tel1 !== tel2) {
+            msgErro.classList.remove('d-none');
+            document.getElementById('inputTelefoneConfirma').classList.add('is-invalid');
+            return;
+        }
+        
+        msgErro.classList.add('d-none');
+        document.getElementById('inputTelefoneConfirma').classList.remove('is-invalid');
 
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
@@ -470,7 +493,7 @@
             body: JSON.stringify({
                 cpf: clienteRetencao.cpf,
                 nome: clienteRetencao.nome,
-                telefone: telefone
+                telefone: tel1
             })
         })
         .then(response => response.json())

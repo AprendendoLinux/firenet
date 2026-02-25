@@ -16,6 +16,7 @@ import threading  # Adicionado para tarefas em background
 from datetime import datetime
 import uuid
 import json # <--- Novo import necessário
+import urllib.parse
 
 app = Flask(__name__)
 
@@ -2172,7 +2173,7 @@ def api_check_status():
         return jsonify({'found': False, 'error': str(e)})
 
 
-# --- NOVAS FUNÇÕES: RETENÇÃO DE CLIENTE (CPF DUPLICADO) ---
+# --- NOVAS FUNÇÕES: RETENÇÃO DE CLIENTE (CPF DUPLICADO) COM ENDEREÇO E WHATSAPP ---
 async def send_telegram_retorno(dados):
     token = os.environ.get('TELEGRAM_BOT_TOKEN')
     if not token: return
@@ -2189,8 +2190,12 @@ async def send_telegram_retorno(dados):
         "🚨 *Novo Pedido de Contato (Cadastro Retido)*\n\n"
         f"*Nome:* {dados['nome']}\n"
         f"*CPF:* {dados['cpf']}\n"
-        f"*Celular/WhatsApp:* {dados['telefone']}\n\n"
-        "_O cliente tentou se cadastrar novamente, foi bloqueado pelo sistema e solicitou contato de um consultor._"
+        f"*WhatsApp Informado:* {dados['telefone']}\n\n"
+        f"🏠 *Endereço:* {dados['endereco_completo']}\n\n"
+        f"📊 *Status:* {dados['status_instalacao']}\n"
+        f"📅 *Data:* {dados['data_ocorrencia']}\n"
+        f"📝 *Observações:* {dados['observacoes']}\n\n"
+        f"📲 *Chamar cliente no WhatsApp:*\n[Clique aqui para enviar mensagem automática]({dados['link_whatsapp']})"
     )
     for cid in telegram_ids:
         try:
@@ -2212,13 +2217,21 @@ def enviar_email_retorno(dados, base_url):
         msg.html = f"""
         <div style="font-family: Arial, sans-serif; color: #333;">
             <h2 style="color: #dc3545;">🚨 Pedido de Contato (Cadastro Duplicado)</h2>
-            <p>O cliente abaixo tentou realizar um novo cadastro com um CPF já existente e solicitou que um consultor entre em contato:</p>
+            <p>O cliente abaixo foi bloqueado por já ter cadastro e solicitou retorno:</p>
             <ul>
                 <li><b>Nome:</b> {dados['nome']}</li>
                 <li><b>CPF:</b> {dados['cpf']}</li>
-                <li><b>WhatsApp/Celular:</b> {dados['telefone']}</li>
+                <li><b>WhatsApp Informado:</b> {dados['telefone']}</li>
             </ul>
-            <p>Por favor, entre em contato o mais breve possível.</p>
+            <hr>
+            <h3>Dados do Banco de Dados:</h3>
+            <ul>
+                <li><b>Endereço:</b> {dados['endereco_completo']}</li>
+                <li><b>Status da Instalação:</b> {dados['status_instalacao']}</li>
+                <li><b>Data no Sistema:</b> {dados['data_ocorrencia']}</li>
+                <li><b>Observações:</b> {dados['observacoes']}</li>
+            </ul>
+            <p>📲 <b><a href="{dados['link_whatsapp']}" style="background-color: #25D366; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px;">Chamar Cliente no WhatsApp</a></b></p>
         </div>
         """
         try:
@@ -2228,18 +2241,84 @@ def enviar_email_retorno(dados, base_url):
 
 @app.route('/api/solicitar_retorno', methods=['POST'])
 def solicitar_retorno():
-    dados = request.get_json()
-    if not dados.get('cpf') or not dados.get('telefone'):
+    payload = request.get_json()
+    cpf_raw = payload.get('cpf')
+    telefone = payload.get('telefone')
+    
+    if not cpf_raw or not telefone:
         return jsonify({'sucesso': False, 'erro': 'Dados incompletos'}), 400
 
+    cpf_num = re.sub(r'\D', '', cpf_raw)
+
+    # Busca os dados completos no banco de dados
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("""
+            SELECT nome, rua, numero, complemento, bairro, cep, status_instalacao, data_instalacao, observacoes 
+            FROM cadastros 
+            WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = %s
+            LIMIT 1
+        """, (cpf_num,))
+        cliente = cursor.fetchone()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print("Erro DB em solicitar_retorno:", e)
+        return jsonify({'sucesso': False, 'erro': 'Erro no banco de dados'}), 500
+
+    if not cliente:
+        return jsonify({'sucesso': False, 'erro': 'Cliente não encontrado no banco'}), 404
+
+    # Monta o Endereço Completo
+    partes_endereco = [cliente['rua'], cliente['numero']]
+    if cliente['complemento']:
+        partes_endereco.append(cliente['complemento'])
+    partes_endereco.append(f"Bairro: {cliente['bairro']}")
+    partes_endereco.append(f"CEP: {cliente['cep']}")
+    endereco_completo = ", ".join(filter(None, partes_endereco))
+
+    # Pega o nome completo do cliente
+    nome_cliente = cliente['nome'] if cliente['nome'] else 'Cliente'
+    obs = cliente['observacoes'] if cliente['observacoes'] else 'Nenhuma observação extra registrada.'
+    data_ocorrencia = cliente['data_instalacao'] if cliente['data_instalacao'] else 'N/D'
+
+    # Saudação dinâmica
+    hora = datetime.now().hour
+    if hora < 12: saudacao = "Bom dia"
+    elif hora < 18: saudacao = "Boa tarde"
+    else: saudacao = "Boa noite"
+
+    # Formata número (Adiciona o 55 do Brasil)
+    tel_limpo = re.sub(r'\D', '', telefone)
+    if not tel_limpo.startswith('55'):
+        tel_limpo = f"55{tel_limpo}"
+    
+    # Texto formatado para o WhatsApp com negrito e quebra de linha
+    texto_wpp = (
+        f"{saudacao}, *{nome_cliente}*! Tudo bem? Sou da *FireNet Telecom* e recebi sua solicitação de contato. "
+        f"Verifiquei em nosso sistema que o status do seu pedido foi registrado em *{data_ocorrencia}* como \"*{cliente['status_instalacao']}*\".\n\n"
+        f"Temos a seguinte observação registrada: *{obs}*. Como posso te ajudar hoje?"
+    )
+    
+    link_whatsapp = f"https://api.whatsapp.com/send?phone={tel_limpo}&text={urllib.parse.quote(texto_wpp)}"
+
+    dados_notificacao = {
+        'nome': cliente['nome'],
+        'cpf': cpf_raw,
+        'telefone': telefone,
+        'endereco_completo': endereco_completo,
+        'status_instalacao': cliente['status_instalacao'],
+        'data_ocorrencia': data_ocorrencia,
+        'observacoes': obs,
+        'link_whatsapp': link_whatsapp
+    }
+
     base_url = request.url_root or APP_BASE_URL
+    threading.Thread(target=enviar_email_retorno, args=(dados_notificacao, base_url)).start()
     
-    # Dispara e-mail em background
-    threading.Thread(target=enviar_email_retorno, args=(dados, base_url)).start()
-    
-    # Dispara Telegram em background
     def run_tg():
-        asyncio.run(send_telegram_retorno(dados))
+        asyncio.run(send_telegram_retorno(dados_notificacao))
     threading.Thread(target=run_tg).start()
 
     return jsonify({'sucesso': True})
