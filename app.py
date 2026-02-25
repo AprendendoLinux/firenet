@@ -1337,6 +1337,33 @@ def check_conflict(start, end, exclude_id=None):
         print(f"Erro ao verificar conflito: {e}")
         return False
 
+# --- NOVA FUNÇÃO DE RESOLUÇÃO DE CONFLITOS (O ROLO COMPRESSOR) ---
+def desativar_conflitos(cursor, start, end, exclude_id=None):
+    """
+    Desativa automaticamente qualquer aviso que conflite com o período informado.
+    Trata datas NULL como 'Infinito' (Desde sempre / Para sempre).
+    """
+    # Define datas "infinitas" para a comparação
+    s_check = start if start else datetime(2000, 1, 1)
+    e_check = end if end else datetime(2100, 1, 1)
+
+    # A mágica do SQL: Atualiza para Inativo (0) todos que batem na regra de colisão do horário
+    query = """
+        UPDATE avisos 
+        SET ativo = 0 
+        WHERE ativo = 1 
+        AND COALESCE(data_inicio, '2000-01-01') < %s 
+        AND COALESCE(data_fim, '2100-01-01') > %s
+    """
+    params = [e_check, s_check]
+    
+    if exclude_id:
+        query += " AND id != %s"
+        params.append(exclude_id)
+        
+    cursor.execute(query, tuple(params))
+
+
 # --- ROTAS DE GERENCIAMENTO DE AVISOS ---
 
 @app.route('/admin/avisos')
@@ -1349,10 +1376,8 @@ def admin_avisos():
     cursor.close()
     conn.close()
     
-    # Passamos 'now' para o template poder bloquear avisos expirados visualmente
     return render_template('admin/avisos.html', avisos=avisos, now=datetime.now(), current_year=datetime.now().year)
 
-# [IMPORTANTE] Esta é a rota que faltava para o botão EDITAR funcionar
 @app.route('/admin/avisos/get/<int:aviso_id>', methods=['GET'])
 @login_required
 def get_aviso_dados(aviso_id):
@@ -1364,7 +1389,6 @@ def get_aviso_dados(aviso_id):
     conn.close()
     
     if aviso:
-        # Formata datas para o input HTML (YYYY-MM-DDTHH:MM)
         if aviso['data_inicio']:
             aviso['data_inicio'] = aviso['data_inicio'].strftime('%Y-%m-%dT%H:%M')
         if aviso['data_fim']:
@@ -1383,43 +1407,34 @@ def salvar_aviso():
         inicio_str = request.form.get('data_inicio')
         fim_str = request.form.get('data_fim')
         
-        # Conversão de Strings para Datetime
         inicio = datetime.strptime(inicio_str, '%Y-%m-%dT%H:%M') if inicio_str else None
         fim = datetime.strptime(fim_str, '%Y-%m-%dT%H:%M') if fim_str else None
         agora = datetime.now()
 
-        # 1. Validação: Data Fim não pode ser menor que Início
+        # Validações lógicas básicas
         if inicio and fim and fim <= inicio:
             flash('A data de fim deve ser posterior à data de início.', 'danger')
             return redirect(url_for('admin_avisos'))
 
-        # 2. Validação Retroativa: Não criar aviso que JÁ acabou
         if fim and fim < agora:
              flash('Não é possível criar um aviso que já expirou (Data Fim no passado).', 'danger')
              return redirect(url_for('admin_avisos'))
 
-        # 3. Verifica Conflito (Tentamos salvar como ATIVO por padrão)
-        ativo = 1
-        
-        # Se houver conflito de horário, salvamos como INATIVO forçadamente
-        if check_conflict(inicio, fim, exclude_id=aviso_id):
-            ativo = 0
-            flash('Aviso salvo, mas mantido INATIVO pois o horário conflita com outro aviso.', 'warning')
-        else:
-            flash('Aviso salvo e programado com sucesso!', 'success')
-
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        ativo = 1 # O novo aviso sempre tenta entrar como ativo
+        
+        # O ROLO COMPRESSOR: Derruba os concorrentes desse horário
+        desativar_conflitos(cursor, inicio, fim, aviso_id)
+        
         if aviso_id:
-            # Edição
             cursor.execute("""
                 UPDATE avisos 
                 SET titulo=%s, mensagem=%s, tipo=%s, data_inicio=%s, data_fim=%s, ativo=%s 
                 WHERE id=%s
             """, (titulo, mensagem, tipo, inicio, fim, ativo, aviso_id))
         else:
-            # Novo Cadastro
             cursor.execute("""
                 INSERT INTO avisos (titulo, mensagem, tipo, data_inicio, data_fim, ativo)
                 VALUES (%s, %s, %s, %s, %s, %s)
@@ -1428,6 +1443,8 @@ def salvar_aviso():
         conn.commit()
         cursor.close()
         conn.close()
+        
+        flash('Aviso salvo e ativado! Avisos conflitantes foram desativados automaticamente.', 'success')
         
     except Exception as e:
         print(f"Erro ao salvar aviso: {e}")
@@ -1442,7 +1459,6 @@ def toggle_aviso(aviso_id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Pega dados do aviso
         cursor.execute("SELECT ativo, data_inicio, data_fim FROM avisos WHERE id = %s", (aviso_id,))
         row = cursor.fetchone()
         
@@ -1453,21 +1469,19 @@ def toggle_aviso(aviso_id):
         start = row[1]
         end = row[2]
         novo_estado = 0 if estado_atual else 1
+        agora = datetime.now()
         
-        # Se for ATIVAR (1), faz validações
         if novo_estado == 1:
-            # 1. Validade
-            if end and end < datetime.now():
+            # Só bloqueia se o usuário tentar ligar um aviso que a data já venceu
+            if end and end < agora:
                 return jsonify({'success': False, 'error': 'Não é possível ativar um aviso expirado.'})
 
-            # 2. Conflito
-            if check_conflict(start, end, exclude_id=aviso_id):
-                return jsonify({'success': False, 'error': 'Conflito! Já existe um aviso ativo neste período.'})
+            # O ROLO COMPRESSOR: Derruba os concorrentes ao ligar a chavinha
+            desativar_conflitos(cursor, start, end, aviso_id)
         
-        # Atualiza status (agora permite múltiplos ativos se não conflitarem)
         cursor.execute("UPDATE avisos SET ativo = %s WHERE id = %s", (novo_estado, aviso_id))
-        
         conn.commit()
+        
         cursor.close()
         conn.close()
         return jsonify({'success': True})

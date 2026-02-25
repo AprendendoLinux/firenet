@@ -325,37 +325,39 @@
                             <button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goBackFromId()"><i class="fas fa-arrow-left"></i></button> 
                             Identificação
                         </h5>
-                        <p class="text-muted">Para prosseguir com <strong><span id="lblAssuntoSelecionado"></span></strong>, precisamos localizar seu cadastro.</p>
+                        <p class="text-muted" id="textoInstrucaoCpf">Para prosseguir com <strong><span id="lblAssuntoSelecionado"></span></strong>, precisamos localizar seu cadastro.</p>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold small">Seu CPF</label>
-                            <input type="text" id="inputCpfChat" class="form-control form-control-lg" placeholder="000.000.000-00" 
-                                   oninput="mascaraCpf(this)" 
-                                   onkeyup="if(event.key === 'Enter') processarIdentificacao()">
-                            <small class="text-danger d-none" id="msgErroCpf">CPF inválido ou não informado.</small>
+                        <div id="blocoInputCpf">
+                            <div class="form-group mb-3">
+                                <label class="fw-bold small">Seu CPF</label>
+                                <input type="text" id="inputCpfChat" class="form-control form-control-lg" placeholder="000.000.000-00" 
+                                       oninput="mascaraCpf(this)" 
+                                       onkeyup="if(event.key === 'Enter') processarIdentificacao()">
+                                <small class="text-danger d-none" id="msgErroCpf">CPF inválido ou não informado.</small>
+                            </div>
+                            
+                            <button class="btn btn-danger w-100 rounded-pill mt-3" id="btnBuscarCpf" onclick="processarIdentificacao()">
+                                Continuar <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
                         </div>
 
-                        <div id="camposManuais" class="d-none animate__animated animate__fadeIn">
-                            <div class="alert alert-warning small">
-                                <i class="fas fa-info-circle"></i> CPF não encontrado. Por favor, preencha abaixo:
+                        <div id="blocoNaoEncontrado" class="d-none animate__animated animate__fadeIn">
+                            <div class="alert alert-warning border-warning shadow-sm text-center">
+                                <i class="fas fa-search-minus fa-3x mb-3 text-warning"></i><br>
+                                <strong class="d-block mb-2 text-dark">Desculpe, não localizamos esse CPF em nossa base.</strong>
+                                <span class="small text-muted">Isso significa que você ainda não é cliente? Deseja conhecer nossos planos?</span>
                             </div>
-                            <div class="form-group mb-3">
-                                <label class="fw-bold small">Nome Completo</label>
-                                <input type="text" id="inputNomeChat" class="form-control" placeholder="Seu nome"
-                                       onkeyup="if(event.key === 'Enter') processarIdentificacao()">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="fw-bold small">Endereço de Instalação</label>
-                                <input type="text" id="inputEndChat" class="form-control" placeholder="Rua, Número e Bairro"
-                                       onkeyup="if(event.key === 'Enter') processarIdentificacao()">
+                            
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-danger rounded-pill fw-bold" onclick="goToStep('planos')">
+                                    <i class="fas fa-wifi me-2"></i> Sim, quero conhecer os planos
+                                </button>
+                                <button class="btn btn-outline-secondary rounded-pill" onclick="resetChat()">
+                                    Não, encerrar atendimento
+                                </button>
                             </div>
                         </div>
-
-                        <button class="btn btn-danger w-100 rounded-pill mt-3" id="btnBuscarCpf" onclick="processarIdentificacao()">
-                            Continuar <i class="fas fa-arrow-right ms-2"></i>
-                        </button>
                     </div>
-
                     <div id="step-apps" class="step-content d-none text-center animate__animated animate__fadeIn">
                         <h5 class="fw-bold mb-4">
                              <button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i></button>
@@ -438,15 +440,34 @@
     function resetChat() {
         goToStep(1);
         flowState = { assunto: '', tipo: '', isBoleto: false, dadosCliente: { nome: '', endereco: '', cpf: '' }, plano: '' };
+        
+        // Limpa os inputs e remove classes de validação
         ['inputCpfChat', 'inputNomeChat', 'inputEndChat', 'inputCepModal', 'inputCpfStatus'].forEach(id => {
             const el = document.getElementById(id);
-            if(el) el.value = '';
+            if(el) {
+                el.value = '';
+                el.classList.remove('is-valid', 'is-invalid');
+            }
         });
-        ['resultadoViabilidadeModal', 'camposManuais', 'resultadoStatus', 'msgErroCpf'].forEach(id => {
+        
+        // Esconde mensagens de erro e blocos condicionais
+        ['resultadoViabilidadeModal', 'camposManuais', 'resultadoStatus', 'msgErroCpf', 'blocoNaoEncontrado'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.classList.add('d-none');
         });
-        document.getElementById('btnBuscarCpf').innerHTML = 'Continuar <i class="fas fa-arrow-right ms-2"></i>';
+        
+        // Restaura a visibilidade do bloco de CPF padrão
+        const blocoInputCpf = document.getElementById('blocoInputCpf');
+        if(blocoInputCpf) blocoInputCpf.classList.remove('d-none');
+        
+        const textoInstrucaoCpf = document.getElementById('textoInstrucaoCpf');
+        if(textoInstrucaoCpf) textoInstrucaoCpf.classList.remove('d-none');
+        
+        const btnBuscarCpf = document.getElementById('btnBuscarCpf');
+        if (btnBuscarCpf) {
+            btnBuscarCpf.innerHTML = 'Continuar <i class="fas fa-arrow-right ms-2"></i>';
+            btnBuscarCpf.disabled = false;
+        }
     }
 
     function verificarAtendimento(destino) {
@@ -495,7 +516,7 @@
         i.value = v;
     }
 
-// --- FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DO CPF ---
+    // --- FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DO CPF ---
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, ''); 
         if (cpf == '') return false;
@@ -714,7 +735,6 @@
         const cpfInput = document.getElementById('inputCpfChat');
         const cpf = cpfInput.value;
         const btn = document.getElementById('btnBuscarCpf');
-        const manualDiv = document.getElementById('camposManuais');
         const msgErro = document.getElementById('msgErroCpf');
 
         if (!validarCPF(cpf)) {
@@ -729,28 +749,6 @@
         cpfInput.classList.remove('is-invalid');
         cpfInput.classList.add('is-valid');
 
-        if (!manualDiv.classList.contains('d-none')) {
-            const nomeInput = document.getElementById('inputNomeChat');
-            const endInput = document.getElementById('inputEndChat');
-
-            const formatarTexto = (texto) => {
-                if (!texto) return "";
-                return texto.trim().toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-            };
-
-            const nome = formatarTexto(nomeInput.value);
-            const end = formatarTexto(endInput.value);
-
-            if(!nome || !end) { alert('Por favor, preencha seu Nome e Endereço.'); return; }
-
-            nomeInput.value = nome;
-            endInput.value = end;
-
-            flowState.dadosCliente = { nome: nome, endereco: end, cpf: cpf };
-            posIdentificacao();
-            return;
-        }
-
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
@@ -762,18 +760,24 @@
         .then(r => r.json())
         .then(data => {
             if (data.found) {
+                // Cliente encontrado: segue para o WhatsApp normalmente
                 flowState.dadosCliente = { nome: data.nome, endereco: data.endereco, cpf: cpf };
                 posIdentificacao();
             } else {
-                manualDiv.classList.remove('d-none');
-                btn.innerHTML = 'Confirmar Dados e Continuar';
+                // Cliente NÃO encontrado: esconde o form e mostra o aviso de conversão
+                document.getElementById('blocoInputCpf').classList.add('d-none');
+                document.getElementById('textoInstrucaoCpf').classList.add('d-none');
+                document.getElementById('blocoNaoEncontrado').classList.remove('d-none');
             }
         })
         .catch(() => {
-            manualDiv.classList.remove('d-none');
-            btn.innerHTML = 'Confirmar Dados e Continuar';
+            msgErro.innerHTML = "Erro ao consultar o sistema. Tente novamente.";
+            msgErro.classList.remove('d-none');
         })
-        .finally(() => btn.disabled = false);
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = 'Continuar <i class="fas fa-arrow-right ms-2"></i>';
+        });
     }
 
     function posIdentificacao() {
