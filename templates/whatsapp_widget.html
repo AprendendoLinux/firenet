@@ -159,7 +159,7 @@
                             </div>
                     </div>
 
-                    <div id="step-taxa" class="step-content d-none animate__animated animate__fadeIn">
+                   <div id="step-taxa" class="step-content d-none animate__animated animate__fadeIn">
                         <h5 class="fw-bold mb-3"><button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i></button> Taxa de Instalação</h5>
                         
                         <div class="alert alert-light border shadow-sm">
@@ -192,9 +192,62 @@
                             </div>
                         </div>
                         
-                        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="selectOption('vendas', 'Dúvida sobre Taxa de Instalação')">
-                            Ainda tenho dúvidas <i class="fab fa-whatsapp ms-1"></i>
+                        <button class="btn btn-outline-danger w-100 rounded-pill mt-2" onclick="goToStep('explicacao-taxa')">
+                            Entenda o que a taxa cobre <i class="fas fa-chevron-right ms-1"></i>
                         </button>
+                    </div>
+
+                    <div id="step-explicacao-taxa" class="step-content d-none animate__animated animate__fadeIn">
+                        <h5 class="fw-bold mb-3">
+                            <button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goToStep('taxa')"><i class="fas fa-arrow-left"></i></button> 
+                            Detalhes da Taxa
+                        </h5>
+                        
+                        <div class="card border-danger shadow-sm mb-4">
+                            <div class="card-body bg-light rounded">
+                                <div class="text-center mb-3 mt-2">
+                                    <i class="fas fa-tools fa-3x text-danger mb-3"></i>
+                                    <h5 class="fw-bold text-dark">Para que serve esse valor?</h5>
+                                </div>
+                                <p class="text-muted text-center mb-2 small">
+                                    A taxa de instalação é um valor único destinado a cobrir os custos operacionais para ativar sua conexão com a máxima qualidade.
+                                </p>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold text-dark mb-3"><i class="fas fa-box-open text-danger me-2"></i>O que está incluso:</h6>
+                        
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center">
+                                <div class="bg-danger text-white rounded-circle p-2 me-3 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <div>
+                                    <strong class="d-block text-dark">Materiais Físicos</strong>
+                                    <span class="small text-muted">Fibra óptica, conectores, passivos de rede e demais materiais.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center">
+                                <div class="bg-danger text-white rounded-circle p-2 me-3 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-hdd"></i>
+                                </div>
+                                <div>
+                                    <strong class="d-block text-dark">Equipamentos</strong>
+                                    <span class="small text-muted">Aparelho ONT (Modem/Roteador) comodatado e configurado.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-3 border rounded bg-white shadow-sm d-flex align-items-center">
+                                <div class="bg-danger text-white rounded-circle p-2 me-3 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-hard-hat"></i>
+                                </div>
+                                <div>
+                                    <strong class="d-block text-dark">Mão de Obra</strong>
+                                    <span class="small text-muted">Deslocamento e tempo de serviço (homem/hora) do técnico.</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="step-viabilidade" class="step-content d-none animate__animated animate__fadeIn">
@@ -422,6 +475,7 @@
 
         let progress = 10;
         if(step === 'planos' || step === 'taxa' || step === 'viabilidade' || step === 'status') progress = 30;
+        if(step === 'explicacao-taxa') progress = 40;
         if(step === 2) progress = 40;
         if(step === 3) progress = 60;
         if(step === 'identificacao') progress = 80;
