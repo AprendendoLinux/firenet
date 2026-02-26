@@ -382,6 +382,10 @@ def _next_identificador(cursor):
     finally:
         cursor.execute("UNLOCK TABLES")
 
+@app.errorhandler(404)
+def page_not_found(e):
+    current_year = datetime.now().year
+    return render_template('404.html', current_year=current_year), 404
 
 @app.route('/')
 def index():
