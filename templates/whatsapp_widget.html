@@ -358,6 +358,7 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div id="step-apps" class="step-content d-none text-center animate__animated animate__fadeIn">
                         <h5 class="fw-bold mb-4">
                              <button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i></button>
@@ -376,40 +377,35 @@
                         </button>
                     </div>
 
+                    <div id="step-fora-horario" class="step-content d-none animate__animated animate__fadeIn">
+                        <h5 class="fw-bold mb-3">
+                            <button class="btn btn-sm btn-link text-muted p-0 me-2" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i></button> 
+                            Fora do Horário
+                        </h5>
+                        
+                        <div class="card mb-4 border-danger" style="background-color: rgba(211, 47, 47, 0.08);">
+                            <div class="card-body text-center">
+                                <div class="text-danger mb-2"><i class="fas fa-store-slash fa-3x"></i></div>
+                                <h5 class="fw-bold text-danger">Atendimento Encerrado</h5>
+                                
+                                <p class="text-dark small mb-0 mt-2">
+                                    {{ mensagem_indisponibilidade }}
+                                </p>
+                                
+                                <hr class="border-danger opacity-25 my-3">
+                                <p class="mb-0 text-dark"><strong>Você ainda pode:</strong><br>Consultar planos e disponibilidade e realizar o pré-cadastro pelo site.</p>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('contato') }}" class="btn btn-danger rounded-pill"><i class="fas fa-envelope me-2"></i>Deixar Mensagem</a>
+                            <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal" onclick="resetChat()">Fechar Chat</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="modal fade" id="modalWhatsOcupado" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Fora do Horário</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body py-4">
-        <div class="card mb-4 border-danger" style="background-color: rgba(211, 47, 47, 0.08);">
-            <div class="card-body text-center">
-                <div class="text-danger mb-2"><i class="fas fa-store-slash fa-3x"></i></div>
-                <h5 class="fw-bold text-danger">Atendimento Encerrado</h5>
-                
-                <p class="text-dark small mb-0 mt-2">
-                    {{ mensagem_indisponibilidade }}
-                </p>
-                
-                <hr class="border-danger opacity-25 my-3">
-                <p class="mb-0 text-dark"><strong>Você ainda pode:</strong><br>Consultar planos e disponibilidade e realizar o pré-cadastro pelo site.</p>
-            </div>
-        </div>
-        <div class="d-grid gap-2">
-            <a href="{{ url_for('contato') }}" class="btn btn-danger rounded-pill"><i class="fas fa-envelope me-2"></i>Deixar Mensagem</a>
-            <button type="button" class="btn btn-link text-muted text-decoration-none btn-sm" data-bs-dismiss="modal">Fechar</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -422,7 +418,7 @@
         tipo: '', 
         isBoleto: false,
         dadosCliente: { nome: '', endereco: '', cpf: '' },
-        plano: '' // NOVO: Armazena o plano selecionado
+        plano: '' 
     };
 
     const mensagensPorAssunto = {
@@ -472,8 +468,7 @@
 
     function verificarAtendimento(destino) {
         if (!LOJA_ABERTA) {
-            const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
-            modalOcupado.show();
+            goToStep('fora-horario');
             return;
         }
 
@@ -490,6 +485,7 @@
         let id = `step-${step}`;
         if(step === 'identificacao') id = 'step-identificacao';
         if(step === 'apps') id = 'step-apps';
+        if(step === 'fora-horario') id = 'step-fora-horario';
         
         const target = document.getElementById(id);
         if(target) target.classList.remove('d-none');
@@ -501,13 +497,14 @@
         if(step === 3) progress = 60;
         if(step === 'identificacao') progress = 80;
         if(step === 'apps') progress = 90;
+        if(step === 'fora-horario') progress = 100;
+        
         document.getElementById('progressBar').style.width = `${progress}%`;
     }
 
-    // --- NOVA FUNÇÃO: Seleciona Plano e vai para Viabilidade ---
     function selecionarPlano(plano) {
-        flowState.plano = plano; // Guarda o plano
-        goToStep('viabilidade'); // Vai para a tela de CEP
+        flowState.plano = plano; 
+        goToStep('viabilidade'); 
     }
 
     function mascaraCep(i) {
@@ -516,13 +513,12 @@
         i.value = v;
     }
 
-    // --- FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DO CPF ---
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, ''); 
         if (cpf == '') return false;
         
         if (cpf.length != 11 || 
-            /^(\d)\1{10}$/.test(cpf)) // Regex que pega 111..., 222...
+            /^(\d)\1{10}$/.test(cpf)) 
                 return false;
         
         let add = 0;
@@ -674,7 +670,6 @@
         })
         .then(info => {
             if (info.coberta) {
-                // ATUALIZADO: Constrói o link com CEP e, se existir, o PLANO
                 let linkCadastro = `/cadastro?cep=${cep}`;
                 if (flowState.plano) {
                     linkCadastro += `&plano=${encodeURIComponent(flowState.plano)}`;
@@ -708,8 +703,7 @@
 
     function selectOption(tipo, assunto, isBoleto = false) {
         if (!LOJA_ABERTA) {
-            const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
-            modalOcupado.show();
+            goToStep('fora-horario');
             return;
         }
 
@@ -760,11 +754,9 @@
         .then(r => r.json())
         .then(data => {
             if (data.found) {
-                // Cliente encontrado: segue para o WhatsApp normalmente
                 flowState.dadosCliente = { nome: data.nome, endereco: data.endereco, cpf: cpf };
                 posIdentificacao();
             } else {
-                // Cliente NÃO encontrado: esconde o form e mostra o aviso de conversão
                 document.getElementById('blocoInputCpf').classList.add('d-none');
                 document.getElementById('textoInstrucaoCpf').classList.add('d-none');
                 document.getElementById('blocoNaoEncontrado').classList.remove('d-none');
@@ -787,8 +779,7 @@
 
     function finalizarParaWhatsapp() {
         if (!LOJA_ABERTA) {
-            const modalOcupado = new bootstrap.Modal(document.getElementById('modalWhatsOcupado'));
-            modalOcupado.show();
+            goToStep('fora-horario');
             return;
         }
 
@@ -817,35 +808,30 @@
         }, 2000);
     }
 
-    // --- LÓGICA PARA TRAVAR A ROLAGEM DO FUNDO SEM SUMIR O TOPO ---
     document.addEventListener('DOMContentLoaded', function() {
         const modalWhatsapp = document.getElementById('modalAtendenteVirtual');
-        const headerSite = document.querySelector('header'); // Pega o menu do topo
+        const headerSite = document.querySelector('header'); 
         
         if (modalWhatsapp) {
-            // Quando o modal COMEÇAR a abrir
             modalWhatsapp.addEventListener('show.bs.modal', function () {
-                const scrollAtual = window.scrollY; // Descobre a posição exata da tela
+                const scrollAtual = window.scrollY; 
                 
                 document.body.style.overflow = 'hidden';
                 document.documentElement.style.overflow = 'hidden';
                 
-                // Puxa o topo para a posição atual da tela para ele ficar visível atrás do modal
                 if (headerSite) {
                     headerSite.style.transform = `translateY(${scrollAtual}px)`;
                 }
             });
             
-            // Quando o modal TERMINAR de fechar
             modalWhatsapp.addEventListener('hidden.bs.modal', function () {
                 document.body.style.overflow = '';
                 document.documentElement.style.overflow = '';
                 
-                // Devolve o menu ao comportamento natural (grudado no topo)
                 if (headerSite) {
                     headerSite.style.transform = '';
                 }
             });
         }
     });    
-    </script>
+</script>
