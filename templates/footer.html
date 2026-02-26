@@ -1,6 +1,6 @@
-<footer class="bg-dark text-white py-4 text-center">
+<footer class="bg-dark text-white py-2 text-center">
   <div class="container">
-    <p class="mb-0">
+    <p class="mb-0 small">
       &copy; <span id="anoAtual"></span> FireNet Telecom | Desenvolvido por 
       <a href="https://www.henrique.tec.br" target="_blank" class="text-white text-decoration-none fw-bold">
         Henrique Fagundes
@@ -16,4 +16,7 @@
     // Pega o elemento pelo ID e define o texto como o ano atual
     document.getElementById("anoAtual").innerText = new Date().getFullYear();
   </script>
+
+  <script src="{{ url_for('static', filename='js/alertas.js') }}"></script>
+
 </footer>

@@ -816,4 +816,36 @@
             resetChat();
         }, 2000);
     }
-</script>
+
+    // --- LÓGICA PARA TRAVAR A ROLAGEM DO FUNDO SEM SUMIR O TOPO ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalWhatsapp = document.getElementById('modalAtendenteVirtual');
+        const headerSite = document.querySelector('header'); // Pega o menu do topo
+        
+        if (modalWhatsapp) {
+            // Quando o modal COMEÇAR a abrir
+            modalWhatsapp.addEventListener('show.bs.modal', function () {
+                const scrollAtual = window.scrollY; // Descobre a posição exata da tela
+                
+                document.body.style.overflow = 'hidden';
+                document.documentElement.style.overflow = 'hidden';
+                
+                // Puxa o topo para a posição atual da tela para ele ficar visível atrás do modal
+                if (headerSite) {
+                    headerSite.style.transform = `translateY(${scrollAtual}px)`;
+                }
+            });
+            
+            // Quando o modal TERMINAR de fechar
+            modalWhatsapp.addEventListener('hidden.bs.modal', function () {
+                document.body.style.overflow = '';
+                document.documentElement.style.overflow = '';
+                
+                // Devolve o menu ao comportamento natural (grudado no topo)
+                if (headerSite) {
+                    headerSite.style.transform = '';
+                }
+            });
+        }
+    });    
+    </script>

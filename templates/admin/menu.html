@@ -124,7 +124,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold"><i class="fas fa-clock me-2 text-primary"></i>Configurar Horários</h5>
+                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-clock me-2 text-danger"></i>Configurar Horários</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-3 p-md-4">
@@ -191,8 +191,8 @@
                 </form>
             </div>
             <div class="modal-footer bg-light border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary px-4" onclick="saveSchedule()">Salvar</button>
+                <button type="button" class="btn btn-outline-secondary px-4 rounded-pill fw-medium" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger px-4 rounded-pill fw-bold" onclick="saveSchedule()">Salvar</button>
             </div>
         </div>
     </div>
@@ -239,7 +239,6 @@
 
 <script>
     let feriados = {{ schedule.feriados|tojson if schedule.feriados else '[]' }};
-    let indexParaExcluir = null;
 
     function fecharMenuMobile() {
         const menuEl = document.getElementById('menuAdminMobile');
@@ -362,10 +361,24 @@
         renderFeriados();
     }
 
-    function prepararExclusao(index) { indexParaExcluir = index; new bootstrap.Modal(document.getElementById('modalConfirmDelete')).show(); }
-    function confirmarExclusao() { if(indexParaExcluir !== null) { feriados.splice(indexParaExcluir, 1); renderFeriados(); bootstrap.Modal.getInstance(document.getElementById('modalConfirmDelete')).hide(); } }
+// --- LÓGICA DE EXCLUSÃO DE DATA ---
+    function prepararExclusao(index) {
+        ModalPadrao.fire({
+            title: 'Tem certeza?',
+            text: 'Você vai remover esta data da configuração.',
+            icon: 'warning',
+            confirmButtonText: 'Sim'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                feriados.splice(index, 1);
+                renderFeriados();
+            }
+        });
+    }
+
     function updateFeriado(i, f, v) { feriados[i][f] = v; if(f==='ativo') renderFeriados(); }
     
+    // --- LÓGICA DE SALVAR HORÁRIOS ---
     function saveSchedule() {
         const schedule = {
             weekdays: { active: document.getElementById('wd_active').checked, start: document.getElementById('wd_start').value, end: document.getElementById('wd_end').value },
@@ -374,7 +387,23 @@
             feriados: feriados
         };
         fetch('/admin/save_schedule', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(schedule) })
-        .then(r=>r.json()).then(d=>{ if(d.success) { bootstrap.Modal.getInstance(document.getElementById('modalConfigHorario')).hide(); new bootstrap.Modal(document.getElementById('modalSucessoConfig')).show(); } else alert('Erro: '+d.error); });
+        .then(r=>r.json()).then(d=>{ 
+            if(d.success) { 
+                bootstrap.Modal.getInstance(document.getElementById('modalConfigHorario')).hide(); 
+                
+                ModalPadrao.fire({
+                    title: 'Sucesso!',
+                    text: 'Horários salvos com sucesso.',
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    checkReload();
+                });
+            } else { 
+                ModalPadrao.fire('Erro', d.error, 'error'); 
+            } 
+        });
     }
     function checkReload() { if(document.getElementById('checkAuto').checked) window.location.reload(); }
 </script>

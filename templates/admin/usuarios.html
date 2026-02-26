@@ -168,8 +168,8 @@
 
     <div class="modal fade" id="modalNovoUsuario" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-danger text-white">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-danger text-white border-0 rounded-top-4">
                     <h5 class="modal-title fw-bold">Novo Usuário</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -209,7 +209,7 @@
                             <input type="text" class="form-control" name="telegram_id" placeholder="Ex: 123456789">
                             <div class="form-text">Para receber notificações do sistema.</div>
                         </div>
-                        <button type="submit" class="btn btn-danger w-100 fw-bold shadow-sm">Criar Usuário</button>
+                        <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm">Criar Usuário</button>
                     </form>
                 </div>
             </div>
@@ -218,8 +218,8 @@
 
     <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-danger text-white">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-danger text-white border-0 rounded-top-4">
                     <h5 class="modal-title fw-bold">Editar Usuário</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -259,34 +259,18 @@
                             <label class="form-label fw-bold">Telegram ID</label>
                             <input type="text" class="form-control" name="telegram_id" id="edit_telegram_id">
                         </div>
-                        <button type="submit" class="btn btn-danger w-100 fw-bold shadow-sm">Salvar Alterações</button>
+                        <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm">Salvar Alterações</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalExcluir" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-body p-4 text-center">
-                    <div class="text-danger mb-3">
-                        <i class="fas fa-exclamation-circle fa-4x"></i>
-                    </div>
-                    <h4 class="fw-bold mb-2">Tem certeza?</h4>
-                    <p class="text-muted">Essa ação removerá permanentemente o acesso deste usuário.</p>
-                    <div class="d-flex justify-content-center gap-2 mt-4">
-                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-danger px-4" id="btnConfirmarExclusao">Sim, Excluir</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     {% include 'footer.html' %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Função para mostrar/ocultar senha
         function togglePassword(inputId, iconId) {
@@ -315,7 +299,7 @@
             const p2 = document.getElementById('new_confirm_password').value;
             
             if (p1 !== p2) {
-                alert('As senhas não coincidem!');
+                ModalPadrao.fire('Erro', 'As senhas não coincidem!', 'error');
                 return;
             }
 
@@ -331,10 +315,10 @@
                 if (json.success) {
                     location.reload();
                 } else {
-                    alert('Erro: ' + json.error);
+                    ModalPadrao.fire('Erro', json.error, 'error');
                 }
             } catch (err) {
-                alert('Erro ao criar usuário.');
+                ModalPadrao.fire('Erro', 'Erro ao criar usuário.', 'error');
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -353,7 +337,7 @@
                     const data = await res.json();
                     
                     if (data.error) {
-                        alert(data.error);
+                        ModalPadrao.fire('Erro', data.error, 'error');
                         return;
                     }
 
@@ -370,7 +354,7 @@
 
                 } catch (err) {
                     console.error(err);
-                    alert('Erro ao buscar dados do usuário.');
+                    ModalPadrao.fire('Erro', 'Erro ao buscar dados do usuário.', 'error');
                 }
             }
         });
@@ -384,7 +368,7 @@
             const p2 = document.getElementById('edit_confirm_password').value;
             
             if (p1 && p1 !== p2) {
-                alert('A nova senha e a confirmação não coincidem!');
+                ModalPadrao.fire('Erro', 'A nova senha e a confirmação não coincidem!', 'error');
                 return;
             }
 
@@ -397,50 +381,41 @@
                 if (json.success) {
                     location.reload();
                 } else {
-                    alert('Erro: ' + json.error);
+                    ModalPadrao.fire('Erro', json.error, 'error');
                 }
             } catch (err) {
-                alert('Erro ao atualizar usuário.');
+                ModalPadrao.fire('Erro', 'Erro ao atualizar usuário.', 'error');
             }
         });
 
-        // Excluir Usuário
-        let usuarioIdParaExcluir = null;
-        const modalExcluir = new bootstrap.Modal(document.getElementById('modalExcluir'));
-        const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
-
+        // --- LÓGICA DE EXCLUSÃO PADRONIZADA ---
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.btn-apagar-usuario');
             if (btn && !btn.disabled) {
-                usuarioIdParaExcluir = btn.dataset.usuarioId;
-                modalExcluir.show();
-            }
-        });
-
-        btnConfirmarExclusao.addEventListener('click', async () => {
-            if (!usuarioIdParaExcluir) return;
-
-            const originalText = btnConfirmarExclusao.innerHTML;
-            btnConfirmarExclusao.innerHTML = 'Excluindo...';
-            btnConfirmarExclusao.disabled = true;
-
-            try {
-                const res = await fetch(`/admin/delete_usuario/${usuarioIdParaExcluir}`, { method: 'POST' });
-                const json = await res.json();
+                const usuarioIdParaExcluir = btn.dataset.usuarioId;
                 
-                if (json.success) {
-                    location.reload();
-                } else {
-                    alert('Erro: ' + json.error);
-                    modalExcluir.hide();
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Erro ao apagar usuário.');
-                modalExcluir.hide();
-            } finally {
-                btnConfirmarExclusao.innerHTML = originalText;
-                btnConfirmarExclusao.disabled = false;
+                ModalPadrao.fire({
+                    title: 'Tem certeza?',
+                    text: 'Essa ação removerá permanentemente o acesso deste usuário.',
+                    icon: 'warning',
+                    confirmButtonText: 'Sim'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const res = await fetch(`/admin/delete_usuario/${usuarioIdParaExcluir}`, { method: 'POST' });
+                            const json = await res.json();
+                            
+                            if (json.success) {
+                                location.reload();
+                            } else {
+                                ModalPadrao.fire('Erro', json.error, 'error');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            ModalPadrao.fire('Erro', 'Erro ao apagar usuário.', 'error');
+                        }
+                    }
+                });
             }
         });
     </script>
