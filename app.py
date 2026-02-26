@@ -805,7 +805,6 @@ def clientes():
 
     params = [] 
 
-    # --- ALTERAÇÃO AQUI: Adicionado data_instalacao e turno_instalacao ---
     sql_select = """
         SELECT id, nome, cpf, telefone, plano, status_instalacao, data_instalacao, turno_instalacao
         FROM cadastros 
@@ -817,7 +816,18 @@ def clientes():
     if busca_cpf:
         sql_select += " AND REPLACE(REPLACE(cpf, '.', ''), '-', '') LIKE %s"
         params.append(f"%{busca_cpf}%")
-    sql_select += " ORDER BY id DESC LIMIT %s OFFSET %s"
+        
+    # --- MUDANÇA AQUI: Nova lógica de ordenação (ORDER BY) ---
+    sql_select += """ 
+        ORDER BY 
+            CASE 
+                WHEN status_instalacao = 'N/D' THEN 1         /* Não Agendadas vêm primeiro */
+                WHEN status_instalacao = 'Programada' THEN 2  /* Programadas vêm em segundo */
+                ELSE 3                                        /* Concluídas e Não Realizadas vão para baixo */
+            END ASC,
+            id DESC 
+        LIMIT %s OFFSET %s
+    """
     params.extend([per_page, offset])
     cursor.execute(sql_select, params)
     cadastros = cursor.fetchall()
@@ -833,8 +843,6 @@ def clientes():
                            total_pages=total_pages,
                            busca_nome=busca_nome,
                            busca_cpf=busca_cpf)
-
-# Em app.py, substitua a rota '/admin/imprimir/<int:cliente_id>' por esta:
 
 @app.route('/admin/imprimir/<int:cliente_id>')
 @login_required
