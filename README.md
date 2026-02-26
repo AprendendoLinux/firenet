@@ -625,7 +625,6 @@ Este projeto é projetado exclusivamente para execução em Docker. Não há sup
 ```
 git clone https://github.com/AprendendoLinux/firenet.git
 cd firenet/
-
 ```
 
 2. Edite o `docker-compose.yml` com valores reais para as variáveis de ambiente (substitua os "fake_" placeholders):
@@ -643,7 +642,6 @@ cd firenet/
 
 ```
 docker-compose up -d --build
-
 ```
 - O app roda em `http://localhost:8080/` (mapeado de porta 5000 interna).
 - O DB MySQL roda em `localhost:3306` (acesso via root com senha definida).
@@ -656,7 +654,6 @@ docker-compose up -d --build
 ```
 docker-compose down
 docker-compose up -d
-
 ```
 
 6. Logs e depuração: `docker-compose logs -f firenet` para app, `docker-compose logs -f database` para DB.
