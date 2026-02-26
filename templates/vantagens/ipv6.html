@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede IPv6 Nativa - FireNet Telecom</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+{% include 'menu_publico.html' %}
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center text-danger mb-2">Rede IPv6 Nativa</h2>
+        
+        <p>Para entender o IPv6 de um jeito bem simples, imagine que a internet é uma cidade gigante. Para o correio entregar uma encomenda, cada casa precisa ter um endereço único, certo? Na internet, esse "endereço" do seu aparelho (celular, TV, videogame) se chama IP.</p>
+        
+        <p>O problema é que o sistema antigo (o IPv4) foi criado há muito tempo e as "ruas" lotaram. Faltou endereço para todo mundo! Para resolver isso, as operadoras comuns começaram a colocar várias casas no mesmo endereço (uma técnica chamada CGNAT). Isso até funciona para o básico, mas deixa a internet com gargalos, causa travamentos em jogos online e atrapalha muito quem usa câmeras de segurança.</p>
+        
+        <p>O IPv6 é o novo sistema de endereços da internet. É como se tivessem criado um planeta inteiro novo, com espaço infinito, onde cada aparelho seu tem o seu próprio endereço VIP e exclusivo, sem precisar dividir com os vizinhos. Na FireNet Telecom, a nossa rede já é 100% preparada e opera nativamente com o IPv6.</p>
+        
+        <p>Na prática, isso significa que seu videogame se conecta direto aos servidores melhorando o "Ping" nos jogos, suas câmeras de segurança e dispositivos de casa inteligente funcionam de forma muito mais rápida, e os maiores sites do mundo carregam com total fluidez. Com a FireNet, você não pega o trânsito das redes antigas, você navega numa via expressa, moderna e livre de gargalos!</p>
+    </div>
+</section>
+
+<section id="vantagens" class="py-5 bg-light">
+    {% include 'cards_vantagens.html' %}
+</section>
+
+{% include 'footer.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

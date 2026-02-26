@@ -399,9 +399,9 @@ def index():
 def contato():
     return render_template('contato.html', recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
 
-@app.route('/vantagens/ipv6-ipv4-fixo')
+@app.route('/vantagens/ipv6')
 def vantagens_ipv6():
-    return render_template('vantagens/ipv6_ipv4_fixo.html')
+    return render_template('vantagens/ipv6.html')
 
 @app.route('/vantagens/baixa-latencia')
 def vantagens_latencia():
