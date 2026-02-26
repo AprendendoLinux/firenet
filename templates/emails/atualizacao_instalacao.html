@@ -33,7 +33,7 @@
             <td class="content" style="padding: 40px 30px; text-align: center;">
                 <h1 style="color: #dc3545; font-weight: 700; font-size: 28px; margin-bottom: 20px;">Atualização na sua Instalação</h1>
                 <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Olá, {{ nome }}!</p>
-                <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Sua instalação foi atualizada.</p>
+                <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">O status do seu pedido foi atualizado.</p>
                 <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;"><strong>Data da instalação:</strong> {{ data_instalacao or 'Não definida' }}</p>
                 <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;"><strong>Turno:</strong> {{ turno_instalacao or 'Não definido' }}</p>
                 <p style="font-weight: bold; color: {% if status_instalacao == 'Programada' %}#b8860b{% elif status_instalacao == 'Concluída' %}#006400{% elif status_instalacao == 'Não Realizada' %}#ff0000{% else %}#198754{% endif %}; font-size: 16px; line-height: 1.6; margin-bottom: 20px;"><strong>Status:</strong> {{ status_instalacao }}</p>
