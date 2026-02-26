@@ -1,6 +1,6 @@
-# FireNet Telecom - Sistema de Gerenciamento de Cadastros e Instalação
+# Sistema de Gerenciamento de Cadastros e Instalação
 
-![FireNet Logo](https://firenettelecom.com.br/static/logo.png) <!-- Substitua por um logo real se disponível -->
+![FireNet Telecom](https://firenettelecom.com.br/static/logo.png)
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repo-blue?logo=github)](https://github.com/AprendendoLinux/firenet)
 [![Licença](https://img.shields.io/badge/Licença-MIT-green)](LICENSE)
@@ -11,15 +11,15 @@
 
 ## Introdução
 
-Bem-vindo ao repositório **FireNet Telecom**! Este projeto é uma aplicação web completa desenvolvida em Python com o framework Flask, projetada para gerenciar cadastros de clientes de uma provedora de internet chamada FireNet Telecom. O sistema permite o registro de novos clientes, gerenciamento de instalações, envio de notificações por email e Telegram, reset de senhas, verificação de cobertura de endereços, geração de relatórios, páginas públicas de marketing com detalhes sobre vantagens e muito mais.
+Bem-vindo ao repositório **FireNet Telecom**! Este projeto é uma aplicação web completa desenvolvida em Python com o framework Flask, projetada para gerenciar cadastros de clientes de uma provedora de internet chamada **FireNet Telecom**. O sistema permite o registro de novos clientes, gerenciamento de instalações, envio de notificações por email e Telegram, reset de senhas, verificação de cobertura de endereços, geração de relatórios, páginas públicas de marketing com detalhes sobre vantagens e muito mais.
 
-O objetivo principal é fornecer uma solução robusta e escalável para automação de processos administrativos em provedores de telecomunicações, com foco em usabilidade, segurança e integração com serviços externos como Google Maps, reCAPTCHA e bots de Telegram. O frontend é construído com templates HTML renderizados via Jinja2, Bootstrap para responsividade e JavaScript para interações dinâmicas, como validações em tempo real, modais, buscas AJAX, wizards de cadastro e mapas interativos. Inclui templates profissionais para emails, garantindo comunicações consistentes e branded.
+O objetivo principal desse projeto é fornecer uma solução robusta e escalável para automação de processos administrativos para a **FireNet Telecom**, com foco em usabilidade, segurança e integração com serviços externos como Google Maps, reCAPTCHA e bots de Telegram. O frontend é construído com templates HTML renderizados via Jinja2, Bootstrap para responsividade e JavaScript para interações dinâmicas, como validações em tempo real, modais, buscas AJAX, wizards de cadastro e mapas interativos. Inclui templates profissionais para emails, garantindo comunicações consistentes e branded.
 
-Este repositório é mantido por [AprendendoLinux](https://github.com/AprendendoLinux) e está hospedado em [https://github.com/AprendendoLinux/firenet](https://github.com/AprendendoLinux/firenet). Se você é um desenvolvedor interessado em Flask, Docker ou automação de workflows administrativos, este projeto pode servir como um excelente exemplo prático. O projeto é projetado exclusivamente para execução em Docker, garantindo consistência entre ambientes de desenvolvimento e produção.
+Este repositório é mantido por [**Henrique Fagundes**](https://henrique.tec.br) e está hospedado aqui no [**Github**](https://github.com/AprendendoLinux/firenet). Se você é um desenvolvedor interessado em Flask, Docker ou automação de workflows administrativos, este projeto pode servir como um excelente exemplo prático. O projeto é projetado exclusivamente para execução em Docker, garantindo consistência entre ambientes de desenvolvimento e produção.
 
 ### Motivação do Projeto
 
-A FireNet Telecom é inspirada em cenários reais de provedores de internet locais no Brasil, onde o gerenciamento manual de cadastros leva a erros, atrasos e perda de eficiência. Este sistema resolve problemas como:
+Este projeto foi inspirado em cenários reais de provedores de internet locais no Brasil, onde o gerenciamento manual de cadastros leva a erros, atrasos e perda de eficiência. Este sistema resolve problemas como:
 - Validação automática de CPF e endereços via CEP.
 - Notificações em tempo real para administradores via email e Telegram, com templates customizados para boas-vindas, resets de senha, atualizações de instalação e alertas de novos cadastros.
 - Agendamento e rastreamento de instalações com status como "Programada", "Concluída" ou "Não Realizada".
@@ -29,6 +29,10 @@ A FireNet Telecom é inspirada em cenários reais de provedores de internet loca
 - Integração com banco de dados MySQL para persistência de dados.
 - Segurança com hashing de senhas e proteção contra spam via reCAPTCHA.
 - Gerenciamento de usuários administrativos e áreas de cobertura.
+- **Retenção Inteligente de Clientes:** Identificação de duplicidade de CPF no cadastro com engatilho automático para resgate da venda via atendimento no Telegram e WhatsApp.
+- **Atendimento Virtual Dinâmico:** Um widget pré-atendente no site que gerencia filas de suporte, verifica viabilidade técnica (ViaCEP + banco de dados local) e informa o status do pedido antes do cliente ser repassado ao atendimento humano.
+- **Gestão Dinâmica de Expediente:** Controle absoluto dos horários de atendimento da equipe, com bloqueios automáticos no site aos finais de semana e feriados configurados.
+- **Alertas e Comunicados Globais:** Módulo anti-conflito para emitir avisos emergenciais e comunicados institucionais na interface do cliente.
 
 O projeto foi desenvolvido com ênfase em boas práticas de programação, como uso de variáveis de ambiente via Docker Compose para configurações sensíveis, tratamento de erros robusto, modularidade para facilitar expansões futuras e um frontend intuitivo com modais para edições, buscas filtradas e elementos reutilizáveis como headers e footers.
 
@@ -49,6 +53,10 @@ O projeto foi desenvolvido com ênfase em boas práticas de programação, como 
 - **Segurança**: Hashing de senhas com Werkzeug, sanitização de inputs para prevenir SQL Injection e XSS, sessões permanentes com Flask.
 - **Frontend Avançado**: Páginas administrativas com tabelas responsivas, modais para edições, buscas dinâmicas por nome/CPF/username/email, máscaras de input (ex: CPF, data) e atualizações AJAX sem recarregar a página. Páginas públicas com carrosséis, cards de vantagens e formulários validados.
 - **Deploy com Docker**: Fácil implantação usando Docker Compose, incluindo container para o app e banco de dados MySQL. Não há suporte para execução local sem Docker.
+- **Atendente Virtual (WhatsApp Widget)**: Modal dinâmico multi-step integrado ao frontend para triagem de suporte, consulta de planos, verificação de viabilidade (ViaCEP + banco local), rastreio de status de instalação e redirecionamento inteligente.
+- **Gestão Inteligente de Horários**: Sistema automatizado configurável pelo painel admin que verifica os dias da semana e feriados, alterando dinamicamente a disponibilidade de suporte e mensagens de "Loja Fechada" no site.
+- **Sistema de Retenção de Clientes**: Fluxo automatizado que identifica tentativas de cadastro com CPFs duplicados, bloqueia a duplicidade no banco e gera um chamado imediato via Telegram para a equipe recuperar a venda com apenas um clique.
+- **Gestão de Avisos Globais**: Painel para criação de alertas temporários para clientes. Possui um "rolo compressor" lógico em SQL/Python que detecta e desativa automaticamente avisos conflitantes no mesmo período temporal.
 
 Este sistema é escalável e pode ser adaptado para outros contextos, como e-commerces ou CRMs simples, com um foco em interfaces amigáveis para administradores e usuários finais.
 
@@ -57,7 +65,7 @@ Este sistema é escalável e pode ser adaptado para outros contextos, como e-com
 O projeto utiliza uma stack moderna e leve, focada em performance e facilidade de manutenção:
 
 - **Backend**: Python 3.11 com Flask 3.0.3 como framework web.
-- **Banco de Dados**: MySQL (via PyMySQL 1.1.1) para armazenamento relacional, com tabelas como `cadastros`, `usuarios`, `relatorios`, `cobertura` e `password_resets`.
+- **Banco de Dados**: MySQL (via PyMySQL 1.1.1) para armazenamento relacional, com tabelas como `cadastros`, `usuarios`, `relatorios`, `cobertura`, `avisos` e `configuracoes`.
 - **Segurança**: Werkzeug 3.0.4 para hashing de senhas e gerenciamento de sessões.
 - **Notificações**:
   - Flask-Mail 0.10.0 para envio de emails, com templates HTML renderizados via Jinja2.
@@ -65,9 +73,9 @@ O projeto utiliza uma stack moderna e leve, focada em performance e facilidade d
 - **Outras Bibliotecas**:
   - Requests 2.32.3 para chamadas HTTP (ex: verificação de reCAPTCHA).
   - Cryptography 43.0.3 para operações criptográficas.
-  - Asyncio para tarefas assíncronas (ex: envio de mensagens no Telegram).
+  - Asyncio e Threading para tarefas assíncronas (ex: envio de mensagens no Telegram sem travar a thread principal).
   - UUID para geração de tokens únicos.
-- **Frontend**: HTML5, CSS3 e JavaScript vanilla (com Bootstrap 5.3.3 para layout responsivo, Font Awesome para ícones, SweetAlert para modais customizados e Jinja2 para templates). Inclui scripts para máscaras de input, validações client-side, AJAX para edições e buscas dinâmicas, wizards multi-step e integração com Google Maps.
+- **Frontend**: HTML5, CSS3 e JavaScript vanilla (com Bootstrap 5.3.3 para layout responsivo, Font Awesome para ícones, SweetAlert para modais customizados e Jinja2 para templates). Inclui scripts para máscaras de input matemáticas, validações client-side, AJAX (Fetch API) para edições e buscas dinâmicas, wizards multi-step e integração com Google Maps.
 - **Containerização**: Docker com Dockerfile e docker-compose.yml para ambientes de desenvolvimento e produção. O app roda em um container Python e o DB em MySQL latest.
 - **Outros**: reCAPTCHA para anti-spam, Google Maps API para mapas, CSS customizado para páginas de impressão e SEO com meta tags.
 
@@ -79,14 +87,15 @@ A estrutura de diretórios é organizada para separar lógica de negócios, temp
 
 ```
 firenet/
-├── app.py                  # Arquivo principal da aplicação Flask com rotas, lógica de negócios e integrações.
+├── app.py                  # Arquivo principal da aplicação Flask com rotas, lógica de negócios, API e integrações.
 ├── sql.py                  # Módulo para gerenciamento de banco de dados (conexões, inicializações de tabelas, migrações).
 ├── requirements.txt        # Dependências Python para build Docker.
 ├── Dockerfile              # Configuração para build da imagem Docker do app.
 ├── docker-compose.yml      # Configuração para orquestração de containers (app + DB MySQL).
 ├── templates/              # Diretório de templates HTML renderizados via Jinja2:
-│   ├── index.html          # Página inicial pública com visão geral da FireNet, seções de planos, vantagens, cobertura, etc.
+│   ├── index.html          # Página inicial pública com visão geral da empresa, seções de planos, vantagens, cobertura, etc.
 │   ├── cadastro.html       # Formulário de cadastro de clientes em wizard multi-step com validações.
+│   ├── whatsapp_widget.html# Componente de Atendente Virtual interativo com fluxos modais de triagem.
 │   ├── login.html          # Página de login administrativo.
 │   ├── forgot_password.html # Página para solicitação de reset de senha.
 │   ├── reset_password.html # Página para redefinição de senha via token.
@@ -112,6 +121,7 @@ firenet/
 │   ├── admin/              # Subdiretório para templates administrativos:
 │   │   ├── menu.html       # Menu de navegação administrativo (incluído em outras páginas admin).
 │   │   ├── clientes.html   # Lista de clientes com buscas, edições modais e agendamentos.
+│   │   ├── avisos.html     # Painel para gerenciamento do sistema de alertas e comunicados globais.
 │   │   ├── relatorios.html # Página de relatórios com geração, listagem e impressão.
 │   │   ├── usuarios.html   # Gerenciamento de usuários com criação, edição e exclusão.
 │   │   ├── cobertura.html  # Gerenciamento de áreas de cobertura com criação, edição e exclusão.
@@ -124,6 +134,7 @@ firenet/
 │   └── img/                # Imagens e logos (ex: logo.png, whatsapp.webp, card_firenet.jpg).
 ├── LICENSE                 # Arquivo de licença (MIT recomendado).
 └── README.md               # Este documento de documentação extensiva.
+
 ```
 
 Nota: Os templates utilizam includes Jinja para reutilizar componentes como menu, footer e cards de vantagens, promovendo DRY (Don't Repeat Yourself). Templates de email são renderizados via Flask-Mail com variáveis Jinja para personalização dinâmica. Se o repositório real tiver mais arquivos, atualize esta seção.
@@ -133,6 +144,12 @@ Nota: Os templates utilizam includes Jinja para reutilizar componentes como menu
 Abaixo, uma descrição detalhada e extensa de cada template frontend principal, incluindo sua funcionalidade, componentes chave e integrações com o backend. Esses templates são renderizados dinamicamente via Flask e Jinja2, com dados passados do backend. Divididos em públicos (marketing/usuário), administrativos e emails.
 
 ### Templates Públicos
+
+#### templates/whatsapp_widget.html (NOVO)
+Modal interativo de pré-atendimento (Atendente Virtual) que flutua em todas as páginas públicas.
+- **Estrutura Principal**: Divisões em múltiplos "steps" invisíveis que simulam um aplicativo. O cliente escolhe consultar planos (carrossel dinâmico), consultar viabilidade por CEP, rastrear o status do agendamento (via CPF) ou ser redirecionado para departamentos específicos (Suporte, Financeiro, Vendas).
+- **JavaScript Integrado**: Validação matemática e formatação automática de CPF; Fetch API acionando rotas do backend (`/api/check_status`, `/api/consultar_cpf`); verificação unificada de ViaCEP combinada com a base local para detectar cobertura no endereço.
+- **Integrações**: Lê variáveis Jinja `{{ whatsapp_ativo }}` para determinar em milissegundos se o expediente está aberto ou fechado, travando ou liberando a transferência do usuário para o link direto do `wa.me`.
 
 #### templates/contato.html
 
@@ -177,10 +194,10 @@ Página inicial pública, servindo como landing page de marketing com seções s
 
 #### templates/cards_vantagens.html
 
-Template include para cards de vantagens, reutilizado em index.html e páginas de vantagens para listar benefícios da FireNet.
+Template include para cards de vantagens, reutilizado em index.html e páginas de vantagens para listar benefícios do provedor.
 
 - **Estrutura Principal**:
-  - Container com título "Vantagens da FireNet Telecom".
+  - Container com título "Vantagens".
   - Grid responsivo de cards: Cada card com ícone Font Awesome, título, descrição curta e link "Saiba mais" para páginas de vantagens específicas (ex: /vantagens/ipv6-ipv4-fixo).
   - 8 vantagens: IPv6 & IPv4 Fixo, Baixa Latência, DNS Próprio, Suporte 24h, Sem Fidelidade, Instalação Rápida, WhatsApp Rápido, Infraestrutura Premium.
   - Botão flutuante WhatsApp (repetido para consistência).
@@ -194,7 +211,7 @@ Template include para cards de vantagens, reutilizado em index.html e páginas d
 Footer reutilizável incluído em todas as páginas públicas e algumas admin.
 
 - **Estrutura Principal**:
-  - Background dark com texto branco: Copyright "© 2025 FireNet Telecom - Todos os direitos reservados."
+  - Background dark com texto branco: Copyright contendo informações de autoria e direitos.
 
 - **Integrações**:
   - Simples include Jinja.
@@ -259,10 +276,10 @@ Página pública para cadastro de clientes em formato wizard multi-step.
 
 - **Estrutura Principal**:
   - Header reutilizável.
-  - Stepper visual com dots e linhas para 4 passos: Dados Pessoais, Endereço, Plano, LGPD.
+  - Stepper visual com dots e linhas para passos: Dados Pessoais, Endereço, Plano, LGPD.
   - Forms validados por passo: Campos com máscaras (CPF, RG, data nascimento, telefone, CEP), selects para planos/vencimentos, checkboxes para WhatsApp/LGPD.
   - Botões de navegação (próximo/voltar) e submit final.
-  - Verificação AJAX de CPF duplicado.
+  - Verificação AJAX de CPF duplicado, que bloqueia o usuário e abre a janela do plano de "Retenção" caso ele já seja cliente.
 
 - **JavaScript Integrado**:
   - Funções para máscaras (CPF, RG, data, telefone, CEP, senha rede).
@@ -372,6 +389,12 @@ Essas páginas estáticas detalham cada vantagem listada nos cards, acessíveis 
 
 ### Templates Administrativos
 
+#### templates/admin/avisos.html (NOVO)
+Painel de controle para criação e disparo de alertas globais no site.
+- **Estrutura Principal**: Formulários para definir título, mensagem, tipo de alerta (warning, info, danger) e datas de início/fim da validade.
+- **JavaScript Integrado**: Comunicação AJAX para salvar e alternar (toggle) o status de ativo/inativo do aviso na interface.
+- **Integrações**: Chama a função do Rolo Compressor do backend (`desativar_conflitos()`) para garantir que os períodos estipulados de avisos não entrem em colisão na tela do usuário.
+
 #### templates/admin/relatorios.html
 
 Este template gerencia a página de relatórios administrativos. É uma interface para gerar novos relatórios baseados em instalações concluídas, listar relatórios antigos com paginação e imprimir via nova aba.
@@ -386,7 +409,7 @@ Este template gerencia a página de relatórios administrativos. É uma interfac
 
 - **JavaScript Integrado**:
   - Máscara para data de vencimento usando regex.
-  - Validação antes de submit: Verifica se há pelo menos 3 instalações concluídas via `TOTAL_INST`; exibe modal ou alert se insuficiente.
+  - Validação antes de submit: Verifica se há pelo menos 3 instalações concluídas; exibe modal ou alert se insuficiente.
   - Abre nova aba para impressão após geração via sessão (`session['novo_relatorio']`).
 
 - **Integrações**:
@@ -398,7 +421,7 @@ Este template gerencia a página de relatórios administrativos. É uma interfac
 Template reutilizável para o menu de navegação administrativo, incluído em todas as páginas admin.
 
 - **Estrutura Principal**:
-  - Header sticky com logo e links de navegação: Clientes, Usuários, Relatórios, Área de Cobertura, Logout.
+  - Header sticky com logo e links de navegação: Clientes, Usuários, Relatórios, Área de Cobertura, Avisos, Logout.
   - Versão desktop: Links horizontais.
   - Versão mobile: Botão hambúrguer para collapse vertical.
 
@@ -413,7 +436,7 @@ Template otimizado para impressão de ficha individual de cliente, formatado par
 - **Estrutura Principal**:
   - Div `.a4-page` com seções: Dados Pessoais, Endereço, Dados do Plano, Instalação, Outros.
   - Cabeçalho com logo e título.
-  - Campos preenchidos via variáveis Jinja (ex: `{{ cliente[1] }}` para nome).
+  - Campos preenchidos via variáveis Jinja.
   - Rodapé com copyright.
   - Botão "Imprimir Ficha" (oculto na impressão via `.no-print`).
 
@@ -527,9 +550,9 @@ Template de boas-vindas para novos clientes pós-cadastro.
 - **Estrutura Principal**:
   - Tabela responsiva para layout email-safe.
   - Header com logo.
-  - Conteúdo: Saudação personalizada (`{{ nome }}`), mensagem de agradecimento, call-to-action button "Acessar Site".
+  - Conteúdo: Saudação personalizada, mensagem de agradecimento, call-to-action button "Acessar Site".
   - Footer vermelho com copyright.
-  - Estilos inline: Font Montserrat, cores branding (#dc3545 para vermelho), responsivo via media queries.
+  - Estilos inline: Font Montserrat, cores branding, responsivo via media queries.
 
 - **Integrações**:
   - Renderizado em função de cadastro com `nome`, `base_url`, `current_year`.
@@ -542,7 +565,7 @@ Template para email de reset de senha, com link temporário.
 - **Estrutura Principal**:
   - Tabela responsiva.
   - Header com logo.
-  - Conteúdo: Saudação, instrução para clicar no button "Redefinir Senha" (`{{ reset_url }}`), aviso se não solicitado.
+  - Conteúdo: Saudação, instrução para clicar no button "Redefinir Senha", aviso se não solicitado.
   - Footer com copyright.
   - Estilos inline similares aos outros emails.
 
@@ -557,7 +580,7 @@ Template para notificar clientes sobre atualizações no status de instalação.
 - **Estrutura Principal**:
   - Tabela responsiva.
   - Header com logo.
-  - Conteúdo: Saudação (`{{ nome }}`), detalhes: Data, Turno, Status (com cor condicional via inline CSS: amarelo para Programada, verde para Concluída, vermelho para Não Realizada), Observações.
+  - Conteúdo: Saudação, detalhes: Data, Turno, Status (com cor condicional via inline CSS: amarelo para Programada, verde para Concluída, vermelho para Não Realizada), Observações.
   - Button "Acessar Site".
   - Footer.
   - Estilos inline, incluindo cores condicionais para status.
@@ -573,7 +596,7 @@ Template detalhado para alertar admins sobre novo cadastro de cliente.
 - **Estrutura Principal**:
   - Tabela responsiva.
   - Header com logo.
-  - Conteúdo: Título "Novo Cadastro", tabela com todos os dados do cliente (Nome, CPF, RG, Data Nascimento, Telefone, WhatsApp, Email, CEP, Rua, Número, Complemento, Ponto Referência, Bairro, Plano, Vencimento, Nome Rede, Senha Rede, LGPD, Data Cadastro).
+  - Conteúdo: Título "Novo Cadastro", tabela com todos os dados do cliente.
   - Footer.
   - Estilos inline para tabela (zebrada, borders).
 
@@ -598,98 +621,88 @@ Este projeto é projetado exclusivamente para execução em Docker. Não há sup
 ### Instalação com Docker
 
 1. Clone o repositório:
-   ```
-   git clone https://github.com/AprendendoLinux/firenet.git
-   cd firenet
-   ```
+
+```
+git clone https://github.com/AprendendoLinux/firenet.git
+cd firenet/
+
+```
 
 2. Edite o `docker-compose.yml` com valores reais para as variáveis de ambiente (substitua os "fake_" placeholders):
-   - `DB_PASSWORD`: Senha segura para MySQL.
-   - `GOOGLE_MAPS_API_KEY`: Chave válida.
-   - `SECRET_KEY`: Chave Flask única.
-   - `TELEGRAM_BOT_TOKEN`: Token do bot.
-   - `MAIL_SERVER`, `MAIL_PORT`, etc.: Configurações SMTP.
-   - `APP_BASE_URL`: URL base (ex: https://seu-dominio.com/).
-   - `RECAPTCHA_SITE_KEY` e `RECAPTCHA_SECRET_KEY`: Chaves Google.
-   - `MYSQL_ROOT_PASSWORD`: Senha root MySQL.
-   - Volumes persistentes: `/srv/database` para dados MySQL.
+- `DB_PASSWORD`: Senha segura para MySQL.
+- `Maps_API_KEY`: Chave válida.
+- `SECRET_KEY`: Chave Flask única.
+- `TELEGRAM_BOT_TOKEN`: Token do bot.
+- `MAIL_SERVER`, `MAIL_PORT`, etc.: Configurações SMTP.
+- `APP_BASE_URL`: URL base (ex: https://seu-dominio.com/).
+- `RECAPTCHA_SITE_KEY` e `RECAPTCHA_SECRET_KEY`: Chaves Google.
+- `MYSQL_ROOT_PASSWORD`: Senha root MySQL.
+- Volumes persistentes: `/srv/database` para dados MySQL.
 
 3. Build e rode os containers:
-   ```
-   docker-compose up -d --build
-   ```
-   - O app roda em `http://localhost:8080/` (mapeado de porta 5000 interna).
-   - O DB MySQL roda em `localhost:3306` (acesso via root com senha definida).
-   - Aguarde inicialização: O app espera o DB estar pronto via `wait_for_db()`.
+
+```
+docker-compose up -d --build
+
+```
+- O app roda em `http://localhost:8080/` (mapeado de porta 5000 interna).
+- O DB MySQL roda em `localhost:3306` (acesso via root com senha definida).
+- Aguarde inicialização: O app espera o DB estar pronto via `wait_for_db()`.
 
 4. Acesse o app: Abra `http://localhost:8080/` no navegador. Login inicial: admin/admin (mude imediatamente).
 
 5. Para parar ou reiniciar:
-   ```
-   docker-compose down
-   docker-compose up -d
-   ```
+
+```
+docker-compose down
+docker-compose up -d
+
+```
 
 6. Logs e depuração: `docker-compose logs -f firenet` para app, `docker-compose logs -f database` para DB.
 
 Em produção: Use HTTPS via reverse proxy (ex: Nginx), volumes persistentes e secrets Docker para senhas. Monitore com tools como Portainer.
 
-## Uso
+## Uso e Endpoints (API)
 
-### Rotas Principais
+A aplicação expõe várias rotas HTTP e endpoints da API interna para as lógicas de retenção e validação do Javascript:
 
-A aplicação expõe várias rotas HTTP. Aqui vai uma lista detalhada com exemplos:
+- **APIs Internas e Background**:
+- `/api/solicitar_retorno` (POST): Rota chamada quando o CPF duplicado é detectado; dispara via Telegram e e-mail os dados do cliente, engatilhando a recuperação da venda.
+- `/api/consultar_cpf` e `/api/check_status` (POST): Rotas essenciais do Atendente Virtual, responsáveis por devolver status de instalação e validar dados do usuário em JSON.
+- `/admin/save_schedule` e `/admin/toggle_whatsapp` (POST): API restrita para salvar dinamicamente as tabelas de horários comerciais e feriados, refletindo globalmente na renderização dos widgets de atendimento do site.
 
-- **Públicas**:
-  - / (GET): Index com seções marketing.
-  - /contato (GET/POST): Formulário contato.
-  - /cadastro (GET/POST): Wizard cadastro.
-  - /check_cpf (POST): Verifica CPF (JSON).
-  - /check_coverage (POST): Verifica cobertura (JSON).
-  - /vantagens/<vantagem> (GET): Detalhes vantagens (ex: /vantagens/baixa-latencia).
-  - /sucesso (GET): Página sucesso.
-  - /forgot_password (GET/POST): Solicita reset.
-  - /reset_password/<token> (GET/POST): Reseta senha.
-  - /enviar_contato (POST): Processa contato.
-  - /login (GET/POST): Login.
-  - /logout (GET): Logout.
+- **Públicas Tradicionais**:
+- / (GET): Index com seções marketing.
+- /contato (GET/POST): Formulário contato.
+- /cadastro (GET/POST): Wizard cadastro.
+- /check_cpf (POST): Verifica CPF (JSON).
+- /check_coverage (POST): Verifica cobertura (JSON).
+- /vantagens/<vantagem> (GET): Detalhes vantagens.
+- /sucesso (GET): Página sucesso.
+- /forgot_password (GET/POST): Solicita reset.
+- /reset_password/<token> (GET/POST): Reseta senha.
+- /enviar_contato (POST): Processa contato.
+- /login (GET/POST): Login.
+- /logout (GET): Logout.
 
 - **Admin Rotas**:
-  - /admin/clientes (GET): Lista clientes com buscas.
-  - /admin/update_cliente/<id> (POST): Edita cliente.
-  - /admin/update_agendamento/<id> (POST): Atualiza instalação.
-  - /admin/imprimir_cliente/<id> (GET): Imprime ficha.
-  - /admin/relatorios (GET): Lista relatórios com paginação.
-  - /admin/gerar_relatorio (POST): Gera novo.
-  - /admin/imprimir_relatorio/<identificador> (GET): Imprime relatório.
-  - /admin/usuarios (GET): Lista usuários.
-  - /admin/create_usuario (POST): Cria usuário.
-  - /admin/update_usuario/<id> (POST): Edita usuário.
-  - /admin/delete_usuario/<id> (POST): Apaga usuário.
-  - /admin/cobertura (GET): Lista coberturas com buscas.
-  - /admin/create_cobertura (POST): Cria cobertura.
-  - /admin/update_cobertura/<id> (POST): Edita cobertura.
-  - /admin/delete_cobertura/<id> (POST): Apaga cobertura.
-
-### Exemplos de Uso
-
-1. **Cadastro Público**:
-   - Acesse /cadastro, preencha wizard, submeta para /cadastro (POST). Redireciona para /sucesso, envia emails boas-vindas e alerta admin.
-
-2. **Verificar Cobertura**:
-   - Em index #cobertura, solicite endereço, clique verificar. Usa AJAX para feedback.
-
-3. **Gerenciar Clientes Admin**:
-   - Em /admin/clientes, busque, edite via modal, atualize instalação (envia email de atualização).
-
-4. **Contato**:
-   - Em /contato, envie form com reCAPTCHA (envia email de contato para admins).
-
-5. **Explorar Vantagens**:
-   - De index #vantagens, clique em card para /vantagens/<slug> (ex: baixa-latencia para detalhes sobre latência baixa).
-
-6. **Reset Senha**:
-   - Em /forgot_password, solicite; receba email com link; redefina em /reset_password/<token>.
+- /admin/clientes (GET): Lista clientes com buscas.
+- /admin/update_cliente/<id> (POST): Edita cliente.
+- /admin/update_agendamento/<id> (POST): Atualiza instalação.
+- /admin/imprimir_cliente/<id> (GET): Imprime ficha.
+- /admin/relatorios (GET): Lista relatórios com paginação.
+- /admin/gerar_relatorio (POST): Gera novo.
+- /admin/imprimir_relatorio/<identificador> (GET): Imprime relatório.
+- /admin/usuarios (GET): Lista usuários.
+- /admin/avisos (GET/POST): Cria e edita comunicados de colisão controlada.
+- /admin/create_usuario (POST): Cria usuário.
+- /admin/update_usuario/<id> (POST): Edita usuário.
+- /admin/delete_usuario/<id> (POST): Apaga usuário.
+- /admin/cobertura (GET): Lista coberturas com buscas.
+- /admin/create_cobertura (POST): Cria cobertura.
+- /admin/update_cobertura/<id> (POST): Edita cobertura.
+- /admin/delete_cobertura/<id> (POST): Apaga cobertura.
 
 ## Configurações Avançadas
 
@@ -708,11 +721,11 @@ Relate em [Issues](https://github.com/AprendendoLinux/firenet/issues).
 
 ## Licença
 
-MIT License - veja [LICENSE](LICENSE).
+[MIT License](LICENSE).
 
 ## Contato
 
-- Autor: [AprendendoLinux](https://github.com/AprendendoLinux)
+- Autor: [**Henrique Fagundes**](https://henrique.tec.br)
 - Email: henrique@henrique.tec.br
 - Suporte: Issues no GitHub.
 
