@@ -67,9 +67,16 @@
                                             <div class="fw-bold text-dark nome">{{ cliente.nome }}</div>
                                             <small class="text-muted"><span class="cpf">{{ cliente.cpf }}</span></small>
                                         </td>
-                                        <td>
-                                            <div class="telefone"><i class="fas fa-phone-alt text-muted me-1 small"></i> {{ cliente.telefone }}</div>
-                                        </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="telefone"><i class="fas fa-phone-alt text-muted me-1 small"></i> {{ cliente.telefone }}</div>
+                                                    {% if cliente.whatsapp == 'Sim' %}
+                                                    <a href="javascript:void(0)" onclick="chamarWhatsApp('{{ cliente.telefone }}', '{{ cliente.nome }}')" title="Chamar no WhatsApp" class="text-decoration-none">
+                                                        <i class="fab fa-whatsapp text-success fs-5"></i>
+                                                    </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
                                         <td>
                                             <span class="badge bg-light text-dark border px-3 py-2 rounded-pill plano">{{ cliente.plano }}</span>
                                         </td>
@@ -144,10 +151,17 @@
                                     <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">CPF</small>
                                     <span class="fw-medium small cpf">{{ cliente.cpf }}</span>
                                 </div>
-                                <div class="col-6">
-                                    <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Telefone</small>
-                                    <span class="fw-medium small telefone">{{ cliente.telefone }}</span>
-                                </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Telefone</small>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-medium small telefone">{{ cliente.telefone }}</span>
+                                            {% if cliente.whatsapp == 'Sim' %}
+                                            <a href="javascript:void(0)" onclick="chamarWhatsApp('{{ cliente.telefone }}', '{{ cliente.nome }}')" title="Chamar no WhatsApp" class="text-decoration-none">
+                                                <i class="fab fa-whatsapp text-success fs-5"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                             </div>
 
                             <div class="bg-light p-2 rounded mb-3 border">
@@ -353,6 +367,34 @@
             });
         }
         aplicarMascaras('editar');
+
+        // Função para chamar no WhatsApp com saudação dinâmica
+        function chamarWhatsApp(telefone, nomeCompleto) {
+            // Limpa o número (deixa só os dígitos) e garante o código do Brasil (55)
+            let telLimpo = telefone.replace(/\D/g, '');
+            if (!telLimpo.startsWith('55')) {
+                telLimpo = '55' + telLimpo;
+            }
+            
+            // Pega apenas o primeiro nome para não ficar robótico (opcional)
+            // const primeiroNome = nomeCompleto.split(' ')[0];
+            
+            // Calcula a saudação
+            const hora = new Date().getHours();
+            let saudacao = "Bom dia";
+            if (hora >= 12 && hora < 18) {
+                saudacao = "Boa tarde";
+            } else if (hora >= 18) {
+                saudacao = "Boa noite";
+            }
+            
+            // Monta o texto em negrito (usando asteriscos no WhatsApp)
+            const texto = `Olá, *${nomeCompleto}*! ${saudacao}!`;
+            
+            // Abre o link em uma nova aba
+            const link = `https://api.whatsapp.com/send?phone=${telLimpo}&text=${encodeURIComponent(texto)}`;
+            window.open(link, '_blank');
+        }
 
         document.addEventListener('click', async function(e) {
             const btn = e.target.closest('.btn-editar, .btn-agendar');

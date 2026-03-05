@@ -811,7 +811,7 @@ def clientes():
     params = [] 
 
     sql_select = """
-        SELECT id, nome, cpf, telefone, plano, status_instalacao, data_instalacao, turno_instalacao
+        SELECT id, nome, cpf, telefone, whatsapp, plano, status_instalacao, data_instalacao, turno_instalacao
         FROM cadastros 
         WHERE 1=1
     """
