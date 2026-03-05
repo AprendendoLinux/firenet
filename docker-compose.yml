@@ -45,6 +45,12 @@ services:
       APP_BASE_URL: 'https://example.com/'
       # Email de resposta
       REPLY_TO_EMAIL: 'reply@example.com'
+      # Email para receber cópia oculta (BCC) dos e-mails enviados aos clientes
+      MAIL_BCC: 'copia_oculta@seudominio.com'
+      # Emails de destino do formulário de contato
+      CONTACT_EMAIL_SUPORTE: 'suporte@firenettelecom.online'
+      CONTACT_EMAIL_VENDAS: 'vendas@firenettelecom.online'
+      CONTACT_EMAIL_FINANCEIRO: 'financeiro@firenettelecom.online'
       # Habilita ou desabilia o reCAPTCHA
       ENABLE_RECAPTCHA: 'True'
       # Chave do site reCAPTCHA para proteção contra spam

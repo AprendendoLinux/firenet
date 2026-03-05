@@ -34,6 +34,7 @@ app.config['MAIL_USE_SSL'] = os.environ.get('MAIL_USE_SSL', 'False') == 'True'
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+app.config['MAIL_BCC'] = os.environ.get('MAIL_BCC')
 
 mail = Mail(app)
 
@@ -1945,9 +1946,9 @@ def enviar_contato_route():
 
     # Mapear setor para e-mail destinatário
     emails_setor = {
-        'Suporte': 'suporte@firenettelecom.online',
-        'Vendas': 'vendas@firenettelecom.online',
-        'Financeiro': 'financeiro@firenettelecom.online'
+        'Suporte': os.environ.get('CONTACT_EMAIL_SUPORTE', 'suporte@dominio.com'),
+        'Vendas': os.environ.get('CONTACT_EMAIL_VENDAS', 'vendas@dominio.com'),
+        'Financeiro': os.environ.get('CONTACT_EMAIL_FINANCEIRO', 'financeiro@dominio.com')
     }
     destinatario = emails_setor.get(setor)
     if not destinatario:
@@ -1971,30 +1972,61 @@ def enviar_contato_route():
 
     return redirect(url_for('contato'))
 
-# Função para email de reset (adicionada ao final, com outras funções de email)
+# Função para enviar email de reset
 def enviar_reset_senha(email_destino, token, base_url):
     with app.app_context():
         reset_url = f"{base_url}reset_password/{token}"
         current_year = datetime.now().year
+        
+        # Renderiza o HTML uma vez para usar nos dois envios
+        html_content = render_template('emails/reset_senha.html', reset_url=reset_url, base_url=base_url, current_year=current_year)
+        
+        # 1. Envia o e-mail para o cliente
         msg = Message('Reset de Senha - FireNet Telecom', recipients=[email_destino])
         msg.reply_to = app.config['REPLY_TO_EMAIL']
-        msg.html = render_template('emails/reset_senha.html', reset_url=reset_url, base_url=base_url, current_year=current_year)
+        msg.html = html_content
         try:
             mail.send(msg)
         except Exception as e:
             print(f"Erro ao enviar email de reset para {email_destino}: {e}")
 
-# Função para enviar email de boas-vindas ao usuário (adicionado base_url)
+        # 2. Envia a cópia oculta (separada) para o admin configurado no compose
+        mail_bcc = app.config.get('MAIL_BCC')
+        if mail_bcc:
+            msg_copy = Message(f'[CÓPIA] Reset de Senha de: {email_destino}', recipients=[mail_bcc])
+            msg_copy.reply_to = app.config['REPLY_TO_EMAIL']
+            msg_copy.html = html_content
+            try:
+                mail.send(msg_copy)
+            except Exception as e:
+                print(f"Erro ao enviar cópia de reset para admin: {e}")
+
+# Função para enviar email de boas-vindas ao usuário
 def enviar_boas_vindas(email_destino, nome, base_url):
     with app.app_context():
         current_year = datetime.now().year
+        
+        html_content = render_template('emails/boas_vindas.html', nome=nome, current_year=current_year, base_url=base_url)
+        
+        # 1. Envia o e-mail para o cliente
         msg = Message('Boas-vindas à FireNet Telecom', recipients=[email_destino])
         msg.reply_to = app.config['REPLY_TO_EMAIL']
-        msg.html = render_template('emails/boas_vindas.html', nome=nome, current_year=current_year, base_url=base_url)
+        msg.html = html_content
         try:
             mail.send(msg)
         except Exception as e:
             print(f"Erro ao enviar email de boas-vindas para {email_destino}: {e}")
+
+        # 2. Envia a cópia oculta (separada) para o admin
+        mail_bcc = app.config.get('MAIL_BCC')
+        if mail_bcc:
+            msg_copy = Message(f'[CÓPIA] Boas-vindas de: {email_destino}', recipients=[mail_bcc])
+            msg_copy.reply_to = app.config['REPLY_TO_EMAIL']
+            msg_copy.html = html_content
+            try:
+                mail.send(msg_copy)
+            except Exception as e:
+                print(f"Erro ao enviar cópia de boas-vindas para admin: {e}")
 
 # Função para notificar admins sobre novo cadastro (adicionado base_url)
 def notificar_admins_novo_cadastro(nome, cpf, rg, data_nascimento, telefone, whatsapp, email, cep, rua, numero, complemento, ponto_referencia, bairro, plano, vencimento, nome_rede, senha_rede, lgpd, base_url):
@@ -2078,13 +2110,12 @@ async def send_telegram_notifications(cadastro_data):
         except TelegramError as e:
             print(f"Erro ao enviar para {chat_id}: {e}")
 
-# Função para enviar email de atualização de instalação ao cliente (adicionado base_url)
+# Função para enviar email de atualização de instalação ao cliente
 def enviar_atualizacao_instalacao(email_destino, nome, data_instalacao, turno_instalacao, status_instalacao, observacoes, base_url):
     with app.app_context():
         current_year = datetime.now().year
-        msg = Message('Atualização de Instalação - FireNet Telecom', recipients=[email_destino])
-        msg.reply_to = app.config['REPLY_TO_EMAIL']
-        msg.html = render_template('emails/atualizacao_instalacao.html', 
+        
+        html_content = render_template('emails/atualizacao_instalacao.html', 
                                    nome=nome, 
                                    data_instalacao=data_instalacao, 
                                    turno_instalacao=turno_instalacao, 
@@ -2092,12 +2123,26 @@ def enviar_atualizacao_instalacao(email_destino, nome, data_instalacao, turno_in
                                    observacoes=observacoes, 
                                    current_year=current_year,
                                    base_url=base_url)
+        
+        # 1. Envia o e-mail para o cliente
+        msg = Message('Atualização de Instalação - FireNet Telecom', recipients=[email_destino])
+        msg.reply_to = app.config['REPLY_TO_EMAIL']
+        msg.html = html_content
         try:
             mail.send(msg)
         except Exception as e:
             print(f"Erro ao enviar email de atualização para {email_destino}: {e}")
 
-# --- Substitua a função api_consultar_cpf inteira por esta ---
+        # 2. Envia a cópia oculta (separada) para o admin
+        mail_bcc = app.config.get('MAIL_BCC')
+        if mail_bcc:
+            msg_copy = Message(f'[CÓPIA] Atualização de Instalação de: {email_destino}', recipients=[mail_bcc])
+            msg_copy.reply_to = app.config['REPLY_TO_EMAIL']
+            msg_copy.html = html_content
+            try:
+                mail.send(msg_copy)
+            except Exception as e:
+                print(f"Erro ao enviar cópia de atualização para admin: {e}")
 
 @app.route('/api/consultar_cpf', methods=['POST'])
 def api_consultar_cpf():
