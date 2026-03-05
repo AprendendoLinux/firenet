@@ -67,16 +67,16 @@
                                             <div class="fw-bold text-dark nome">{{ cliente.nome }}</div>
                                             <small class="text-muted"><span class="cpf">{{ cliente.cpf }}</span></small>
                                         </td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="telefone"><i class="fas fa-phone-alt text-muted me-1 small"></i> {{ cliente.telefone }}</div>
-                                                    {% if cliente.whatsapp == 'Sim' %}
-                                                    <a href="javascript:void(0)" onclick="chamarWhatsApp('{{ cliente.telefone }}', '{{ cliente.nome }}')" title="Chamar no WhatsApp" class="text-decoration-none">
-                                                        <i class="fab fa-whatsapp text-success fs-5"></i>
-                                                    </a>
-                                                    {% endif %}
-                                                </div>
-                                            </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="telefone" style="min-width: 145px;"><i class="fas fa-phone-alt text-muted me-1 small"></i> {{ cliente.telefone }}</div>
+                                                {% if cliente.whatsapp == 'Sim' %}
+                                                <a href="javascript:void(0)" onclick="chamarWhatsApp('{{ cliente.telefone }}', '{{ cliente.nome }}')" title="Chamar no WhatsApp" class="text-decoration-none">
+                                                    <i class="fab fa-whatsapp text-success fs-5"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
                                         <td>
                                             <span class="badge bg-light text-dark border px-3 py-2 rounded-pill plano">{{ cliente.plano }}</span>
                                         </td>
@@ -142,7 +142,7 @@
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
                                     <h6 class="fw-bold text-dark mb-0 nome">{{ cliente.nome }}</h6>
-                                    </div>
+                                </div>
                                 <span class="badge bg-light text-dark border plano">{{ cliente.plano }}</span>
                             </div>
 
@@ -151,17 +151,17 @@
                                     <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">CPF</small>
                                     <span class="fw-medium small cpf">{{ cliente.cpf }}</span>
                                 </div>
-                                    <div class="col-6">
-                                        <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Telefone</small>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="fw-medium small telefone">{{ cliente.telefone }}</span>
-                                            {% if cliente.whatsapp == 'Sim' %}
-                                            <a href="javascript:void(0)" onclick="chamarWhatsApp('{{ cliente.telefone }}', '{{ cliente.nome }}')" title="Chamar no WhatsApp" class="text-decoration-none">
-                                                <i class="fab fa-whatsapp text-success fs-5"></i>
-                                            </a>
-                                            {% endif %}
-                                        </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Telefone</small>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fw-medium small telefone" style="min-width: 115px;">{{ cliente.telefone }}</span>
+                                        {% if cliente.whatsapp == 'Sim' %}
+                                        <a href="javascript:void(0)" onclick="chamarWhatsApp('{{ cliente.telefone }}', '{{ cliente.nome }}')" title="Chamar no WhatsApp" class="text-decoration-none">
+                                            <i class="fab fa-whatsapp text-success fs-5"></i>
+                                        </a>
+                                        {% endif %}
                                     </div>
+                                </div>
                             </div>
 
                             <div class="bg-light p-2 rounded mb-3 border">
