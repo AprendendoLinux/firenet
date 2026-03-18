@@ -10,29 +10,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh; font-family: 'Montserrat', sans-serif;">
-    <div class="container text-center">
-        <div class="card border-0 shadow-lg rounded-4 p-5 mx-auto" style="max-width: 600px;">
-            
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="img-fluid mb-4 mx-auto" style="max-height: 80px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
-            
-            <div class="text-danger mb-4">
-                <i class="fas fa-tools fa-5x"></i>
+<body class="bg-light d-flex flex-column" style="min-height: 100vh; font-family: 'Montserrat', sans-serif;">
+    
+    <main class="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+        <div class="container text-center">
+            <div class="card border-0 shadow-lg rounded-4 p-5 mx-auto" style="max-width: 600px;">
+                
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="FireNet Telecom" class="img-fluid mb-4 mx-auto" style="max-height: 80px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+                
+                <div class="text-danger mb-4">
+                    <i class="fas fa-tools fa-5x"></i>
+                </div>
+                
+                <h1 class="fw-bold text-dark mb-3">Site em Manutenção</h1>
+                
+                <p class="text-muted fs-5 mb-4">
+                    Estamos realizando algumas atualizações no sistema para melhorar a sua experiência. 
+                    Por favor, tente novamente mais tarde.
+                </p>
+                
+                <p class="text-muted small mb-0">
+                    Agradecemos a sua compreensão! <br>
+                    <strong>Equipe FireNet Telecom</strong>
+                </p>
+                
             </div>
-            
-            <h1 class="fw-bold text-dark mb-3">Site em Manutenção</h1>
-            
-            <p class="text-muted fs-5 mb-4">
-                Estamos realizando algumas atualizações no sistema para melhorar a sua experiência. 
-                Por favor, tente novamente mais tarde.
-            </p>
-            
-            <p class="text-muted small mb-0">
-                Agradecemos a sua compreensão! <br>
-                <strong>Equipe FireNet Telecom</strong>
-            </p>
-            
         </div>
-    </div>
+    </main>
+
+    {% include 'footer.html' %}
+    
 </body>
 </html>

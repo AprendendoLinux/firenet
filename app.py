@@ -55,19 +55,23 @@ APP_BASE_URL = os.environ.get('APP_BASE_URL', 'http://localhost:5000/')
 @app.before_request
 def check_maintenance_mode():
     """
-    Intercepta todas as requisições. Se o MAINTENANCE_MODE estiver ativo,
-    bloqueia o acesso e exibe a página de manutenção (exceto para arquivos estáticos).
+    Intercepta as requisições. Se o MAINTENANCE_MODE estiver ativo,
+    exibe a página de manutenção, exceto para área administrativa e arquivos estáticos.
     """
-    # Verifica se a variável de ambiente está ativa
     maintenance = os.environ.get('MAINTENANCE_MODE', 'false').lower() == 'true'
     
     if maintenance:
-        # Permite que arquivos estáticos (CSS, imagens como a logo) sejam carregados
-        if request.path.startswith('/static/'):
+        # Rotas que DEVEM funcionar mesmo em manutenção
+        rotas_permitidas = ('/static/', '/login', '/logout', '/admin')
+        
+        # Se a rota acessada começar com alguma das permitidas, o sistema deixa passar normalmente
+        if request.path.startswith(rotas_permitidas):
             return None
             
-        # Retorna a página de manutenção com o código HTTP 503
-        return render_template('manutencao.html'), 503
+        # Para as demais rotas (públicas), retorna a página de manutenção
+        # Passamos o current_year para que o rodapé consiga renderizar o ano atual corretamente
+        from datetime import datetime
+        return render_template('manutencao.html', current_year=datetime.now().year), 503
 # ==========================================
 
 # --- NOVA FUNÇÃO DE LÓGICA DE HORÁRIO ---
