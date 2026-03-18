@@ -49,6 +49,27 @@ GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
 # Fallback para base_url via env var (útil para testes ou crons sem request context)
 APP_BASE_URL = os.environ.get('APP_BASE_URL', 'http://localhost:5000/')
 
+# ==========================================
+# MODO DE MANUTENÇÃO
+# ==========================================
+@app.before_request
+def check_maintenance_mode():
+    """
+    Intercepta todas as requisições. Se o MAINTENANCE_MODE estiver ativo,
+    bloqueia o acesso e exibe a página de manutenção (exceto para arquivos estáticos).
+    """
+    # Verifica se a variável de ambiente está ativa
+    maintenance = os.environ.get('MAINTENANCE_MODE', 'false').lower() == 'true'
+    
+    if maintenance:
+        # Permite que arquivos estáticos (CSS, imagens como a logo) sejam carregados
+        if request.path.startswith('/static/'):
+            return None
+            
+        # Retorna a página de manutenção com o código HTTP 503
+        return render_template('manutencao.html'), 503
+# ==========================================
+
 # --- NOVA FUNÇÃO DE LÓGICA DE HORÁRIO ---
 def is_horario_comercial():
     try:
