@@ -57,6 +57,8 @@ services:
       RECAPTCHA_SITE_KEY: 'fake_recaptcha_site_key_jkl012'
       # Chave secreta reCAPTCHA (substitua por valor seguro)
       RECAPTCHA_SECRET_KEY: 'fake_recaptcha_secret_mno345'
+      # Modo manutenção (true ou false)
+      MAINTENANCE_MODE: 'false'
     depends_on:
       - database
 
